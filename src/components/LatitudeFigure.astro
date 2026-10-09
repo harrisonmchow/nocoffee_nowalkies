@@ -1,0 +1,91 @@
+---
+// The five regions on an equirectangular grid, 60°E–160°E by 50°N–50°S.
+// Positions come straight from the coordinates in regions.ts.
+import { regions } from '../data/regions';
+
+const X = (lon: number) => (lon - 60) * 10;
+const Y = (lat: number) => (50 - lat) * 10;
+const pts = Object.fromEntries(regions.map((r) => [r.slug, { ...r, x: X(r.lon), y: Y(r.lat) }]));
+
+// Labels for the Australian cluster sit in a column to the left, in latitude order.
+const cluster = ['warrumbungles', 'blue-mountains', 'kosciuszko', 'tasmania'].map((s, i) => ({
+  ...pts[s],
+  ly: 760 + i * 52,
+}));
+const aa = pts['ala-archa'];
+const near = pts['warrumbungles'];
+const angle = (Math.atan2(near.y - aa.y, near.x - aa.x) * 180) / Math.PI;
+const mid = { x: (aa.x + near.x) / 2, y: (aa.y + near.y) / 2 };
+const cx = cluster.reduce((a, p) => a + p.x, 0) / 4;
+const cy = cluster.reduce((a, p) => a + p.y, 0) / 4;
+
+const lons = [60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160];
+const lats = [50, 40, 30, 20, 10, 0, -10, -20, -30, -40, -50];
+---
+<figure class="lat">
+  <svg viewBox="-60 -20 1100 1060" role="img" aria-labelledby="lat-title lat-desc">
+    <title id="lat-title">Where the five regions sit on the globe</title>
+    <desc id="lat-desc">Blue Mountains, Warrumbungles, Kosciuszko and Tasmania cluster in south-east Australia between 31 and 42 degrees south. Ala Archa sits alone at 42.56 degrees north, 74.49 degrees east, 11,182 kilometres from Warrumbungles.</desc>
+
+    <g class="lat__grid">
+      {lons.map((l) => <line x1={X(l)} x2={X(l)} y1="0" y2="1000" />)}
+      {lats.map((l) => <line x1="0" x2="1000" y1={Y(l)} y2={Y(l)} class:list={{ 'is-eq': l === 0 }} />)}
+    </g>
+    <g class="lat__ticks">
+      {lats.filter((l) => l % 20 === 0 || l === 50 || l === -50).map((l) => (
+        <text x="-14" y={Y(l) + 8} text-anchor="end">{l === 0 ? '0°' : `${Math.abs(l)}°${l > 0 ? 'N' : 'S'}`}</text>
+      ))}
+      {lons.filter((l) => l % 20 === 0).map((l) => (
+        <text x={X(l)} y="1036" text-anchor="middle">{l}°E</text>
+      ))}
+      <text x="12" y={Y(0) - 12} class="lat__eq">Equator</text>
+    </g>
+
+    <circle class="lat__ring" cx={cx} cy={cy} r="88" />
+    <line class="lat__link" x1={aa.x} y1={aa.y} x2={near.x} y2={near.y} />
+    <text
+      class="lat__dist"
+      x={mid.x}
+      y={mid.y - 16}
+      text-anchor="middle"
+      transform={`rotate(${angle} ${mid.x} ${mid.y})`}
+    >11,182 km</text>
+
+    {cluster.map((p) => (
+      <g>
+        <polyline class="lat__leader" points={`${640},${p.ly - 9} ${760},${p.ly - 9} ${p.x - 12},${p.y}`} />
+        <text class="lat__name" x="630" y={p.ly} text-anchor="end">{p.name}</text>
+        <circle class="lat__dot" cx={p.x} cy={p.y} r="9" />
+      </g>
+    ))}
+    <text class="lat__note" x={cx} y={cy + 130} text-anchor="middle">1,190 km across</text>
+
+    <circle class="lat__halo" cx={aa.x} cy={aa.y} r="26" />
+    <circle class="lat__dot" cx={aa.x} cy={aa.y} r="9" />
+    <text class="lat__name" x={aa.x + 44} y={aa.y + 12}>Ala Archa</text>
+  </svg>
+  <figcaption class="mono muted">Equirectangular grid, 10° squares. Straight-line distances between the points on the signs.</figcaption>
+</figure>
+
+<style>
+  .lat { margin: 0; }
+  @media (max-width: 1399px) { .lat { padding-left: 22px; } }
+  .lat svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .lat__grid line { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .lat__grid line.is-eq { stroke: var(--mute); stroke-dasharray: 3 5; }
+  .lat__ticks text { font-family: var(--mono); font-size: 22px; fill: var(--mute); }
+  .lat__eq { font-family: var(--mono); font-size: 22px; fill: var(--ink-2); }
+  .lat__ring { fill: var(--green-bg); stroke: var(--green-fg); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .lat__halo { fill: var(--yellow-bg); stroke: var(--yellow-fg); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .lat__link { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .lat__leader { fill: none; stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .lat__dot { fill: var(--ink); }
+  .lat__name { font-family: var(--serif); font-size: 40px; fill: var(--ink); letter-spacing: -0.01em; }
+  .lat__dist { font-family: var(--serif); font-size: 52px; font-style: italic; fill: var(--ink); }
+  .lat__note { font-family: var(--mono); font-size: 22px; fill: var(--green-fg); }
+  figcaption { margin-top: 14px; font-size: 0.6875rem; }
+  @media (max-width: 600px) {
+    .lat__ticks text, .lat__eq, .lat__note { font-size: 30px; }
+    .lat__name { font-size: 48px; }
+  }
+</style>

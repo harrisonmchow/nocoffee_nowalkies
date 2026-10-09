@@ -1,0 +1,48 @@
+---
+// One continuous hairline track that runs the length of the page's content,
+// sitting in the left gutter at every width.
+---
+<div class="trail" aria-hidden="true">
+  <svg viewBox="0 0 40 1000" preserveAspectRatio="none">
+    <path
+      class="trail__line"
+      d="M20 0 C 34 60, 6 120, 20 180 S 36 300, 18 360 S 4 480, 22 540 S 36 660, 18 720 S 6 840, 20 900 S 26 970, 20 1000"
+      vector-effect="non-scaling-stroke"
+    />
+  </svg>
+  <span class="trail__start"></span>
+  <span class="trail__end"></span>
+</div>
+
+<style>
+  .trail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: max(8px, calc((100vw - var(--max)) / 2 - 64px));
+    width: 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .trail svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .trail path { fill: none; stroke-width: 1px; }
+  .trail__line { stroke: var(--ink); }
+  .trail__start, .trail__end {
+    position: absolute;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    border: 1px solid var(--ink);
+    background: var(--bone);
+    border-radius: 50%;
+  }
+  .trail__start { top: -4px; }
+  .trail__end { bottom: -4px; background: var(--ink); }
+
+
+  @media (max-width: 1399px) {
+    .trail { left: 2px; top: 48px; width: max(12px, calc(var(--gutter) - 6px)); }
+    .trail__start, .trail__end { width: 7px; height: 7px; margin-left: -3.5px; }
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+// Phosphor Icons, bold weight (per SKILL.md), inlined at build time.
+import arrowUpRight from '@phosphor-icons/core/bold/arrow-up-right-bold.svg?raw';
+import arrowRight from '@phosphor-icons/core/bold/arrow-right-bold.svg?raw';
+import arrowLeft from '@phosphor-icons/core/bold/arrow-left-bold.svg?raw';
+import instagram from '@phosphor-icons/core/bold/instagram-logo-bold.svg?raw';
+import envelope from '@phosphor-icons/core/bold/envelope-simple-bold.svg?raw';
+import close from '@phosphor-icons/core/bold/x-bold.svg?raw';
+import caretLeft from '@phosphor-icons/core/bold/caret-left-bold.svg?raw';
+import caretRight from '@phosphor-icons/core/bold/caret-right-bold.svg?raw';
+import camera from '@phosphor-icons/core/bold/camera-bold.svg?raw';
+
+const icons = {
+  'arrow-up-right': arrowUpRight,
+  'arrow-right': arrowRight,
+  'arrow-left': arrowLeft,
+  instagram,
+  envelope,
+  close,
+  'caret-left': caretLeft,
+  'caret-right': caretRight,
+  camera,
+};
+
+interface Props {
+  name: keyof typeof icons;
+  label?: string;
+  class?: string;
+}
+const { name, label, class: cls } = Astro.props;
+---
+<span
+  class:list={['icon', cls]}
+  aria-hidden={label ? undefined : 'true'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  set:html={icons[name]}
+/>

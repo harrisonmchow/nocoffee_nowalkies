@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.astro/
+.impeccable/review/
+.DS_Store

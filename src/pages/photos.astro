@@ -1,0 +1,304 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Sign from '../components/Sign.astro';
+import Icon from '../components/Icon.astro';
+import Trail from '../components/Trail.astro';
+import { regions, formatCoord } from '../data/regions';
+import { photos, photosFor } from '../data/photos';
+
+const large = await Promise.all(
+  photos.map((p) => getImage({ src: p.image, width: 2000, format: 'webp' })),
+);
+const largeSrc = new Map(photos.map((p, i) => [p, large[i].src]));
+let n = 0;
+const standIns = photos.filter((p) => p.standIn).length;
+---
+<Base title="Photos" current="photos" description="Photos from the Blue Mountains, Warrumbungles, Kosciuszko, Tasmania and Ala Archa.">
+  <header class="ph-head wrap">
+    <h1>Photos</h1>
+    <p class="ph-lede">The ones that didn’t fit in a post. Sorted by where we were standing.</p>
+    {standIns > 0 && (
+      <p class="ph-note">
+        <span class="tag tag--draft">Stand-ins</span>
+        <span>Until our own photos are uploaded, these are openly licensed photos of the same places. <a href="/credits">Credits</a></span>
+      </p>
+    )}
+  </header>
+
+  <nav class="ph-signs" aria-label="Jump to a place">
+    <ul class="wrap" role="list">
+      {regions.map((r) => (
+        <li><Sign size="sm" name={r.name} tag={r.tag} href={`#${r.slug}`} data-spy={r.slug} /></li>
+      ))}
+    </ul>
+  </nav>
+
+  <div class="trail-host">
+    <Trail />
+    {regions.map((r) => {
+      const list = photosFor(r.slug);
+      return (
+        <section class="ph-region wrap" id={r.slug} aria-labelledby={`${r.slug}-h`} data-spy-target={r.slug}>
+          <div class="ph-region__head" data-reveal>
+            <h2 id={`${r.slug}-h`}>{r.name}</h2>
+            <p class="ph-region__meta">
+              <span class={`tag tag--${r.tag}`}>{r.tag}</span>
+              <span class="mono muted">{r.where} · {formatCoord(r.lat, r.lon)}</span>
+            </p>
+          </div>
+          <ul class="ph-grid" role="list">
+            {list.map((p, i) => {
+              const idx = n++;
+              return (
+                <li class={`ph-item ph-item--${i}`} data-reveal style={`--i:${i}`}>
+                  <button
+                    class="ph-item__btn"
+                    type="button"
+                    data-lightbox={idx}
+                    data-src={largeSrc.get(p)}
+                    data-caption={`${r.name}: ${p.caption}`}
+                    data-credit={`${p.standIn ? 'Stand-in photo · ' : ''}${p.credit} · ${p.license}`}
+                    aria-label={`View larger: ${p.caption}`}
+                  >
+                    <Image
+                      src={p.image}
+                      alt={p.caption}
+                      widths={[480, 800, 1200, 1600]}
+                      sizes={i === 0 ? '(min-width: 960px) 62vw, 100vw' : '(min-width: 960px) 31vw, 100vw'}
+                    />
+                  </button>
+                  <p class="ph-item__cap">
+                    <span>{p.caption}</span>
+                    <span class="mono muted">{p.credit} · <a href={p.source} rel="noopener" target="_blank">{p.license}</a></span>
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      );
+    })}
+  </div>
+
+  <dialog class="lb" aria-label="Photo viewer" data-lb>
+    <div class="lb__frame">
+      <img class="lb__img" src={large[0].src} alt="" loading="lazy" data-lb-img />
+    </div>
+    <div class="lb__bar">
+      <p class="lb__cap">
+        <span data-lb-cap></span>
+        <span class="mono" data-lb-credit></span>
+      </p>
+      <div class="lb__ctrl">
+        <span class="mono lb__count" data-lb-count></span>
+        <button class="lb__btn" type="button" data-lb-prev aria-label="Previous photo"><Icon name="caret-left" /></button>
+        <button class="lb__btn" type="button" data-lb-next aria-label="Next photo"><Icon name="caret-right" /></button>
+        <button class="lb__btn" type="button" data-lb-close aria-label="Close"><Icon name="close" /></button>
+      </div>
+    </div>
+  </dialog>
+</Base>
+
+<script>
+  // Lightbox on the native <dialog>
+  const dlg = document.querySelector<HTMLDialogElement>('[data-lb]');
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-lightbox]'));
+  if (dlg && items.length) {
+    const img = dlg.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const cap = dlg.querySelector<HTMLElement>('[data-lb-cap]')!;
+    const credit = dlg.querySelector<HTMLElement>('[data-lb-credit]')!;
+    const count = dlg.querySelector<HTMLElement>('[data-lb-count]')!;
+    let at = 0;
+    let opener: HTMLElement | null = null;
+    const show = (i: number) => {
+      at = (i + items.length) % items.length;
+      const b = items[at];
+      img.src = b.dataset.src!;
+      img.alt = b.dataset.caption!;
+      cap.textContent = b.dataset.caption!;
+      credit.textContent = b.dataset.credit!;
+      count.textContent = `${at + 1} / ${items.length}`;
+    };
+    items.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        opener = b;
+        show(i);
+        dlg.showModal();
+      }),
+    );
+    dlg.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(at - 1));
+    dlg.querySelector('[data-lb-next]')!.addEventListener('click', () => show(at + 1));
+    dlg.querySelector('[data-lb-close]')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(at - 1);
+      if (e.key === 'ArrowRight') show(at + 1);
+    });
+    dlg.addEventListener('close', () => opener?.focus());
+  }
+
+  // Highlight the sign for the region in view
+  const signs = new Map(
+    Array.from(document.querySelectorAll<HTMLElement>('[data-spy]')).map((s) => [s.dataset.spy!, s]),
+  );
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const key = (e.target as HTMLElement).dataset.spyTarget!;
+        signs.forEach((s, k) => s.classList.toggle('is-active', k === key));
+      }
+    },
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+  document.querySelectorAll('[data-spy-target]').forEach((el) => io.observe(el));
+</script>
+
+<style>
+  .ph-head { padding-top: clamp(56px, 9vw, 120px); }
+  .ph-head h1 { font-size: clamp(4rem, 11vw, 9rem); letter-spacing: -0.04em; line-height: 0.95; }
+  .ph-lede { margin-top: 20px; font-size: 1.1875rem; color: var(--ink-2); max-width: 40ch; }
+  .ph-note {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 24px;
+    max-width: 62ch;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+  }
+
+  .ph-signs {
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 20;
+    margin-top: clamp(40px, 6vw, 72px);
+    background: rgba(247, 246, 243, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .ph-signs ul {
+    display: flex;
+    gap: 22px;
+    margin: 0 auto;
+    padding-block: 12px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ph-signs ul::-webkit-scrollbar { display: none; }
+  .ph-signs li { flex: none; }
+  .ph-signs li :global(.sign) { width: auto; }
+  .ph-signs li :global(.sign__body) { flex: none; }
+  .ph-signs li :global(.sign__name) { white-space: nowrap; }
+  .ph-signs li :global(.sign__meta) { display: none; }
+
+  .trail-host { position: relative; }
+  .trail-host > * { position: relative; z-index: 1; }
+
+  .ph-region { padding-top: clamp(72px, 10vw, 128px); scroll-margin-top: calc(var(--nav-h) + 72px); }
+  .ph-region__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ph-region__head h2 { font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.03em; }
+  .ph-region__meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .ph-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+  }
+  .ph-item--0 { grid-row: span 2; }
+  .ph-item { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; }
+  .ph-item__btn {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: #e6e3dc;
+    min-height: 0;
+  }
+  .ph-item__btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 3 / 2;
+    filter: saturate(0.82) sepia(0.08);
+    transition: transform 900ms var(--ease), filter 400ms var(--ease);
+  }
+  .ph-item--0 .ph-item__btn { position: relative; min-height: 320px; }
+  .ph-item--0 .ph-item__btn img { position: absolute; inset: 0; aspect-ratio: auto; }
+  .ph-item__btn:hover img { transform: scale(1.02); filter: saturate(0.95) sepia(0.04); }
+  .ph-item__cap { display: grid; gap: 2px; font-size: 0.875rem; }
+  .ph-item__cap .mono { font-size: 0.6875rem; }
+  .ph-item__cap a { color: inherit; }
+  @media (max-width: 760px) {
+    .ph-grid { grid-template-columns: 1fr; }
+    .ph-item--0 { grid-row: auto; }
+    .ph-item--0 .ph-item__btn { min-height: 0; }
+    .ph-item--0 .ph-item__btn img { position: static; aspect-ratio: 3 / 2; }
+  }
+
+  /* Lightbox */
+  .lb {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--bone);
+    color: var(--ink);
+  }
+  .lb[open] { display: grid; grid-template-rows: 1fr auto; animation: lb-in 320ms var(--ease); }
+  .lb::backdrop { background: var(--bone); }
+  .lb__frame { min-height: 0; display: grid; place-items: center; padding: clamp(16px, 3vw, 40px); }
+  .lb__img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+  .lb__bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px var(--gutter);
+    border-top: 1px solid var(--rule);
+    background: var(--paper);
+  }
+  .lb__cap { display: grid; gap: 2px; font-size: 0.9375rem; min-width: 0; }
+  .lb__cap .mono { font-size: 0.6875rem; color: var(--mute); }
+  .lb__ctrl { display: flex; align-items: center; gap: 6px; flex: none; }
+  .lb__count { margin-right: 10px; color: var(--mute); }
+  .lb__btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease), transform 200ms var(--ease);
+  }
+  .lb__btn:hover { background: var(--bone); }
+  .lb__btn:active { transform: scale(0.96); }
+  @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+  @media (max-width: 600px) {
+    .lb__bar { flex-direction: column; align-items: stretch; }
+    .lb__ctrl { justify-content: flex-end; }
+  }
+</style>

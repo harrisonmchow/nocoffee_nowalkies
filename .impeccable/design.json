@@ -1,0 +1,503 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-09T00:55:30.983Z",
+  "title": "Design System: No Coffee / No Walkies",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Trackhead Charcoal",
+        "canonical": "#111111",
+        "tonalRamp": [
+          "oklch(15% 0.002 90)",
+          "oklch(26% 0.002 90)",
+          "oklch(37% 0.002 90)",
+          "oklch(48% 0.002 90)",
+          "oklch(59% 0.002 90)",
+          "oklch(70% 0.002 90)",
+          "oklch(82% 0.002 90)",
+          "oklch(95% 0.002 90)"
+        ]
+      },
+      "ink-hover": {
+        "role": "primary",
+        "displayName": "Charcoal Hover",
+        "canonical": "#333333",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(26% 0 0)",
+          "oklch(37% 0 0)",
+          "oklch(48% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(82% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "bone": {
+        "role": "neutral",
+        "displayName": "Warm Bone",
+        "canonical": "#f7f6f3",
+        "tonalRamp": [
+          "oklch(15% 0.004 95)",
+          "oklch(26% 0.004 95)",
+          "oklch(37% 0.004 95)",
+          "oklch(48% 0.004 95)",
+          "oklch(59% 0.004 95)",
+          "oklch(70% 0.004 95)",
+          "oklch(82% 0.004 95)",
+          "oklch(95% 0.004 95)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#fbfbfa",
+        "tonalRamp": [
+          "oklch(15% 0.002 100)",
+          "oklch(26% 0.002 100)",
+          "oklch(37% 0.002 100)",
+          "oklch(48% 0.002 100)",
+          "oklch(59% 0.002 100)",
+          "oklch(70% 0.002 100)",
+          "oklch(82% 0.002 100)",
+          "oklch(95% 0.002 100)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Plate White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(26% 0 0)",
+          "oklch(37% 0 0)",
+          "oklch(48% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(82% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "#2f3437",
+        "tonalRamp": [
+          "oklch(15% 0.01 230)",
+          "oklch(26% 0.01 230)",
+          "oklch(37% 0.01 230)",
+          "oklch(48% 0.01 230)",
+          "oklch(59% 0.01 230)",
+          "oklch(70% 0.01 230)",
+          "oklch(82% 0.01 230)",
+          "oklch(95% 0.01 230)"
+        ]
+      },
+      "mute": {
+        "role": "neutral",
+        "displayName": "Trail Grey",
+        "canonical": "#787774",
+        "tonalRamp": [
+          "oklch(15% 0.004 95)",
+          "oklch(26% 0.004 95)",
+          "oklch(37% 0.004 95)",
+          "oklch(48% 0.004 95)",
+          "oklch(59% 0.004 95)",
+          "oklch(70% 0.004 95)",
+          "oklch(82% 0.004 95)",
+          "oklch(95% 0.004 95)"
+        ]
+      },
+      "mute-on-ink": {
+        "role": "neutral",
+        "displayName": "Grey on Ink",
+        "canonical": "#a9a8a4",
+        "tonalRamp": [
+          "oklch(15% 0.004 95)",
+          "oklch(26% 0.004 95)",
+          "oklch(37% 0.004 95)",
+          "oklch(48% 0.004 95)",
+          "oklch(59% 0.004 95)",
+          "oklch(70% 0.004 95)",
+          "oklch(82% 0.004 95)",
+          "oklch(95% 0.004 95)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#eaeaea",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(26% 0 0)",
+          "oklch(37% 0 0)",
+          "oklch(48% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(82% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "rule-soft": {
+        "role": "neutral",
+        "displayName": "Soft Hairline",
+        "canonical": "rgba(0, 0, 0, 0.06)"
+      },
+      "green-bg": {
+        "role": "tertiary",
+        "displayName": "Pale Green",
+        "canonical": "#edf3ec",
+        "tonalRamp": [
+          "oklch(15% 0.04 145)",
+          "oklch(26% 0.04 145)",
+          "oklch(37% 0.04 145)",
+          "oklch(48% 0.04 145)",
+          "oklch(59% 0.04 145)",
+          "oklch(70% 0.04 145)",
+          "oklch(82% 0.04 145)",
+          "oklch(95% 0.04 145)"
+        ]
+      },
+      "green-fg": {
+        "role": "tertiary",
+        "displayName": "Moss",
+        "canonical": "#346538",
+        "tonalRamp": [
+          "oklch(15% 0.08 145)",
+          "oklch(26% 0.08 145)",
+          "oklch(37% 0.08 145)",
+          "oklch(48% 0.08 145)",
+          "oklch(59% 0.08 145)",
+          "oklch(70% 0.08 145)",
+          "oklch(82% 0.08 145)",
+          "oklch(95% 0.08 145)"
+        ]
+      },
+      "blue-bg": {
+        "role": "tertiary",
+        "displayName": "Pale Blue",
+        "canonical": "#e1f3fe",
+        "tonalRamp": [
+          "oklch(15% 0.05 235)",
+          "oklch(26% 0.05 235)",
+          "oklch(37% 0.05 235)",
+          "oklch(48% 0.05 235)",
+          "oklch(59% 0.05 235)",
+          "oklch(70% 0.05 235)",
+          "oklch(82% 0.05 235)",
+          "oklch(95% 0.05 235)"
+        ]
+      },
+      "blue-fg": {
+        "role": "tertiary",
+        "displayName": "Lake",
+        "canonical": "#1f6c9f",
+        "tonalRamp": [
+          "oklch(15% 0.1 245)",
+          "oklch(26% 0.1 245)",
+          "oklch(37% 0.1 245)",
+          "oklch(48% 0.1 245)",
+          "oklch(59% 0.1 245)",
+          "oklch(70% 0.1 245)",
+          "oklch(82% 0.1 245)",
+          "oklch(95% 0.1 245)"
+        ]
+      },
+      "yellow-bg": {
+        "role": "tertiary",
+        "displayName": "Pale Yellow",
+        "canonical": "#fbf3db",
+        "tonalRamp": [
+          "oklch(15% 0.05 90)",
+          "oklch(26% 0.05 90)",
+          "oklch(37% 0.05 90)",
+          "oklch(48% 0.05 90)",
+          "oklch(59% 0.05 90)",
+          "oklch(70% 0.05 90)",
+          "oklch(82% 0.05 90)",
+          "oklch(95% 0.05 90)"
+        ]
+      },
+      "yellow-fg": {
+        "role": "tertiary",
+        "displayName": "Ochre",
+        "canonical": "#956400",
+        "tonalRamp": [
+          "oklch(15% 0.12 75)",
+          "oklch(26% 0.12 75)",
+          "oklch(37% 0.12 75)",
+          "oklch(48% 0.12 75)",
+          "oklch(59% 0.12 75)",
+          "oklch(70% 0.12 75)",
+          "oklch(82% 0.12 75)",
+          "oklch(95% 0.12 75)"
+        ]
+      },
+      "red-bg": {
+        "role": "tertiary",
+        "displayName": "Pale Red",
+        "canonical": "#fdebec",
+        "tonalRamp": [
+          "oklch(15% 0.03 15)",
+          "oklch(26% 0.03 15)",
+          "oklch(37% 0.03 15)",
+          "oklch(48% 0.03 15)",
+          "oklch(59% 0.03 15)",
+          "oklch(70% 0.03 15)",
+          "oklch(82% 0.03 15)",
+          "oklch(95% 0.03 15)"
+        ]
+      },
+      "red-fg": {
+        "role": "tertiary",
+        "displayName": "Brick",
+        "canonical": "#9f2f2d",
+        "tonalRamp": [
+          "oklch(15% 0.14 27)",
+          "oklch(26% 0.14 27)",
+          "oklch(37% 0.14 27)",
+          "oklch(48% 0.14 27)",
+          "oklch(59% 0.14 27)",
+          "oklch(70% 0.14 27)",
+          "oklch(82% 0.14 27)",
+          "oklch(95% 0.14 27)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page h1s and closing statements. The home hero word uses min(10.5vw, band x 0.78) at -0.035em, always on one line."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section h2s; statement h2s step down to clamp(2rem, 4.4vw, 3.6rem)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sign names, card titles, crew names, numbered-list heads."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text, capped at 34-52ch."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Buttons, nav, blurbs, list rows."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels in fact lists and footer columns; never an eyebrow above a heading."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Uppercase pastel grade pills only."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Coordinates, counts, credits, figure axes; tabular figures."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-hover",
+        "value": "0 2px 8px rgba(0, 0, 0, 0.04)",
+        "purpose": "Place card hover only, paired with a border shift to #dcdbd8."
+      },
+      {
+        "name": "ghost-ring",
+        "value": "inset 0 0 0 1px #eaeaea",
+        "purpose": "Ghost button border drawn as an inset ring."
+      },
+      {
+        "name": "bar-blur",
+        "value": "backdrop-filter: saturate(1.2) blur(10px)",
+        "purpose": "Sticky nav and photo sign bar over 86-90% bone."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The only easing curve."
+      },
+      {
+        "name": "state",
+        "value": "200ms",
+        "purpose": "Buttons, links, nav underline, icon nudges."
+      },
+      {
+        "name": "sign",
+        "value": "260ms",
+        "purpose": "Sign plate slide (translateX 4px), colour inversion, tip fill."
+      },
+      {
+        "name": "reveal",
+        "value": "600ms; translateY(12px) + opacity; stagger calc(var(--i) * 80ms)",
+        "purpose": "Scroll entry via IntersectionObserver, below-fold blocks only."
+      },
+      {
+        "name": "hero-swap",
+        "value": "700ms crossfade; 1400ms scale 1.03 to 1; 700ms clip-path word wipe",
+        "purpose": "The signature trackhead photo and word swap."
+      },
+      {
+        "name": "media-zoom",
+        "value": "900ms; scale 1.02-1.03",
+        "purpose": "Photo hover inside clipped tiles."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "All transitions and animations collapse under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "xs",
+        "value": "380px"
+      },
+      {
+        "name": "sm",
+        "value": "600px"
+      },
+      {
+        "name": "nav",
+        "value": "720px"
+      },
+      {
+        "name": "md",
+        "value": "760px"
+      },
+      {
+        "name": "split",
+        "value": "860px"
+      },
+      {
+        "name": "hero",
+        "value": "959px"
+      },
+      {
+        "name": "trail",
+        "value": "1399px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Fingerpost Sign",
+      "kind": "custom",
+      "refersTo": "sign",
+      "description": "Plate with an authored SVG pointed tip, hung off the charcoal post; navigation, hero selector and photo filter. One charcoal active plate per group.",
+      "html": "<div class=\"ds-post\"><button class=\"ds-sign is-active\" aria-pressed=\"true\"><span class=\"ds-sign__body\"><span class=\"ds-sign__name\">Blue Mountains</span><span class=\"ds-sign__meta\"><span class=\"ds-tag ds-tag--nsw\">NSW</span><span class=\"ds-mono\">33.63°S 150.31°E</span></span></span><span class=\"ds-sign__arrow\"><svg viewBox=\"0 0 256 256\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></span><svg class=\"ds-sign__tip\" viewBox=\"0 0 20 64\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><path d=\"M0 0.5 L19 32 L0 63.5\" vector-effect=\"non-scaling-stroke\"/></svg></button><button class=\"ds-sign\" aria-pressed=\"false\"><span class=\"ds-sign__body\"><span class=\"ds-sign__name\">Ala Archa</span><span class=\"ds-sign__meta\"><span class=\"ds-tag ds-tag--kgz\">KGZ</span><span class=\"ds-mono\">42.56°N 74.49°E</span></span></span><span class=\"ds-sign__arrow\"><svg viewBox=\"0 0 256 256\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></span><svg class=\"ds-sign__tip\" viewBox=\"0 0 20 64\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><path d=\"M0 0.5 L19 32 L0 63.5\" vector-effect=\"non-scaling-stroke\"/></svg></button></div>",
+      "css": ".ds-post{position:relative;display:grid;gap:8px;max-width:380px;padding:12px 0 12px 26px;background:var(--bone,#f7f6f3)}.ds-post::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:6px;background:var(--ink,#111111);border-radius:1px}.ds-sign{--plate:var(--white,#ffffff);--plate-ink:var(--ink,#111111);--plate-line:var(--rule,#eaeaea);--tip:20px;position:relative;display:flex;align-items:center;gap:16px;width:calc(100% - var(--tip));margin:0;padding:14px 18px 14px 20px;background:var(--plate);color:var(--plate-ink);border:1px solid var(--plate-line);border-right:0;border-radius:3px 0 0 3px;text-align:left;font:inherit;cursor:pointer;transition:background-color 260ms cubic-bezier(0.16,1,0.3,1),color 260ms cubic-bezier(0.16,1,0.3,1),transform 260ms cubic-bezier(0.16,1,0.3,1)}.ds-sign__tip{position:absolute;top:-1px;right:calc(var(--tip) * -1);width:var(--tip);height:calc(100% + 2px);overflow:visible}.ds-sign__tip path{fill:var(--plate);stroke:var(--plate-line);stroke-width:1px;transition:fill 260ms cubic-bezier(0.16,1,0.3,1),stroke 260ms cubic-bezier(0.16,1,0.3,1)}.ds-sign__body{display:grid;gap:4px;flex:1;min-width:0}.ds-sign__name{font-family:'Instrument Serif',Georgia,serif;font-size:1.625rem;line-height:1.05;letter-spacing:-0.015em}.ds-sign__meta{display:flex;align-items:center;gap:10px;color:var(--mute,#787774)}.ds-sign__arrow{flex:none;display:grid;place-items:center;transition:transform 260ms cubic-bezier(0.16,1,0.3,1)}.ds-sign:hover{transform:translateX(4px)}.ds-sign:hover .ds-sign__arrow{transform:translateX(2px)}.ds-sign:active{transform:translateX(4px) scale(0.99)}.ds-sign:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}.ds-sign.is-active{--plate:var(--ink,#111111);--plate-ink:var(--white,#ffffff);--plate-line:var(--ink,#111111)}.ds-sign.is-active .ds-sign__meta{color:var(--mute-on-ink,#a9a8a4)}.ds-mono{font-family:'Geist Mono Variable','SF Mono',monospace;font-size:0.75rem;letter-spacing:0.02em;font-variant-numeric:tabular-nums}.ds-tag{display:inline-flex;align-items:center;padding:0.2em 0.65em;border-radius:9999px;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.6875rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;line-height:1.5}.ds-tag--nsw{background:var(--green-bg,#edf3ec);color:var(--green-fg,#346538)}.ds-tag--kgz{background:var(--yellow-bg,#fbf3db);color:var(--yellow-fg,#956400)}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Charcoal fill; the one strong action in a block.",
+      "html": "<a class=\"ds-btn\" href=\"#\">See our work <svg viewBox=\"0 0 256 256\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></a>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:0.6em;padding:0.85em 1.3em;background:var(--ink,#111111);color:var(--white,#ffffff);border:0;border-radius:5px;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.9375rem;font-weight:500;text-decoration:none;cursor:pointer;transition:background-color 200ms cubic-bezier(0.16,1,0.3,1),transform 200ms cubic-bezier(0.16,1,0.3,1)}.ds-btn:hover{background:#333333}.ds-btn:active{transform:scale(0.98)}.ds-btn:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action; the hairline is an inset ring.",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\">All 15 photos <svg viewBox=\"0 0 256 256\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></a>",
+      "css": ".ds-btn-ghost{display:inline-flex;align-items:center;gap:0.6em;padding:0.85em 1.3em;background:transparent;color:var(--ink,#111111);box-shadow:inset 0 0 0 1px var(--rule,#eaeaea);border:0;border-radius:5px;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.9375rem;font-weight:500;text-decoration:none;cursor:pointer;transition:background-color 200ms cubic-bezier(0.16,1,0.3,1),transform 200ms cubic-bezier(0.16,1,0.3,1)}.ds-btn-ghost:hover{background:var(--white,#ffffff)}.ds-btn-ghost:active{transform:scale(0.98)}.ds-btn-ghost:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}"
+    },
+    {
+      "name": "Grade Tags",
+      "kind": "chip",
+      "refersTo": "tag-nsw",
+      "description": "Pastel pills that mark region grade and draft status.",
+      "html": "<span class=\"ds-tag ds-g\">NSW</span> <span class=\"ds-tag ds-b\">TAS</span> <span class=\"ds-tag ds-y\">KGZ</span> <span class=\"ds-tag ds-r\">Stand-ins</span>",
+      "css": ".ds-tag{display:inline-flex;align-items:center;padding:0.2em 0.65em;border-radius:9999px;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.6875rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;line-height:1.5}.ds-g{background:var(--green-bg,#edf3ec);color:var(--green-fg,#346538)}.ds-b{background:var(--blue-bg,#e1f3fe);color:var(--blue-fg,#1f6c9f)}.ds-y{background:var(--yellow-bg,#fbf3db);color:var(--yellow-fg,#956400)}.ds-r{background:var(--red-bg,#fdebec);color:var(--red-fg,#9f2f2d)}"
+    },
+    {
+      "name": "Place Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White hairline card: graded photo, grade tag and mono coordinates, serif name, blurb.",
+      "html": "<a class=\"ds-card\" href=\"#\"><div class=\"ds-card__media\"></div><div class=\"ds-card__body\"><div class=\"ds-card__meta\"><span class=\"ds-card__tag\">TAS</span><span class=\"ds-card__mono\">41.66°S 145.95°E</span></div><h3 class=\"ds-card__name\">Tasmania</h3><p class=\"ds-card__blurb\">Dolerite peaks, buttongrass plains and Dove Lake under Cradle Mountain.</p><span class=\"ds-card__more\">3 photos <svg viewBox=\"0 0 256 256\" width=\"16\" height=\"16\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z\"/></svg></span></div></a>",
+      "css": ".ds-card{display:flex;flex-direction:column;max-width:360px;background:var(--white,#ffffff);border:1px solid var(--rule,#eaeaea);border-radius:10px;overflow:hidden;color:var(--ink,#111111);text-decoration:none;transition:box-shadow 200ms cubic-bezier(0.16,1,0.3,1),border-color 200ms cubic-bezier(0.16,1,0.3,1)}.ds-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.04);border-color:#dcdbd8}.ds-card:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}.ds-card__media{aspect-ratio:16/10;background:#e6e3dc}.ds-card__body{display:grid;gap:10px;padding:24px}.ds-card__meta{display:flex;align-items:center;gap:10px}.ds-card__tag{padding:0.2em 0.65em;border-radius:9999px;background:var(--blue-bg,#e1f3fe);color:var(--blue-fg,#1f6c9f);font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.6875rem;font-weight:600;letter-spacing:0.06em}.ds-card__mono{font-family:'Geist Mono Variable','SF Mono',monospace;font-size:0.75rem;color:var(--mute,#787774)}.ds-card__name{margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:2rem;line-height:1.05;letter-spacing:-0.02em}.ds-card__blurb{margin:0;color:var(--ink-2,#2f3437);font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.9375rem;line-height:1.6}.ds-card__more{display:inline-flex;align-items:center;gap:0.4em;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.875rem;font-weight:500}.ds-card__more svg{transition:transform 200ms cubic-bezier(0.16,1,0.3,1)}.ds-card:hover .ds-card__more svg{transform:translateX(3px)}"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "64px sticky translucent bar; serif wordmark with muted slash; underline marks hover and current page.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-nav__mark\" href=\"#\">No Coffee <span>/</span> No Walkies</a><nav class=\"ds-nav__links\"><a href=\"#\">Places</a><a href=\"#\" aria-current=\"page\">Photos</a><a href=\"#\">Work with us</a></nav></header>",
+      "css": ".ds-nav{display:flex;align-items:center;justify-content:space-between;gap:24px;height:64px;padding:0 24px;background:rgba(247,246,243,0.86);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--rule-soft,rgba(0,0,0,0.06))}.ds-nav__mark{font-family:'Instrument Serif',Georgia,serif;font-size:1.375rem;letter-spacing:-0.01em;color:var(--ink,#111111);text-decoration:none;white-space:nowrap}.ds-nav__mark span{color:var(--mute,#787774)}.ds-nav__links{display:flex;align-items:center;gap:32px;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.9375rem}.ds-nav__links a{color:var(--ink-2,#2f3437);text-decoration:none;padding-block:6px;border-bottom:1px solid transparent;transition:border-color 200ms cubic-bezier(0.16,1,0.3,1),color 200ms cubic-bezier(0.16,1,0.3,1)}.ds-nav__links a:hover,.ds-nav__links a[aria-current=page]{color:var(--ink,#111111);border-bottom-color:var(--ink,#111111)}.ds-nav a:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": "icon-button",
+      "description": "44px square white control used in the lightbox bar.",
+      "html": "<button class=\"ds-ibtn\" aria-label=\"Next photo\"><svg viewBox=\"0 0 256 256\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z\"/></svg></button>",
+      "css": ".ds-ibtn{display:grid;place-items:center;width:44px;height:44px;padding:0;background:var(--white,#ffffff);color:var(--ink,#111111);border:1px solid var(--rule,#eaeaea);border-radius:5px;cursor:pointer;transition:background-color 200ms cubic-bezier(0.16,1,0.3,1),transform 200ms cubic-bezier(0.16,1,0.3,1)}.ds-ibtn:hover{background:var(--bone,#f7f6f3)}.ds-ibtn:active{transform:scale(0.96)}.ds-ibtn:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Trackhead",
+    "overview": "The site is the sign at the start of a walk. Australian national-park trackhead signage sets the system: a timber-black post, white fingerpost plates with a pointed end, a serif place name, mono coordinates and a bold arrow. The fingerposts are both the navigation and the identity. Around them sits a warm, flat editorial page (the user-confirmed minimalist-ui guide in SKILL.md is binding): bone ground, charcoal ink, hairline 1px borders, and colour only in small washed-out pastel tags.\n\nDensity is low and the type contrast is high. Huge Instrument Serif words carry the places; Geist does the plain talking; Geist Mono carries coordinates, credits and counts. Photography is desaturated and warmed by one filter, so stand-in and real photos sit in the same palette. One continuous hand-drawn hairline trail runs down the left gutter of each long page, starting at an open ring and ending at a filled dot. A to-scale latitude figure plots all five regions on a 10-degree grid as the one data illustration.\n\nMotion is quiet: one long-tailed ease (`cubic-bezier(0.16, 1, 0.3, 1)`), a 12px rise-and-fade scroll entry, signs that slide 4px toward where they point, and photos that crossfade. Everything collapses to near-instant under reduced motion.",
+    "keyCharacteristics": [
+      "Fingerpost signs (plate + authored SVG pointed tip + serif name + mono coordinates + Phosphor bold arrow) as navigation and selectors.",
+      "Warm monochrome with spot pastels used only for region tags and figure highlights.",
+      "Flat surfaces: 1px #EAEAEA borders and white-on-bone tonal steps, no resting shadows.",
+      "One enormous serif region word that never shrinks below its band.",
+      "A single continuous hairline trail per long page.",
+      "Photos graded `saturate(0.82) sepia(0.08)`."
+    ],
+    "rules": [
+      {
+        "name": "The Grade Tag Rule",
+        "body": "Pastels appear only as pill tags or small figure highlights, always as a bg/fg pair. They never fill a section, a button or a card.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Post Rule",
+        "body": "Charcoal at mass (the active plate, the 6px post, the primary button) is the only heavy colour on the page. Each sign group gets one active plate.",
+        "section": "colors"
+      },
+      {
+        "name": "The Serif Speaks Places Rule",
+        "body": "Serif is used for names, places and statements. Sans is used for instructions and explanation. The hero h1 is deliberately sans at 1.0625rem/500 because the big word does the shouting.",
+        "section": "typography"
+      },
+      {
+        "name": "The Coordinates Are Mono Rule",
+        "body": "Any latitude, longitude, count or licence string is set in mono with tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Plate Rule",
+        "body": "Surfaces are flat at rest. A shadow appears only as a hover response and never above 0.04 opacity.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the fingerpost sign for any choice between places, with one active charcoal plate per group.",
+      "Do keep every border a 1px hairline (#EAEAEA) and every resting surface flat.",
+      "Do grade every photo with `filter: saturate(0.82) sepia(0.08)` and credit stand-ins in mono beside a red draft tag.",
+      "Do set coordinates, counts and licences in Geist Mono with tabular figures.",
+      "Do use Phosphor Icons in the bold weight, inlined as SVG.",
+      "Do animate with `cubic-bezier(0.16, 1, 0.3, 1)`: 600ms 12px scroll entry staggered by 80ms, and 200 to 260ms state changes.",
+      "Do keep h1 to h3 in Instrument Serif at weight 400 with negative tracking."
+    ],
+    "donts": [
+      "Don't use Inter, Roboto or Open Sans, or thin-line icon sets (Lucide, Feather, Heroicons).",
+      "Don't use gradients, neon colours or glassmorphism beyond the sticky-bar blur.",
+      "Don't fill sections, buttons or cards with pastel or saturated colour; pastels are tags and figure highlights only.",
+      "Don't use shadows heavier than `0 2px 8px rgba(0,0,0,0.04)`, or any shadow at rest.",
+      "Don't use pill radius for cards, panels or primary buttons.",
+      "Don't use pure black (#000000) for text.",
+      "Don't put a small label or eyebrow above a heading; labels name fields, not sections.",
+      "Don't use emojis."
+    ]
+  }
+}

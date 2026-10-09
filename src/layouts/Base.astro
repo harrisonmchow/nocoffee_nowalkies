@@ -1,0 +1,230 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  current?: 'home' | 'photos' | 'work' | 'credits';
+}
+const {
+  title,
+  description = 'Four friends, five places, one Instagram account. Trips, photos and brand work from @nocoffee_nowalkies.',
+  current,
+} = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : site.name;
+const nav = [
+  { href: '/#places', label: 'Places', key: 'places' },
+  { href: '/photos', label: 'Photos', key: 'photos' },
+  { href: '/work', label: 'Work with us', key: 'work' },
+];
+---
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta name="theme-color" content="#f7f6f3" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="nav">
+      <div class="nav__inner wrap">
+        <a class="nav__mark" href="/" aria-label={`${site.name}, home`}>
+          <span class="nav__mark-word">No Coffee</span>
+          <span class="nav__mark-slash" aria-hidden="true">/</span>
+          <span class="nav__mark-word">No Walkies</span>
+        </a>
+        <nav aria-label="Primary">
+          <ul class="nav__links">
+            {nav.map((n) => (
+              <li>
+                <a href={n.href} aria-current={current === n.key ? 'page' : undefined}>{n.label}</a>
+              </li>
+            ))}
+            <li>
+              <a class="nav__ig" href={site.instagram} rel="me noopener" target="_blank">
+                <Icon name="instagram" />
+                <span class="nav__ig-label">Instagram</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="wrap foot__inner">
+        <p class="foot__line">Coffee first. Then the walk.</p>
+        <div class="foot__cols">
+          <div>
+            <p class="label">Write to us</p>
+            <a class="foot__big" href={`mailto:${site.email}`}>{site.email}</a>
+          </div>
+          <div>
+            <p class="label">Follow along</p>
+            <a class="foot__big" href={site.instagram} rel="me noopener" target="_blank">{site.handle}</a>
+          </div>
+          <div>
+            <p class="label">On this site</p>
+            <ul class="foot__links">
+              <li><a href="/#places">Places</a></li>
+              <li><a href="/photos">Photos</a></li>
+              <li><a href="/work">Work with us</a></li>
+              <li><a href="/credits">Photo credits</a></li>
+            </ul>
+          </div>
+        </div>
+        <p class="foot__small label">
+          Harry, Kevin, Caleb and Mikey. Blue Mountains to Ala Archa.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Scroll entry: only blocks that start below the fold are hidden,
+      // so nothing in the first viewport ever waits on JS.
+      const blocks = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+      if ('IntersectionObserver' in window && blocks.length) {
+        const fold = window.innerHeight;
+        const later = blocks.filter((el) => el.getBoundingClientRect().top > fold * 0.92);
+        later.forEach((el) => el.classList.add('pending'));
+        document.documentElement.classList.add('reveal-ready');
+        blocks.filter((el) => !later.includes(el)).forEach((el) => el.classList.add('is-in'));
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+        );
+        later.forEach((el) => io.observe(el));
+      }
+    </script>
+
+    <style>
+      .skip {
+        position: absolute;
+        left: 16px;
+        top: -100px;
+        z-index: 100;
+        padding: 10px 14px;
+        background: var(--ink);
+        color: var(--white);
+        border-radius: 4px;
+      }
+      .skip:focus { top: 12px; }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        height: var(--nav-h);
+        background: rgba(247, 246, 243, 0.86);
+        backdrop-filter: saturate(1.2) blur(10px);
+        -webkit-backdrop-filter: saturate(1.2) blur(10px);
+        border-bottom: 1px solid var(--rule-soft);
+      }
+      .nav__inner {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .nav__mark {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.3em;
+        font-family: var(--serif);
+        font-size: 1.375rem;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .nav__mark-slash { color: var(--mute); }
+      .nav__links {
+        display: flex;
+        align-items: center;
+        gap: clamp(14px, 2.4vw, 32px);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 0.9375rem;
+      }
+      .nav__links a {
+        text-decoration: none;
+        color: var(--ink-2);
+        padding-block: 6px;
+        border-bottom: 1px solid transparent;
+        transition: border-color 200ms var(--ease), color 200ms var(--ease);
+      }
+      .nav__links a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+      .nav__links a[aria-current='page'] { color: var(--ink); border-bottom-color: var(--ink); }
+      .nav__ig { display: inline-flex; align-items: center; gap: 0.4em; }
+
+      @media (max-width: 720px) {
+        .nav__mark { font-size: 1.15rem; gap: 0.22em; }
+        .nav__links li:first-child { display: none; }
+        .nav__ig-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+        .nav__links { gap: 14px; font-size: 0.875rem; }
+      }
+      @media (max-width: 380px) {
+        .nav__mark { font-size: 1.05rem; }
+        .nav__links { gap: 11px; }
+      }
+
+      .foot {
+        margin-top: var(--section);
+        border-top: 1px solid var(--rule);
+        background: var(--paper);
+      }
+      .foot__inner { padding-block: clamp(64px, 9vw, 112px) 40px; }
+      .foot__line {
+        font-family: var(--serif);
+        font-size: clamp(2.5rem, 7vw, 5.5rem);
+        line-height: 1;
+        letter-spacing: -0.03em;
+        max-width: 14ch;
+      }
+      .foot__cols {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 32px;
+        margin-top: clamp(48px, 7vw, 88px);
+        padding-top: 28px;
+        border-top: 1px solid var(--rule);
+      }
+      .foot__cols .label { margin-bottom: 10px; }
+      .foot__big {
+        font-family: var(--serif);
+        font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+        text-decoration: none;
+        overflow-wrap: anywhere;
+        line-height: 1.2;
+      }
+      .foot__big:hover { text-decoration: underline; }
+      .foot__links { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+      .foot__links a { text-decoration: none; color: var(--ink-2); }
+      .foot__links a:hover { text-decoration: underline; }
+      .foot__small { margin-top: 56px; }
+      @media (max-width: 760px) {
+        .foot__cols { grid-template-columns: 1fr; gap: 28px; }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,586 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Sign from '../components/Sign.astro';
+import Icon from '../components/Icon.astro';
+import Trail from '../components/Trail.astro';
+import LatitudeFigure from '../components/LatitudeFigure.astro';
+import { regions, formatCoord } from '../data/regions';
+import { photos, photosFor, leadPhoto } from '../data/photos';
+import { crew, site } from '../data/site';
+
+const leads = regions.map((r) => ({ region: r, photo: leadPhoto(r.slug) }));
+const strip = regions.flatMap((r) => photosFor(r.slug).slice(1, 3));
+const cardPhoto = (slug: string, i: number) => photosFor(slug)[i] ?? leadPhoto(slug);
+---
+<Base current="home">
+  <section
+    class="hero"
+    aria-labelledby="hero-title"
+    data-hero
+    data-credits={JSON.stringify(leads.map(({ photo }) => `Stand-in photo · ${photo.credit} · ${photo.license}`))}
+  >
+    <div class="hero__photos">
+      {leads.map(({ region, photo }, i) => (
+        <Image
+          src={photo.image}
+          alt={`${region.name}: ${photo.caption}`}
+          widths={[640, 1024, 1600, 2000]}
+          sizes="100vw"
+          class:list={['hero__img', { 'is-active': i === 0 }]}
+          quality={72}
+          loading={i === 0 ? 'eager' : 'lazy'}
+          fetchpriority={i === 0 ? 'high' : 'auto'}
+          data-hero-img={i}
+        />
+      ))}
+      <p class="hero__credit mono" data-hero-credit>
+        Stand-in photo · {leads[0].photo.credit} · {leads[0].photo.license}
+      </p>
+    </div>
+
+    <div class="hero__post">
+      <ul class="hero__signs" role="list" aria-label="Choose a place">
+        {regions.map((r, i) => (
+          <li>
+            <Sign
+              name={r.name}
+              meta={formatCoord(r.lat, r.lon)}
+              tag={r.tag}
+              active={i === 0}
+              data-hero-sign={i}
+              aria-controls="hero-word"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="hero__band">
+      <div class="hero__word" id="hero-word" aria-live="polite">
+        {regions.map((r, i) => (
+          <span class:list={['hero__word-item', { 'is-active': i === 0 }]} data-hero-word={i} aria-hidden={i === 0 ? undefined : 'true'}>
+            {r.word}
+          </span>
+        ))}
+      </div>
+      <div class="hero__intro">
+        <h1 id="hero-title">Four friends walking from the Blue Mountains to Kyrgyzstan, and posting the photos.</h1>
+        <div class="hero__actions">
+          {regions.map((r, i) => (
+            <a
+              class:list={['hero__go', { 'is-active': i === 0 }]}
+              href={`/photos#${r.slug}`}
+              data-hero-go={i}
+              hidden={i !== 0}
+            >
+              {r.name} photos <Icon name="arrow-right" />
+            </a>
+          ))}
+          <a class="hero__go hero__go--quiet" href="/work">For brands <Icon name="arrow-up-right" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="trail-host">
+    <Trail />
+
+
+    <section class="reach wrap" aria-labelledby="reach-title">
+      <div class="reach__text" data-reveal>
+        <h2 id="reach-title">Four of our places fit inside 1,190 km. The fifth is 11,182 km from the nearest of them.</h2>
+        <p class="muted">The five regions plotted to scale by latitude and longitude. Distances are straight-line, between the points on the signs.</p>
+      </div>
+      <div data-reveal>
+        <LatitudeFigure />
+      </div>
+    </section>
+
+    <section class="places wrap" id="places" aria-labelledby="places-title">
+      <div class="section-head" data-reveal>
+        <h2 id="places-title">Places</h2>
+        <p class="muted">Five regions, two continents. Trip notes are on the way.</p>
+      </div>
+      <ul class="places__grid" role="list">
+        {regions.map((r, i) => {
+          const p = cardPhoto(r.slug, i === 0 ? 0 : 1);
+          return (
+            <li class={`place place--${i}`} data-reveal style={`--i:${i % 3}`}>
+              <a class="place__link" href={`/photos#${r.slug}`}>
+                <div class="place__media">
+                  <Image
+                    src={p.image}
+                    alt={`${r.name}: ${p.caption}`}
+                    widths={[480, 800, 1200]}
+                    sizes={i === 0 ? '(min-width: 960px) 66vw, 100vw' : '(min-width: 960px) 33vw, 100vw'}
+                  />
+                </div>
+                <div class="place__body">
+                  <div class="place__meta">
+                    <span class={`tag tag--${r.tag}`}>{r.tag}</span>
+                    <span class="mono muted">{formatCoord(r.lat, r.lon)}</span>
+                  </div>
+                  <h3 class="place__name">{r.name}</h3>
+                  <p class="place__blurb">{r.blurb}</p>
+                  {p.standIn && <p class="place__credit mono muted">Stand-in photo · {p.credit} · {p.license}</p>}
+                  <span class="place__more">
+                    {photosFor(r.slug).length} photos <Icon name="arrow-right" />
+                  </span>
+                </div>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+
+    <section class="strip" aria-labelledby="strip-title">
+      <div class="wrap section-head section-head--row" data-reveal>
+        <div class="strip__title">
+          <h2 id="strip-title">More from these places</h2>
+          <p class="label"><span class="tag tag--draft">Stand-ins</span> Openly licensed photos until ours are uploaded. <a href="/credits">Credits</a></p>
+        </div>
+        <a class="btn btn--ghost" href="/photos">All {photos.length} photos <Icon name="arrow-right" /></a>
+      </div>
+      <ul class="strip__row" role="list" data-reveal>
+        {strip.map((p) => (
+          <li class="strip__item">
+            <a href={`/photos#${p.region}`}>
+              <Image src={p.image} alt={p.caption} widths={[400, 720]} sizes="(min-width: 960px) 28vw, 72vw" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="crew wrap" aria-labelledby="crew-title">
+      <div class="crew__lead" data-reveal>
+        <h2 id="crew-title">
+          We’re Harry, Kevin, Caleb and Mikey. We walk, we take too many photos, and we post them at{' '}
+          <a href={site.instagram} rel="me noopener" target="_blank">{site.handle}</a>.
+        </h2>
+        <p class="crew__sub">This site is the longer version: every place we’ve walked, the photos that didn’t fit in a post, and the brand work we’ve made along the way.</p>
+      </div>
+      <ul class="crew__list" role="list">
+        {crew.map((c, i) => (
+          <li class="crew__person" data-reveal style={`--i:${i}`}>
+            <span class="crew__name">{c.name}</span>
+            {c.line
+              ? <span class="crew__line">{c.line}</span>
+              : <span class="crew__line muted">Bio coming soon</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="brands wrap" aria-labelledby="brands-title">
+      <div class="brands__inner" data-reveal>
+        <div>
+          <h2 id="brands-title">For brands: content made on real trips, by the four people who took them.</h2>
+        </div>
+        <div class="brands__side">
+          <ul class="brands__facts" role="list">
+            <li><span class="label">Who</span><span>Four creators, one shared account</span></li>
+            <li><span class="label">Where</span><span>Blue Mountains, Warrumbungles, Kosciuszko, Tasmania, Ala Archa</span></li>
+            <li><span class="label">Channel</span><span>{site.handle} on Instagram</span></li>
+          </ul>
+          <div class="brands__actions">
+            <a class="btn" href="/work">See our work <Icon name="arrow-right" /></a>
+            <a class="btn btn--ghost" href={`mailto:${site.email}?subject=Brand%20enquiry`}><Icon name="envelope" /> Email us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  if (hero) {
+    const signs = Array.from(hero.querySelectorAll<HTMLButtonElement>('[data-hero-sign]'));
+    const imgs = Array.from(hero.querySelectorAll<HTMLElement>('[data-hero-img]'));
+    const words = Array.from(hero.querySelectorAll<HTMLElement>('[data-hero-word]'));
+    const gos = Array.from(hero.querySelectorAll<HTMLAnchorElement>('[data-hero-go]'));
+    const credit = hero.querySelector<HTMLElement>('[data-hero-credit]');
+    const credits = JSON.parse(hero.dataset.credits || '[]') as string[];
+    let current = 0;
+
+    const set = (i: number) => {
+      if (i === current) return;
+      current = i;
+      signs.forEach((s, j) => {
+        s.classList.toggle('is-active', j === i);
+        s.setAttribute('aria-pressed', String(j === i));
+      });
+      imgs.forEach((im, j) => im.classList.toggle('is-active', j === i));
+      words.forEach((w, j) => {
+        w.classList.toggle('is-active', j === i);
+        if (j === i) w.removeAttribute('aria-hidden');
+        else w.setAttribute('aria-hidden', 'true');
+      });
+      gos.forEach((g, j) => (g.hidden = j !== i));
+      if (credit && credits[i]) credit.textContent = credits[i];
+    };
+
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    signs.forEach((s, i) => {
+      s.addEventListener('click', () => set(i));
+      if (canHover) s.addEventListener('pointerenter', () => set(i));
+    });
+  }
+</script>
+
+<style>
+  /* ---------- Trackhead hero ---------- */
+  .hero {
+    --band: clamp(150px, 24svh, 240px);
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+    grid-template-rows: minmax(0, 1fr) var(--band);
+    height: calc(100svh - var(--nav-h));
+    min-height: 620px;
+    max-height: 1100px;
+  }
+  .hero__photos {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    position: relative;
+    overflow: hidden;
+    background: #d9d6cf;
+  }
+  .hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08) contrast(1.02);
+    opacity: 0;
+    transform: scale(1.03);
+    transition: opacity 700ms var(--ease), transform 1400ms var(--ease);
+  }
+  .hero__img.is-active { opacity: 1; transform: scale(1); }
+  .hero__credit {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 16px;
+    margin: 0;
+    padding: 4px 9px;
+    background: rgba(247, 246, 243, 0.92);
+    color: var(--ink-2);
+    border-radius: 3px;
+    font-size: 0.6875rem;
+    max-width: calc(100% - var(--gutter) * 2);
+  }
+
+  /* The post and its five fingerposts */
+  .hero__post {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    position: relative;
+    z-index: 2;
+    padding: 0 var(--gutter) 28px 26px;
+  }
+  .hero__post::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: calc(var(--band) * -0.35);
+    width: 6px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  .hero__signs {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The band: one enormous word */
+  .hero__band {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+    align-items: end;
+    padding: 0 0 clamp(18px, 3svh, 32px);
+  }
+  .hero__word {
+    position: relative;
+    padding-left: var(--gutter);
+    height: 100%;
+    overflow: hidden;
+  }
+  .hero__word-item {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 0;
+    font-family: var(--serif);
+    font-size: min(10.5vw, calc(var(--band) * 0.78));
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    white-space: nowrap;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.12em);
+    transition: clip-path 700ms var(--ease), transform 700ms var(--ease);
+  }
+  .hero__word-item.is-active { clip-path: inset(0 0 0 0); transform: none; }
+
+  .hero__intro {
+    padding: 0 var(--gutter) 0 26px;
+    display: grid;
+    gap: 18px;
+  }
+  .hero__intro h1 {
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: var(--ink-2);
+    max-width: 34ch;
+  }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .hero__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  .hero__go[hidden] { display: none; }
+  .hero__go--quiet { color: var(--mute); border-bottom-color: var(--rule); }
+  .hero__go--quiet:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+  @media (max-width: 959px) {
+    .hero {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+    }
+    .hero__photos { order: 1; height: 40svh; min-height: 260px; }
+    .hero__band { display: contents; }
+    .hero__word { order: 2; }
+    .hero__post { order: 3; align-self: stretch; }
+    .hero__intro { order: 4; }
+    .hero__credit { bottom: auto; top: 12px; }
+    .hero__word {
+      height: auto;
+      padding: 14px var(--gutter) 0;
+      display: grid;
+    }
+    .hero__word-item {
+      position: static;
+      grid-area: 1 / 1;
+      font-size: clamp(3.25rem, 15vw, 7rem);
+    }
+    .hero__post { padding: 22px var(--gutter) 0 calc(var(--gutter) + 18px); }
+    .hero__post::before { left: var(--gutter); top: 0; bottom: 0; width: 5px; }
+    .hero__intro { padding: 28px var(--gutter) 0; }
+  }
+
+  /* ---------- Sections ---------- */
+  .trail-host { position: relative; }
+  .trail-host > * { position: relative; z-index: 1; }
+  .trail-host > :global(.trail) { position: absolute; }
+
+  .section-head { display: grid; gap: 10px; margin-bottom: clamp(32px, 5vw, 56px); }
+  .section-head h2 { font-size: clamp(2.5rem, 5.5vw, 4.5rem); letter-spacing: -0.03em; }
+  .section-head--row {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 20px;
+  }
+
+  /* Crew */
+  .crew { padding-top: var(--section); }
+  .crew__lead h2 {
+    max-width: 22ch;
+    font-size: clamp(2rem, 4.4vw, 3.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+  .crew__lead h2 a { text-decoration-thickness: 1px; text-underline-offset: 0.12em; }
+  .crew__sub {
+    margin-top: 28px;
+    max-width: 52ch;
+    color: var(--ink-2);
+    font-size: 1.125rem;
+  }
+  .crew__list {
+    margin: clamp(48px, 7vw, 80px) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--rule);
+  }
+  .crew__person {
+    display: grid;
+    gap: 6px;
+    padding: 24px 24px 8px 0;
+  }
+  .crew__person + .crew__person { padding-left: 24px; border-left: 1px solid var(--rule); }
+  .crew__name { font-family: var(--serif); font-size: 1.75rem; line-height: 1.1; }
+  .crew__line { font-size: 0.9375rem; }
+  @media (max-width: 760px) {
+    .crew__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .crew__person.crew__person:nth-child(3) { padding-left: 0; border-left: 0; }
+    .crew__person:nth-child(n + 3) { border-top: 1px solid var(--rule); }
+  }
+
+  /* Reach figure */
+  .reach {
+    padding-top: var(--section);
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .reach__text { position: sticky; top: calc(var(--nav-h) + 32px); }
+  @media (max-width: 860px) {
+    .reach { grid-template-columns: 1fr; }
+    .reach__text { position: static; }
+  }
+  .reach__text h2 {
+    font-size: clamp(2rem, 4.4vw, 3.6rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+  .reach__text p { margin-top: 18px; max-width: 52ch; font-size: 0.9375rem; }
+
+  /* Places bento */
+  .places { padding-top: var(--section); }
+  .places__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .place--0 { grid-column: span 4; grid-row: span 2; }
+  .place--1, .place--2 { grid-column: span 2; }
+  .place--3, .place--4 { grid-column: span 3; }
+  .place__link {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: box-shadow 200ms var(--ease), border-color 200ms var(--ease);
+  }
+  .place__link:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); border-color: #dcdbd8; }
+  .place__media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #e6e3dc; }
+  .place--0 .place__media { aspect-ratio: auto; flex: 1; min-height: 320px; }
+  .place__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08);
+    transition: transform 900ms var(--ease);
+  }
+  .place__link:hover .place__media img { transform: scale(1.025); }
+  .place__body { padding: clamp(20px, 2.4vw, 32px); display: grid; gap: 10px; }
+  .place__meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .place__name { font-size: clamp(1.75rem, 2.6vw, 2.25rem); }
+  .place--0 .place__name { font-size: clamp(2.25rem, 4vw, 3.5rem); }
+  .place__blurb { color: var(--ink-2); font-size: 0.9375rem; max-width: 52ch; }
+  .place__credit { font-size: 0.6875rem; }
+  .strip__title { display: grid; gap: 12px; }
+  .strip__title .label { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .place__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .place__more :global(.icon) { transition: transform 200ms var(--ease); }
+  .place__link:hover .place__more :global(.icon) { transform: translateX(3px); }
+  @media (max-width: 959px) {
+    .places__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .place--0 { grid-column: 1 / -1; grid-row: auto; }
+    .place--0 .place__media { aspect-ratio: 16 / 10; flex: none; min-height: 0; }
+    .place--1, .place--2, .place--3, .place--4 { grid-column: span 1; }
+  }
+  @media (max-width: 600px) {
+    .places__grid { grid-template-columns: 1fr; }
+    .place--1, .place--2, .place--3, .place--4 { grid-column: auto; }
+  }
+
+  /* Camera-roll strip */
+  .strip { padding-top: var(--section); }
+  .strip__row {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--gutter) 12px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(240px, 28vw, 420px);
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: thin;
+  }
+  .strip__item { scroll-snap-align: start; }
+  .strip__item a { display: block; border-radius: 6px; overflow: hidden; }
+  .strip__item img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08);
+    transition: transform 900ms var(--ease);
+  }
+  .strip__item a:hover img { transform: scale(1.03); }
+  @media (min-width: 1336px) {
+    .strip__row { padding-inline: calc((100vw - var(--max)) / 2); scroll-padding-inline: calc((100vw - var(--max)) / 2); }
+  }
+
+  /* Brands */
+  .brands { padding-top: var(--section); }
+  .brands__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    padding: clamp(32px, 5vw, 64px);
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+  }
+  .brands h2 { font-size: clamp(2rem, 3.8vw, 3.25rem); line-height: 1.08; letter-spacing: -0.025em; }
+  .brands__facts { list-style: none; margin: 0; padding: 0; }
+  .brands__facts li {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+  }
+  .brands__facts li:first-child { padding-top: 0; }
+  .brands__facts .label { padding-top: 2px; }
+  .brands__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  @media (max-width: 860px) {
+    .brands__inner { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,241 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Sign from '../components/Sign.astro';
+import Icon from '../components/Icon.astro';
+import Trail from '../components/Trail.astro';
+import { regions, formatCoord } from '../data/regions';
+import { leadPhoto, photosFor } from '../data/photos';
+import { site, work, crew } from '../data/site';
+
+const mail = `mailto:${site.email}?subject=${encodeURIComponent('Brand enquiry')}`;
+const heroPhoto = photosFor('tasmania')[0];
+const asks = [
+  { h: 'Who you are', p: 'Your brand, and the product or place you want to feature.' },
+  { h: 'What you’d like made', p: 'Photos, short video, posts or stories, and roughly how many.' },
+  { h: 'When and where', p: 'Your timing, and whether it suits one of our regions or somewhere new.' },
+  { h: 'How it works for you', p: 'Budget, product, or both, and where you plan to use the content.' },
+];
+---
+<Base title="Work with us" current="work" description="UGC and brand content from @nocoffee_nowalkies: four friends shooting on real hikes across Australia and Kyrgyzstan.">
+  <section class="wk-hero wrap" aria-labelledby="wk-title">
+    <div class="wk-hero__text">
+      <h1 id="wk-title">Content from trips we actually take.</h1>
+      <p class="wk-hero__lede">
+        We’re {crew.map((c) => c.name).slice(0, -1).join(', ')} and {crew.at(-1)!.name}. We shoot on our own walks, in places we know, and post from {site.handle}.
+      </p>
+      <div class="wk-hero__actions">
+        <a class="btn" href={mail}><Icon name="envelope" /> Email {site.email}</a>
+        <a class="btn btn--ghost" href={site.instagram} rel="me noopener" target="_blank"><Icon name="instagram" /> See the feed</a>
+      </div>
+    </div>
+    <figure class="wk-hero__fig">
+      <Image src={heroPhoto.image} alt={`Tasmania: ${heroPhoto.caption}`} widths={[480, 800, 1200]} sizes="(min-width: 960px) 40vw, 100vw" loading="eager" />
+      <figcaption class="mono">Stand-in photo · {heroPhoto.credit} · {heroPhoto.license}</figcaption>
+    </figure>
+  </section>
+
+  <div class="trail-host">
+    <Trail />
+
+
+    <section class="wk-work wrap" aria-labelledby="wk-work-title">
+      <div class="section-head" data-reveal>
+        <h2 id="wk-work-title">Selected work</h2>
+      </div>
+      {work.length > 0 ? (
+        <ul class="wk-grid" role="list">
+          {work.map((w, i) => {
+            const p = leadPhoto(w.region);
+            return (
+              <li class="wk-card" data-reveal style={`--i:${i % 3}`}>
+                {p && <Image src={p.image} alt="" widths={[480, 800]} sizes="(min-width: 960px) 33vw, 100vw" />}
+                <div class="wk-card__body">
+                  <p class="mono muted">{w.brand} · {w.year}</p>
+                  <h3>{w.title}</h3>
+                  <ul class="wk-card__tags" role="list">
+                    {w.deliverables.map((d) => <li class="tag tag--NSW">{d}</li>)}
+                  </ul>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p class="wk-empty" data-reveal>
+          Case studies are on their way over from Instagram. Until then, <a href={mail}>email us for examples of past brand work</a>.
+        </p>
+      )}
+    </section>
+
+    <section class="wk-places wrap" aria-labelledby="wk-places-title">
+      <div class="wk-places__head" data-reveal>
+        <h2 id="wk-places-title">Where we shoot</h2>
+        <p class="muted">Four regions in Australia and one in Kyrgyzstan, all walked by the four of us. Somewhere new is fine too.</p>
+      </div>
+      <ul class="wk-places__list" role="list">
+        {regions.map((r, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <Sign name={r.name} meta={`${r.where} · ${formatCoord(r.lat, r.lon)}`} tag={r.tag} href={`/photos#${r.slug}`} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="wk-ask wrap" aria-labelledby="wk-ask-title">
+      <div class="wk-ask__inner" data-reveal>
+        <div>
+          <h2 id="wk-ask-title">What to put in your email</h2>
+          <p class="muted">Four things that help us reply with a yes, or a useful no, quickly.</p>
+        </div>
+        <ol class="wk-ask__list">
+          {asks.map((a) => (
+            <li>
+              <h3>{a.h}</h3>
+              <p>{a.p}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="wk-close wrap" aria-labelledby="wk-close-title" data-reveal>
+      <h2 id="wk-close-title">Let’s walk somewhere.</h2>
+      <a class="wk-close__mail" href={mail}>
+        {site.email}
+        <Icon name="arrow-up-right" />
+      </a>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .trail-host { position: relative; }
+  .trail-host > * { position: relative; z-index: 1; }
+  .section-head { display: grid; gap: 10px; margin-bottom: clamp(28px, 4vw, 48px); }
+  .section-head h2, .wk-places__head h2, .wk-ask h2 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: -0.03em;
+  }
+
+  .wk-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: end;
+    padding-top: clamp(56px, 9vw, 120px);
+  }
+  .wk-hero h1 {
+    font-size: clamp(3.25rem, 8vw, 7rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 11ch;
+  }
+  .wk-hero__lede { margin-top: 28px; max-width: 46ch; font-size: 1.1875rem; color: var(--ink-2); }
+  .wk-hero__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+  .wk-hero__actions .btn { overflow-wrap: anywhere; }
+  .wk-hero__fig { margin: 0; }
+  .wk-hero__fig img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 8px;
+    filter: saturate(0.82) sepia(0.08);
+  }
+  .wk-hero__fig figcaption { margin-top: 10px; font-size: 0.6875rem; color: var(--mute); }
+  @media (max-width: 860px) {
+    .wk-hero { grid-template-columns: 1fr; }
+    .wk-hero__fig img { aspect-ratio: 3 / 2; }
+  }
+
+  .wk-work { padding-top: var(--section); }
+  .wk-grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
+  }
+  .wk-card { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .wk-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; filter: saturate(0.82) sepia(0.08); }
+  .wk-card__body { padding: 24px; display: grid; gap: 8px; }
+  .wk-card h3 { font-size: 1.75rem; }
+  .wk-card__tags { list-style: none; margin: 4px 0 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  @media (max-width: 860px) { .wk-grid { grid-template-columns: 1fr; } }
+
+  .wk-empty {
+    max-width: 40ch;
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--ink-2);
+  }
+  .wk-empty a { color: var(--ink); text-underline-offset: 0.15em; }
+
+  .wk-places {
+    padding-top: var(--section);
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .wk-places__head { position: sticky; top: calc(var(--nav-h) + 32px); display: grid; gap: 14px; }
+  .wk-places__head p { max-width: 36ch; }
+  .wk-places__list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 8px; position: relative; }
+  .wk-places__list::before {
+    content: '';
+    position: absolute;
+    left: 12px; top: -24px; bottom: -48px;
+    width: 6px; background: var(--ink); border-radius: 1px;
+  }
+  @media (max-width: 860px) {
+    .wk-places { grid-template-columns: 1fr; }
+    .wk-places__head { position: static; }
+  }
+
+  .wk-ask { padding-top: var(--section); }
+  .wk-ask__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 6vw, 96px);
+  }
+  .wk-ask__inner > div { display: grid; gap: 14px; align-content: start; }
+  .wk-ask__list { margin: 0; padding: 0; list-style: none; counter-reset: ask; }
+  .wk-ask__list li {
+    counter-increment: ask;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    column-gap: 12px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .wk-ask__list li:first-child { padding-top: 0; }
+  .wk-ask__list li::before {
+    content: counter(ask);
+    grid-row: span 2;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--mute);
+    padding-top: 6px;
+  }
+  .wk-ask__list h3 { font-size: 1.625rem; }
+  .wk-ask__list p { color: var(--ink-2); font-size: 0.9375rem; margin-top: 4px; }
+  @media (max-width: 860px) { .wk-ask__inner { grid-template-columns: 1fr; } }
+
+  .wk-close { padding-top: var(--section); display: grid; gap: 20px; }
+  .wk-close h2 { font-size: clamp(3rem, 8vw, 6.5rem); letter-spacing: -0.04em; line-height: 1; }
+  .wk-close__mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    justify-self: start;
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 4.2vw, 3.25rem);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    overflow-wrap: anywhere;
+    transition: color 200ms var(--ease);
+  }
+  .wk-close__mail:hover { color: var(--ink-2); }
+  .wk-close__mail :global(.icon) { transition: transform 200ms var(--ease); }
+  .wk-close__mail:hover :global(.icon) { transform: translate(3px, -3px); }
+</style>
