@@ -1,0 +1,225 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import Sign from '../../../components/Sign.astro';
+import Icon from '../../../components/Icon.astro';
+import Trail from '../../../components/Trail.astro';
+import Lightbox from '../../../components/Lightbox.astro';
+import { regions, formatCoord } from '../../../data/regions';
+import { leadPhoto, regionPhotos } from '../../../data/photos';
+import { getWalks, walkHref, walkMeta } from '../../../lib/walks';
+
+export function getStaticPaths() {
+  return regions.map((r) => ({ params: { region: r.slug }, props: { region: r } }));
+}
+
+const { region: r } = Astro.props;
+const lead = leadPhoto(r.slug);
+const walks = await getWalks(r.slug);
+const photos = (await regionPhotos(r.slug)).slice(0, 6);
+const large = await Promise.all(photos.map((p) => getImage({ src: p.image, width: 2000, format: 'webp' })));
+const others = regions.filter((o) => o.slug !== r.slug);
+---
+<Base title={r.name} current="places" description={`${r.name}, ${r.where}: our walks, write-ups and photos.`}>
+  <section class="rg-hero" aria-labelledby="rg-title">
+    <div class="rg-hero__photo">
+      <Image src={lead.image} alt={`${r.name}: ${lead.caption}`} widths={[640, 1024, 1600, 2000]} sizes="100vw" loading="eager" fetchpriority="high" quality={72} />
+      {lead.standIn && <p class="rg-hero__credit mono">Stand-in photo · {lead.credit} · {lead.license}</p>}
+    </div>
+    <div class="rg-hero__band wrap">
+      <h1 id="rg-title" class="rg-hero__word">{r.word}</h1>
+      <div class="rg-hero__side">
+        <p class="rg-hero__meta">
+          <span class={`tag tag--${r.tag}`}>{r.tag}</span>
+          <span class="mono muted">{r.where} · {formatCoord(r.lat, r.lon)}</span>
+        </p>
+        <p class="rg-hero__blurb">{r.blurb}</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="trail-host">
+    <Trail />
+
+    <section class="rg-walks wrap" aria-labelledby="rg-walks-h">
+      <div class="rg-walks__head" data-reveal>
+        <h2 id="rg-walks-h">Walks</h2>
+        <p class="muted">
+          {walks.length === 0
+            ? `Nothing written up for ${r.name} yet.`
+            : `${walks.length} ${walks.length === 1 ? 'walk' : 'walks'} in ${r.name}. Pick one for the write-up, route and photos.`}
+        </p>
+      </div>
+      {walks.length > 0 && (
+        <ul class="rg-walks__list" role="list">
+          {walks.map((w, i) => (
+            <li data-reveal style={`--i:${i}`}>
+              <Sign
+                name={w.data.title}
+                href={walkHref(w)}
+                meta={walkMeta(w)}
+                tag={w.data.grade ? `grade-${w.data.grade}` : undefined}
+                tagLabel={w.data.grade ? `Grade ${w.data.grade}` : undefined}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    <section class="rg-photos wrap" aria-labelledby="rg-photos-h">
+      <div class="section-row" data-reveal>
+        <h2 id="rg-photos-h">Photos</h2>
+        <a class="btn btn--ghost" href={`/photos#${r.slug}`}>All {r.name} photos <Icon name="arrow-right" /></a>
+      </div>
+      <ul class="rg-photos__grid" role="list">
+        {photos.map((p, i) => (
+          <li data-reveal style={`--i:${i % 3}`}>
+            <button
+              class="rg-photos__btn"
+              type="button"
+              data-lightbox={i}
+              data-src={large[i].src}
+              data-caption={`${r.name}: ${p.caption}`}
+              data-credit={[p.standIn ? 'Stand-in photo' : undefined, p.credit, p.license].filter(Boolean).join(' · ')}
+              aria-label={`View larger: ${p.caption}`}
+            >
+              <Image src={p.image} alt={p.caption} widths={[480, 800, 1200]} sizes="(min-width: 960px) 33vw, 50vw" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <nav class="rg-others wrap" aria-labelledby="rg-others-h">
+      <h2 id="rg-others-h" class="label">Other places</h2>
+      <ul role="list">
+        {others.map((o) => (
+          <li><Sign size="sm" name={o.name} tag={o.tag} href={`/places/${o.slug}/`} /></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+
+  {large[0] && <Lightbox initialSrc={large[0].src} />}
+</Base>
+
+<style>
+  .rg-hero__photo {
+    position: relative;
+    height: 58svh;
+    min-height: 320px;
+    overflow: hidden;
+    background: #d9d6cf;
+  }
+  .rg-hero__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08) contrast(1.02);
+  }
+  .rg-hero__credit {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 16px;
+    margin: 0;
+    padding: 4px 9px;
+    background: rgba(247, 246, 243, 0.92);
+    color: var(--ink-2);
+    border-radius: 3px;
+    font-size: 0.75rem;
+  }
+  .rg-hero__band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+    align-items: end;
+    gap: 32px;
+    padding-top: clamp(16px, 2vw, 28px);
+  }
+  .rg-hero__word {
+    font-size: clamp(3.5rem, 10.5vw, 11rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    overflow-wrap: anywhere;
+  }
+  .rg-hero__side { display: grid; gap: 12px; padding-bottom: 0.6em; }
+  .rg-hero__meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .rg-hero__blurb { color: var(--ink-2); max-width: 44ch; }
+  @media (max-width: 860px) {
+    .rg-hero__photo { height: 44svh; }
+    .rg-hero__band { grid-template-columns: 1fr; gap: 14px; }
+    .rg-hero__credit { bottom: auto; top: 12px; }
+  }
+
+  .trail-host { position: relative; }
+  .trail-host > * { position: relative; z-index: 1; }
+
+  .rg-walks {
+    padding-top: var(--section);
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .rg-walks__head { display: grid; gap: 14px; position: sticky; top: calc(var(--nav-h) + 32px); }
+  .rg-walks__head h2, .rg-photos h2 { font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.03em; }
+  .rg-walks__head p { max-width: 36ch; }
+  .rg-walks__list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 8px; position: relative; }
+  .rg-walks__list::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: -24px;
+    bottom: -48px;
+    width: 6px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  @media (max-width: 860px) {
+    .rg-walks { grid-template-columns: 1fr; }
+    .rg-walks__head { position: static; }
+  }
+
+  .rg-photos { padding-top: var(--section); }
+  .section-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 20px;
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+  .rg-photos__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .rg-photos__btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: #e6e3dc;
+  }
+  .rg-photos__btn img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08);
+    transition: transform 900ms var(--ease);
+  }
+  .rg-photos__btn:hover img { transform: scale(1.03); }
+  @media (max-width: 760px) {
+    .rg-photos__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .section-row { grid-template-columns: 1fr; justify-items: start; }
+  }
+
+  .rg-others { padding-top: var(--section); display: grid; gap: 14px; }
+  .rg-others ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 26px; }
+  .rg-others :global(.sign) { width: auto; }
+</style>

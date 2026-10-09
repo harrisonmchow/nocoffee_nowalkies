@@ -1,0 +1,298 @@
+---
+// A walk's route traced from its GPX file, drawn in the same flat ink as the
+// latitude figure, with an elevation profile underneath. Moving along the
+// profile (pointer or arrow keys) moves a marker along the route.
+import { project, simplify, type Track } from '../lib/gpx';
+
+interface Props {
+  track: Track;
+  title: string;
+  sample?: boolean;
+}
+const { track, title, sample = false } = Astro.props;
+
+const W = 1000;
+const all = project(track.points);
+const xs = all.map((p) => p.x);
+const ys = all.map((p) => p.y);
+const [minX, maxX, minY, maxY] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+const bw = Math.max(maxX - minX, 0.2);
+const bh = Math.max(maxY - minY, 0.2);
+const H = Math.round(Math.min(760, Math.max(440, (W * bh) / bw)));
+const pad = 56;
+const s = Math.min((W - pad * 2) / bw, (H - pad * 2) / bh);
+const ox = (W - bw * s) / 2 - minX * s;
+const oy = (H - bh * s) / 2 - minY * s;
+const X = (x: number) => +(x * s + ox).toFixed(1);
+const Y = (y: number) => +(y * s + oy).toFixed(1);
+
+const line = simplify(all, 0.008);
+const d = line.map((p, i) => `${i ? 'L' : 'M'}${X(p.x)} ${Y(p.y)}`).join(' ');
+
+// Grid squares sized to the route
+const span = Math.max(bw, bh);
+const step = span > 60 ? 10 : span > 24 ? 5 : span > 8 ? 2 : 1;
+const gx: number[] = [];
+const gy: number[] = [];
+for (let k = Math.floor(minX / step) * step; k <= maxX + step; k += step) if (X(k) >= 0 && X(k) <= W) gx.push(X(k));
+for (let k = Math.floor(minY / step) * step; k <= maxY + step; k += step) if (Y(k) >= 0 && Y(k) <= H) gy.push(Y(k));
+
+// Kilometre ticks along the route
+const total = track.distanceKm;
+const tickStep = total > 60 ? 10 : total > 25 ? 5 : total > 8 ? 2 : 1;
+const ticks: { x: number; y: number; km: number }[] = [];
+let j = 1;
+for (let km = tickStep; km < total - tickStep * 0.4; km += tickStep) {
+  while (j < all.length && all[j].d < km) j++;
+  const a = all[j - 1];
+  const b = all[j];
+  const t = (km - a.d) / (b.d - a.d || 1);
+  ticks.push({ x: X(a.x + (b.x - a.x) * t), y: Y(a.y + (b.y - a.y) * t), km });
+}
+const labelEvery = tickStep * (total > 12 ? 5 : 2);
+
+const start = all[0];
+const end = all.at(-1)!;
+
+// Elevation profile
+const hasEle = track.minEle !== undefined && track.maxEle !== undefined;
+const PW = 1000;
+const PH = 240;
+const pl = 132;
+const pr = 16;
+const pt = 32;
+const pb = 34;
+const lo = hasEle ? Math.floor((track.minEle! - 20) / 50) * 50 : 0;
+const hi = hasEle ? Math.ceil((track.maxEle! + 20) / 50) * 50 : 1;
+const PX = (km: number) => +(pl + (km / total) * (PW - pl - pr)).toFixed(1);
+const PY = (e: number) => +(pt + (1 - (e - lo) / (hi - lo)) * (PH - pt - pb)).toFixed(1);
+
+// Evenly spaced samples drive both the profile line and the scrubber.
+const N = 240;
+const samples: { x: number; y: number; d: number; e?: number }[] = [];
+let k = 0;
+for (let i = 0; i <= N; i++) {
+  const target = (total * i) / N;
+  while (k < all.length - 1 && all[k + 1].d < target) k++;
+  const a = all[k];
+  const b = all[Math.min(k + 1, all.length - 1)];
+  const t = b.d === a.d ? 0 : (target - a.d) / (b.d - a.d);
+  const e = a.ele !== undefined && b.ele !== undefined ? a.ele + (b.ele - a.ele) * t : a.ele;
+  samples.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, d: target, e });
+}
+const prof = hasEle ? samples.map((p, i) => `${i ? 'L' : 'M'}${PX(p.d)} ${PY(p.e!)}`).join(' ') : '';
+const area = hasEle ? `${prof} L${PX(total)} ${PH - pb} L${PX(0)} ${PH - pb} Z` : '';
+const eleLines: number[] = [];
+if (hasEle) {
+  const eStep = hi - lo > 1200 ? 500 : hi - lo > 500 ? 200 : hi - lo > 200 ? 100 : 50;
+  for (let e = Math.ceil(lo / eStep) * eStep; e <= hi; e += eStep) eleLines.push(e);
+}
+const kmLabels: number[] = [];
+for (let km = 0; km <= total + 0.001; km += tickStep * (total > 12 ? 2 : 1)) kmLabels.push(km);
+
+const scrub = samples.map((p) => [X(p.x), Y(p.y), +p.d.toFixed(2), p.e === undefined ? null : Math.round(p.e), PX(p.d), p.e === undefined ? null : PY(p.e)]);
+const fmt = (n: number) => Math.round(n).toLocaleString('en-AU');
+// Labels near the right edge sit to the left of their marker so they never clip.
+const side = (x: number, gap: number) =>
+  x > W - 240 ? { x: x - gap, anchor: 'end' } : { x: x + gap, anchor: 'start' };
+const id = `route-${Math.random().toString(36).slice(2, 8)}`;
+---
+<figure class="route" data-route={JSON.stringify(scrub)}>
+  <svg class="route__map" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby={`${id}-t ${id}-d`}>
+    <title id={`${id}-t`}>Route map: {title}</title>
+    <desc id={`${id}-d`}>{track.distanceKm.toFixed(1)} km {track.loop ? 'loop' : 'route'}{track.gainM !== undefined ? ` with ${fmt(track.gainM)} m of climbing` : ''}.</desc>
+    <g class="route__grid">
+      {gx.map((x) => <line x1={x} x2={x} y1="0" y2={H} />)}
+      {gy.map((y) => <line x1="0" x2={W} y1={y} y2={y} />)}
+    </g>
+    <path class="route__halo" d={d} />
+    <path class="route__line" d={d} />
+    {ticks.map((t) => (
+      <g class="route__tick">
+        <circle cx={t.x} cy={t.y} r={t.km % labelEvery === 0 ? 6 : 3.5} />
+        {t.km % labelEvery === 0 && <text x={side(t.x, 12).x} y={t.y - 10} text-anchor={side(t.x, 12).anchor}>{t.km} km</text>}
+      </g>
+    ))}
+    {track.loop ? (
+      <g class="route__end">
+        <circle cx={X(start.x)} cy={Y(start.y)} r="12" class="route__ring" />
+        <circle cx={X(start.x)} cy={Y(start.y)} r="5" />
+        <text x={side(X(start.x), 20).x} y={Y(start.y) + 6} text-anchor={side(X(start.x), 20).anchor}>Start and finish</text>
+      </g>
+    ) : (
+      <>
+        <g class="route__end">
+          <circle cx={X(start.x)} cy={Y(start.y)} r="10" class="route__ring" />
+          <text x={side(X(start.x), 18).x} y={Y(start.y) + 6} text-anchor={side(X(start.x), 18).anchor}>Start</text>
+        </g>
+        <g class="route__end">
+          <circle cx={X(end.x)} cy={Y(end.y)} r="8" />
+          <text x={side(X(end.x), 16).x} y={Y(end.y) + 6} text-anchor={side(X(end.x), 16).anchor}>Finish</text>
+        </g>
+      </>
+    )}
+    <g class="route__scale" transform={`translate(${pad - 24} ${H - 26})`}>
+      <line x1="0" x2={step * s} y1="0" y2="0" />
+      <line x1="0" x2="0" y1="-6" y2="6" />
+      <line x1={step * s} x2={step * s} y1="-6" y2="6" />
+      <text x={step * s + 10} y="6">{step} km</text>
+    </g>
+    <circle class="route__cursor" r="9" cx="-100" cy="-100" data-route-dot />
+  </svg>
+
+  {hasEle && (
+    <div class="route__profile-wrap">
+      <svg
+        class="route__profile"
+        viewBox={`0 0 ${PW} ${PH}`}
+        role="slider"
+        tabindex="0"
+        aria-label="Position along the route"
+        aria-valuemin="0"
+        aria-valuemax={total.toFixed(1)}
+        aria-valuenow="0"
+        aria-valuetext="Start"
+        data-route-profile
+      >
+        <g class="route__pgrid">
+          {eleLines.map((e) => <line x1={pl} x2={PW - pr} y1={PY(e)} y2={PY(e)} />)}
+          {kmLabels.map((km) => (
+            <text x={PX(km)} y={PH - 8} text-anchor={km === 0 ? 'start' : 'middle'}>{+km.toFixed(1)} km</text>
+          ))}
+        </g>
+        <path class="route__area" d={area} />
+        <path class="route__pline" d={prof} />
+        <g class="route__pgrid">
+          {eleLines.map((e, i) => (
+            <text class:list={['route__elabel', { 'route__elabel--alt': (eleLines.length - 1 - i) % 2 === 1 }]} x={pl - 12} y={PY(e) + 6} text-anchor="end">
+              {fmt(e)}<tspan class:list={['route__unit', { 'route__unit--top': i === eleLines.length - 1 }]}> m</tspan>
+            </text>
+          ))}
+        </g>
+        <line class="route__pcursor" x1="-10" x2="-10" y1={pt} y2={PH - pb} data-route-pline />
+        <circle class="route__cursor" r="6" cx="-100" cy="-100" data-route-pdot />
+      </svg>
+    </div>
+  )}
+
+  <figcaption class="route__cap">
+    <span class="mono" data-route-readout>
+      {track.distanceKm.toFixed(1)} km
+      {track.gainM !== undefined && <> · {fmt(track.gainM)} m up · {fmt(track.lossM!)} m down</>}
+      {hasEle && <> · {fmt(track.minEle!)}–{fmt(track.maxEle!)} m</>}
+    </span>
+    {sample && <span class="tag tag--draft">Sample route, not a real track</span>}
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-route]').forEach((fig) => {
+    const pts = JSON.parse(fig.dataset.route!) as [number, number, number, number | null, number, number | null][];
+    const prof = fig.querySelector<SVGSVGElement>('[data-route-profile]');
+    const dot = fig.querySelector<SVGCircleElement>('[data-route-dot]')!;
+    const pdot = fig.querySelector<SVGCircleElement>('[data-route-pdot]');
+    const pline = fig.querySelector<SVGLineElement>('[data-route-pline]');
+    const readout = fig.querySelector<HTMLElement>('[data-route-readout]')!;
+    const resting = readout.textContent;
+    if (!prof || !pdot || !pline) return;
+    let at = 0;
+    const show = (i: number) => {
+      at = Math.max(0, Math.min(pts.length - 1, i));
+      const [x, y, d, e, px, py] = pts[at];
+      dot.setAttribute('cx', String(x));
+      dot.setAttribute('cy', String(y));
+      pdot.setAttribute('cx', String(px));
+      pdot.setAttribute('cy', String(py ?? -100));
+      pline.setAttribute('x1', String(px));
+      pline.setAttribute('x2', String(px));
+      const text = `${d.toFixed(1)} km${e !== null ? ` · ${e.toLocaleString('en-AU')} m` : ''}`;
+      readout.textContent = text;
+      prof.setAttribute('aria-valuenow', d.toFixed(1));
+      prof.setAttribute('aria-valuetext', text);
+      fig.classList.add('is-scrubbing');
+    };
+    const hide = () => {
+      fig.classList.remove('is-scrubbing');
+      readout.textContent = resting;
+    };
+    const fromPointer = (ev: PointerEvent) => {
+      const r = prof.getBoundingClientRect();
+      const vbx = ((ev.clientX - r.left) / r.width) * prof.viewBox.baseVal.width;
+      let best = 0;
+      for (let i = 1; i < pts.length; i++) if (Math.abs(pts[i][4] - vbx) < Math.abs(pts[best][4] - vbx)) best = i;
+      show(best);
+    };
+    prof.addEventListener('pointermove', fromPointer);
+    prof.addEventListener('pointerdown', fromPointer);
+    prof.addEventListener('pointerleave', (ev) => { if (ev.pointerType === 'mouse') hide(); });
+    prof.addEventListener('focus', () => show(at));
+    prof.addEventListener('blur', hide);
+    prof.addEventListener('keydown', (ev) => {
+      const jump = ev.shiftKey ? 20 : 4;
+      if (ev.key === 'ArrowRight') { ev.preventDefault(); show(at + jump); }
+      if (ev.key === 'ArrowLeft') { ev.preventDefault(); show(at - jump); }
+      if (ev.key === 'Home') { ev.preventDefault(); show(0); }
+      if (ev.key === 'End') { ev.preventDefault(); show(pts.length - 1); }
+    });
+  });
+</script>
+
+<style>
+  .route { margin: 0; display: grid; gap: 12px; }
+  .route__map {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+  }
+  .route__grid line { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .route__halo { fill: none; stroke: var(--white); stroke-width: 9; stroke-linejoin: round; stroke-linecap: round; }
+  .route__line { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .route__tick circle { fill: var(--white); stroke: var(--ink); stroke-width: 1.5; }
+  .route__tick text, .route__end text, .route__scale text {
+    font-family: var(--mono);
+    font-size: 20px;
+    fill: var(--ink-2);
+    paint-order: stroke;
+    stroke: var(--white);
+    stroke-width: 6px;
+  }
+  .route__end circle { fill: var(--ink); }
+  .route__end .route__ring { fill: var(--green-bg); stroke: var(--ink); stroke-width: 2; }
+  .route__scale line { stroke: var(--ink); stroke-width: 2; }
+  .route__cursor {
+    fill: var(--yellow-bg);
+    stroke: var(--ink);
+    stroke-width: 2;
+    opacity: 0;
+    transition: opacity 200ms var(--ease);
+  }
+  .is-scrubbing .route__cursor { opacity: 1; }
+
+  .route__profile-wrap {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 8px 4px 2px;
+  }
+  .route__profile { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: pan-y; border-radius: 6px; }
+  .route__pgrid line { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .route__pgrid text { font-family: var(--mono); font-size: 17px; fill: var(--mute); }
+
+  .route__area { fill: var(--green-bg); }
+  .route__pline { fill: none; stroke: var(--ink); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .route__pcursor { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 3 4; opacity: 0; }
+  .is-scrubbing .route__pcursor { opacity: 1; }
+
+  .route__cap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .route__cap .mono { color: var(--ink-2); }
+
+  @media (max-width: 600px) {
+    .route__tick text, .route__end text, .route__scale text { font-size: 30px; }
+    .route__pgrid text { font-size: 28px; }
+    .route__elabel--alt { display: none; }
+    .route__unit:not(.route__unit--top) { display: none; }
+  }
+</style>

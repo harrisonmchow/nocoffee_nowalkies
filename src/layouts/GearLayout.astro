@@ -1,0 +1,93 @@
+---
+// Gear pages navigate between each other with view transitions, so the
+// figure, names and items morph from one view to the next. The router is
+// only on these pages; links out to the rest of the site load normally.
+import { ClientRouter } from 'astro:transitions';
+import Base from './Base.astro';
+import '../styles/gear.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+---
+<Base title={title} description={description} current="gear">
+  <ClientRouter slot="head" fallback="animate" />
+  <slot />
+</Base>
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+
+  // Each gear page wraps its content in .g-page with data-up / data-prev /
+  // data-next URLs. Esc goes up a level, arrows step sideways.
+  let swapped = false;
+  let direction: string = 'forward';
+  document.addEventListener('astro:before-preparation', (e) => {
+    direction = (e as unknown as { direction: string }).direction;
+  });
+
+  // Flat-lays lay their items down when you arrive from above, but not when
+  // you step back out of an item (that item is already morphing into place).
+  const cascade = () => {
+    const flat = document.querySelector<HTMLElement>('[data-cascade]');
+    if (flat && direction !== 'back') flat.classList.add('is-cascade');
+  };
+  cascade();
+  document.addEventListener('astro:after-swap', () => {
+    swapped = true;
+    cascade();
+  });
+
+  function onLoad() {
+    const page = document.querySelector<HTMLElement>('.g-page');
+    if (!page) return;
+    // After a client-side step, put focus on the new view's heading.
+    if (swapped) page.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true });
+
+    // Person page: hovering or focusing a category leans the figure toward it.
+    const stage = page.querySelector<HTMLElement>('[data-stage]');
+    page.querySelectorAll<HTMLElement>('[data-peek]').forEach((el) => {
+      const on = () => {
+        if (!stage) return;
+        stage.style.setProperty('--fx', `${el.dataset.fx}%`);
+        stage.style.setProperty('--fy', `${el.dataset.fy}%`);
+        stage.dataset.peek = el.dataset.peek;
+      };
+      const off = () => { if (stage) delete stage.dataset.peek; };
+      el.addEventListener('pointerenter', on);
+      el.addEventListener('pointerleave', off);
+      el.addEventListener('focusin', on);
+      el.addEventListener('focusout', off);
+    });
+  }
+  document.addEventListener('astro:page-load', onLoad);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+    const target = e.target as HTMLElement;
+    if (target.closest('input, textarea, select, [contenteditable], dialog[open], [role="slider"]')) return;
+    const page = document.querySelector<HTMLElement>('.g-page');
+    if (!page) return;
+
+    // Lineup: arrows move between people like a character-select screen.
+    if (page.dataset.mode === 'lineup' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const people = Array.from(page.querySelectorAll<HTMLElement>('[data-person]'));
+      const at = people.indexOf(document.activeElement as HTMLElement);
+      const next = at < 0 ? 0 : (at + (e.key === 'ArrowRight' ? 1 : -1) + people.length) % people.length;
+      people[next]?.focus();
+      e.preventDefault();
+      return;
+    }
+    const go = (key: 'up' | 'prev' | 'next') => {
+      const url = page.dataset[key];
+      if (!url) return;
+      e.preventDefault();
+      navigate(url);
+    };
+    if (e.key === 'Escape') go('up');
+    else if (e.key === 'ArrowLeft') go('prev');
+    else if (e.key === 'ArrowRight') go('next');
+  });
+</script>

@@ -1,0 +1,90 @@
+---
+// A person in full kit. Uses their cut-out photo when one exists
+// (src/content/loadouts/<person>.md → figure), otherwise a stand-in ink figure.
+// Figures share one frame: 2:3, feet at 96% height, head top near 6%,
+// so focus points and transitions line up for everyone.
+import { Image } from 'astro:assets';
+
+interface Props {
+  name: string;
+  tone: 'green' | 'blue' | 'yellow' | 'red';
+  figure?: ImageMetadata;
+  figureAlt?: string;
+  transitionName: string;
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+  /** Render as the faint backdrop behind a flat-lay or item. */
+  ghost?: boolean;
+}
+const { name, tone, figure, figureAlt, transitionName, sizes = '40vw', eager = false, class: cls, ghost = false } = Astro.props;
+---
+<div class:list={['gfig', `gfig--${tone}`, { 'gfig--ghost': ghost }, cls]} transition:name={transitionName}>
+  {figure ? (
+    <Image
+      class="gfig__img"
+      src={figure}
+      alt={figureAlt ?? `${name} in full hiking kit`}
+      widths={[400, 700, 1000, 1400]}
+      sizes={sizes}
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  ) : (
+    <svg class="gfig__svg" viewBox="0 0 400 600" role="img" aria-label={`Stand-in figure for ${name} in hiking kit`}>
+      <circle class="gfig__shape" cx="238" cy="262" r="150" />
+      <line class="gfig__pole" x1="112" y1="318" x2="94" y2="576" />
+      <line class="gfig__pole" x1="288" y1="318" x2="306" y2="576" />
+      <rect class="gfig__fill" x="130" y="94" width="140" height="218" rx="28" />
+      <path class="gfig__ink" d="M138 124 Q200 104 262 124" />
+      <path class="gfig__tube" d="M178 296 L172 556 M222 296 L228 556" />
+      <path class="gfig__tube-in" d="M178 296 L172 556 M222 296 L228 556" />
+      <path class="gfig__fill" d="M150 548 h46 v16 a12 12 0 0 1 -12 12 h-42 a8 8 0 0 1 -8 -8 v-4 a16 16 0 0 1 16 -16 z" />
+      <path class="gfig__fill" d="M250 548 h-46 v16 a12 12 0 0 0 12 12 h42 a8 8 0 0 0 8 -8 v-4 a16 16 0 0 0 -16 -16 z" />
+      <path class="gfig__fill" d="M150 136 Q200 116 250 136 L260 308 Q200 320 140 308 Z" />
+      <path class="gfig__ink" d="M200 128 L200 312" />
+      <path class="gfig__ink" d="M168 134 Q162 200 172 266 M232 134 Q238 200 228 266" />
+      <path class="gfig__ink" d="M170 198 L230 198" />
+      <path class="gfig__fill" d="M138 284 Q200 298 262 284 L264 304 Q200 318 136 304 Z" />
+      <path class="gfig__tube" d="M156 148 L126 236 L114 310 M244 148 L274 236 L286 310" />
+      <path class="gfig__tube-in" d="M156 148 L126 236 L114 310 M244 148 L274 236 L286 310" />
+      <circle class="gfig__fill" cx="113" cy="318" r="11" />
+      <circle class="gfig__fill" cx="287" cy="318" r="11" />
+      <rect class="gfig__fill" x="189" y="104" width="22" height="22" rx="4" />
+      <circle class="gfig__fill" cx="200" cy="76" r="32" />
+      <path class="gfig__fill" d="M168 70 Q170 40 200 40 Q230 40 232 70 Z" />
+      <path class="gfig__ink" d="M164 70 Q200 84 238 70" />
+    </svg>
+  )}
+</div>
+
+<style>
+  .gfig {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+  }
+  .gfig__img, .gfig__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    overflow: visible;
+  }
+  .gfig__img { filter: saturate(0.9) sepia(0.05); }
+  .gfig__svg { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .gfig__shape { stroke: none; }
+  .gfig--green .gfig__shape { fill: var(--green-bg); }
+  .gfig--blue .gfig__shape { fill: var(--blue-bg); }
+  .gfig--yellow .gfig__shape { fill: var(--yellow-bg); }
+  .gfig--red .gfig__shape { fill: var(--red-bg); }
+  .gfig__fill { fill: var(--white); stroke: var(--ink); stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+  .gfig__ink { stroke: var(--ink); stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+  .gfig__tube { stroke: var(--ink); stroke-width: 40; }
+  .gfig__tube-in { stroke: var(--white); stroke-width: 35; }
+  .gfig__pole { stroke: var(--ink); stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
+  /* A figure used as a ghosted backdrop: the faintness lives on the content,
+     so view-transition snapshots carry it (ancestor opacity is not captured). */
+  .gfig--ghost > :global(*) { opacity: 0.08; filter: blur(2px) grayscale(0.4); }
+</style>

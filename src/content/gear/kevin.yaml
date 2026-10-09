@@ -1,0 +1,75 @@
+# Sample loadout. Replace each item with the real thing:
+# add brand, weightG (grams), notes, and image (a cut-out in ./kevin/).
+sample: true
+items:
+  - id: hat
+    name: Hat
+    category: clothing
+    type: hat
+  - id: rain-jacket
+    name: Rain jacket
+    category: clothing
+    type: rain-jacket
+    worn: false
+  - id: down-jacket
+    name: Down jacket
+    category: clothing
+    type: down-jacket
+    worn: false
+  - id: fleece
+    name: Fleece
+    category: clothing
+    type: fleece
+    worn: false
+  - id: shirt
+    name: Hiking shirt
+    category: clothing
+    type: shirt
+  - id: pants
+    name: Hiking pants
+    category: clothing
+    type: pants
+  - id: socks
+    name: Hiking socks
+    category: clothing
+    type: socks
+  - id: shoes
+    name: Trail shoes
+    category: clothing
+    type: shoes
+  - id: pack
+    name: Pack
+    category: gear
+    type: bag
+  - id: tent
+    name: Tent
+    category: gear
+    type: tent
+  - id: sleeping-pad
+    name: Sleeping pad
+    category: gear
+    type: sleeping-pad
+  - id: sleeping-bag
+    name: Sleeping bag
+    category: gear
+    type: sleeping-bag
+  - id: stove
+    name: Stove and pot
+    category: gear
+    type: cooking
+  - id: water
+    name: Water bottles
+    category: gear
+    type: water
+  - id: power
+    name: Power bank and cables
+    category: gear
+    type: electronics
+  - id: first-aid
+    name: First aid kit
+    category: gear
+    type: first-aid
+  - id: headtorch
+    name: Headtorch
+    category: gear
+    type: accessories

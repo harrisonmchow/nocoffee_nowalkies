@@ -1,0 +1,76 @@
+---
+// An item's picture: its top-down cut-out when one exists, otherwise a
+// stand-in top-down ink drawing on the owner's pastel shape (SKILL.md illustration rule).
+import { Image } from 'astro:assets';
+import { itemTypes } from '../data/gear-types';
+import type { GearItem } from '../lib/gear';
+import { drawings } from '../data/gear-drawings';
+
+interface Props {
+  item: GearItem;
+  tone: 'green' | 'blue' | 'yellow' | 'red';
+  transitionName: string;
+  sizes?: string;
+  eager?: boolean;
+}
+const { item, tone, transitionName, sizes = '240px', eager = false } = Astro.props;
+const spec = itemTypes[item.type];
+---
+<div class:list={['gart', `gart--${tone}`, { 'gart--stand-in': !item.image }]} transition:name={transitionName}>
+  {item.image ? (
+    <Image
+      class="gart__img"
+      src={item.image}
+      alt={[item.brand, item.name].filter(Boolean).join(' ')}
+      widths={[240, 480, 900, 1200]}
+      sizes={sizes}
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  ) : (
+    <>
+      <span class="gart__shape" aria-hidden="true"></span>
+      <svg class="gart__draw" viewBox="0 0 200 200" role="img" aria-label={`Stand-in drawing of ${spec.label.toLowerCase()}, seen from above`} set:html={drawings[item.type]} />
+    </>
+  )}
+</div>
+
+<style>
+  .gart {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+  }
+  .gart__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 14px rgba(17, 17, 17, 0.05));
+  }
+  .gart__shape {
+    position: absolute;
+    width: 64%;
+    height: 64%;
+    left: 24%;
+    top: 22%;
+    border-radius: 12%;
+  }
+  .gart--green .gart__shape { background: var(--green-bg); }
+  .gart--blue .gart__shape { background: var(--blue-bg); }
+  .gart--yellow .gart__shape { background: var(--yellow-bg); }
+  .gart--red .gart__shape { background: var(--red-bg); }
+  .gart__draw {
+    position: relative;
+    width: 86%;
+    height: 86%;
+    overflow: visible;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .gart__draw :global(*) { vector-effect: non-scaling-stroke; }
+  .gart__draw :global(.f) { fill: var(--white); }
+</style>

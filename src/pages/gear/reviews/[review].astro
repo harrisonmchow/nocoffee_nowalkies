@@ -1,0 +1,261 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import GearLayout from '../../../layouts/GearLayout.astro';
+import GearArt from '../../../components/GearArt.astro';
+import GearFigure from '../../../components/GearFigure.astro';
+import Rating from '../../../components/Rating.astro';
+import Sign from '../../../components/Sign.astro';
+import Icon from '../../../components/Icon.astro';
+import { itemTypes } from '../../../data/gear-types';
+import { crewName } from '../../../data/site';
+import { regions } from '../../../data/regions';
+import { personTone, getLoadout, gearHref } from '../../../lib/gear';
+import { getWalks, walkHref, walkMeta, type Walk } from '../../../lib/walks';
+import {
+  getReviews, reviewHref, verdictLabel, disclosure, reviewArtItem, testedLine, type Review,
+} from '../../../lib/reviews';
+
+export async function getStaticPaths() {
+  const reviews = await getReviews();
+  const walks = await getWalks();
+  return Promise.all(
+    reviews.map(async (r: Review, i: number) => {
+      // Fail the build on broken links rather than shipping them.
+      let kit: { href: string; label: string } | undefined;
+      if (r.data.item) {
+        const p = await getLoadout(r.data.item.person);
+        const item = p.items.find((x) => x.id === r.data.item!.id);
+        if (!item) throw new Error(`Review ${r.id}: no item "${r.data.item.id}" in ${r.data.item.person}'s gear`);
+        kit = { href: gearHref(p.id, item.category, item.id), label: `${p.name}’s ${item.name.toLowerCase()}`, category: item.category };
+      }
+      const usedOn = r.data.walks.map((id: string) => {
+        const w = walks.find((x: Walk) => x.id === id);
+        if (!w) throw new Error(`Review ${r.id}: no walk "${id}" (use <region>/<walk-folder>)`);
+        return w;
+      });
+      return {
+        params: { review: r.id },
+        props: {
+          review: r,
+          kit,
+          usedOn,
+          prev: reviews[(i - 1 + reviews.length) % reviews.length],
+          next: reviews[(i + 1) % reviews.length],
+          index: i,
+          count: reviews.length,
+        },
+      };
+    }),
+  );
+}
+
+const { review: r, kit, usedOn, prev, next, index, count } = Astro.props as {
+  review: Review; kit?: { href: string; label: string; category: 'clothing' | 'gear' }; usedOn: Walk[]; prev: Review; next: Review; index: number; count: number;
+};
+const { Content } = await render(r);
+const d = disclosure(r);
+const tested = testedLine(r);
+const date = r.data.date?.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+const product = [r.data.brand, r.data.itemName].filter(Boolean).join(' ');
+const regionName = (slug: string) => regions.find((x) => x.slug === slug)?.name ?? slug;
+// The reviewer's figure stands behind the review, faint, at the item's place on the body.
+const who = await getLoadout(r.data.item?.person ?? r.data.author);
+const focus = who.loadout.data.focus[kit?.category ?? itemTypes[r.data.type].category];
+const typeLabel = itemTypes[r.data.type].label;
+const retired = r.data.verdict === 'retired';
+---
+<GearLayout title={`${r.data.title} | Reviews`} description={r.data.summary}>
+  <div class="dive" aria-hidden="true">
+    <div class="dive__fig" style={`--fx:${focus.x}%;--fy:${focus.y}%`}>
+      <GearFigure name={who.name} tone={personTone[who.id]} figure={who.loadout.data.figure} transitionName={`figure-${who.id}`} sizes="100vw" ghost />
+    </div>
+  </div>
+  <div class="g-page wrap" data-up="/gear/reviews/" data-prev={count > 1 ? reviewHref(prev) : undefined} data-next={count > 1 ? reviewHref(next) : undefined}>
+    <article class="rv">
+      <div class="rv__top">
+        <a class="g-back" href="/gear/reviews/"><Icon name="arrow-left" /> All reviews</a>
+        <p class="g-keys"><kbd>Esc</kbd> all reviews{count > 1 && <> <kbd>←</kbd><kbd>→</kbd> other reviews</>}</p>
+      </div>
+
+      <header class="rv__hero">
+        <div class="rv__stage">
+          {r.data.cover ? (
+            <div class="rv__photo" transition:name={`review-${r.id}`}>
+              <Image src={r.data.cover} alt={r.data.coverAlt ?? product} widths={[480, 900, 1200]} sizes="(min-width: 860px) 45vw, 100vw" loading="eager" />
+            </div>
+          ) : (
+            <div class="rv__art">
+              <GearArt item={reviewArtItem(r)} tone={personTone[r.data.author]} transitionName={`review-${r.id}`} sizes="480px" eager />
+            </div>
+          )}
+        </div>
+
+        <div class="rv__head">
+          <h1 tabindex="-1">{r.data.title}</h1>
+          <p class="rv__product">
+            <span>{product}</span>
+            {r.data.sample && <span class="tag tag--draft">Sample</span>}
+          </p>
+
+          <p class:list={['rv__disclosure', `rv__disclosure--${r.data.acquired}`]}>
+            <span class={`tag tag--${r.data.acquired}`}>{d.short}</span>
+            <span>{d.long}</span>
+          </p>
+
+          <div class="rv__score">
+            <Rating value={r.data.rating} size="lg" />
+            <span class={`tag tag--${r.data.verdict}`}>{verdictLabel[r.data.verdict]}</span>
+          </div>
+
+          <dl class="g-spec">
+            <div><dt>Reviewed by</dt><dd>{crewName(r.data.author)}</dd></div>
+            {date && <div><dt>Published</dt><dd>{date}</dd></div>}
+            {tested && <div><dt>Tested over</dt><dd class="num">{tested}</dd></div>}
+            {typeLabel !== r.data.itemName && <div><dt>Type</dt><dd>{typeLabel}</dd></div>}
+            {kit && <div><dt>{retired ? 'Was in our kit' : 'In our kit'}</dt><dd><a href={kit.href}>{kit.label} <Icon name="arrow-right" /></a></dd></div>}
+          </dl>
+        </div>
+      </header>
+
+      {(r.data.pros.length > 0 || r.data.cons.length > 0) && (
+        <section class="rv__pc" aria-label="Pros and cons">
+          {r.data.pros.length > 0 && (
+            <div>
+              <h2>Good</h2>
+              <ul class="rv__list rv__list--pro" role="list">
+                {r.data.pros.map((p: string) => <li><Icon name="plus" /><span>{p}</span></li>)}
+              </ul>
+            </div>
+          )}
+          {r.data.cons.length > 0 && (
+            <div>
+              <h2>Not so good</h2>
+              <ul class="rv__list rv__list--con" role="list">
+                {r.data.cons.map((c: string) => <li><Icon name="minus" /><span>{c}</span></li>)}
+              </ul>
+            </div>
+          )}
+        </section>
+      )}
+
+      <div class="rv__body prose">
+        <Content />
+      </div>
+
+      {usedOn.length > 0 && (
+        <section class="rv__walks" aria-labelledby="rv-walks-h">
+          <h2 id="rv-walks-h">Carried on</h2>
+          <ul class="rv__walk-list" role="list">
+            {usedOn.map((w) => (
+              <li><Sign name={w.data.title} href={walkHref(w)} meta={`${regionName(w.data.region)} · ${walkMeta(w)}`} /></li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {count > 1 && (
+        <nav class="item__step rv__step" aria-label="Other reviews">
+          <a href={reviewHref(prev)}><Icon name="arrow-left" /> {prev.data.title}</a>
+          <span class="mono muted">{index + 1} of {count}</span>
+          <a href={reviewHref(next)}>{next.data.title} <Icon name="arrow-right" /></a>
+        </nav>
+      )}
+    </article>
+  </div>
+</GearLayout>
+
+<style>
+  .rv { position: relative; z-index: 1; padding-top: clamp(24px, 4vw, 48px); }
+  .rv__top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+  .rv__hero {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(24px, 5vw, 80px);
+    align-items: start;
+    margin-top: 20px;
+  }
+  .rv__stage {
+    display: grid;
+    place-items: center;
+    padding: clamp(20px, 4vw, 56px);
+    background-color: var(--paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1' cy='1' r='1' fill='%23111' fill-opacity='0.08'/%3E%3C/svg%3E");
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+  }
+  .rv__art { width: min(100%, 420px); }
+  .rv__photo { width: 100%; aspect-ratio: 4 / 5; border-radius: 8px; overflow: hidden; }
+  .rv__photo img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.82) sepia(0.08); }
+
+  .rv__head { display: grid; gap: 20px; align-content: start; }
+  .rv__head h1 { font-size: clamp(2.75rem, 5.5vw, 4.75rem); letter-spacing: -0.035em; line-height: 1; }
+  .rv__product { margin-top: -6px; font-size: 1.125rem; color: var(--ink-2); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  .rv__disclosure {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--white);
+    font-size: 0.9375rem;
+  }
+  .rv__disclosure--paid-partnership { border-color: var(--ink); }
+
+  .rv__score { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .rv__head .g-spec a { color: var(--ink); text-underline-offset: 0.2em; display: inline-flex; align-items: center; gap: 0.35em; }
+
+  .rv__pc {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 4vw, 56px);
+    margin-top: clamp(48px, 7vw, 88px);
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+  }
+  .rv__pc h2 { font-size: clamp(1.75rem, 3vw, 2.25rem); letter-spacing: -0.02em; }
+  .rv__list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+  .rv__list li {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 12px;
+    align-items: baseline;
+    color: var(--ink-2);
+  }
+  .rv__list li :global(.icon) { width: 14px; height: 14px; translate: 0 2px; color: var(--ink); }
+  .rv__list--con li :global(.icon) { color: var(--mute); }
+
+  .rv__body { margin: clamp(48px, 7vw, 88px) auto 0; }
+  .rv__body > :first-child { margin-top: 0; }
+
+  .rv__walks {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(24px, 5vw, 80px);
+    margin-top: clamp(56px, 8vw, 104px);
+    align-items: start;
+  }
+  .rv__walks h2 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.03em; }
+  .rv__walk-list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 8px; position: relative; }
+  .rv__walk-list::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: -14px;
+    bottom: -14px;
+    width: 6px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  .rv__step { margin-top: clamp(48px, 7vw, 88px); }
+
+  @media (max-width: 860px) {
+    .rv__hero, .rv__walks { grid-template-columns: 1fr; }
+    .rv__art { width: min(100%, 300px); }
+    .rv__pc { grid-template-columns: 1fr; }
+  }
+</style>

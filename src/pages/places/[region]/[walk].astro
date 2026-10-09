@@ -1,0 +1,269 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Sign from '../../../components/Sign.astro';
+import Icon from '../../../components/Icon.astro';
+import Trail from '../../../components/Trail.astro';
+import Lightbox from '../../../components/Lightbox.astro';
+import RouteMap from '../../../components/RouteMap.astro';
+import { regions, formatCoord } from '../../../data/regions';
+import { crewName } from '../../../data/site';
+import { getReviews, reviewHref, verdictLabel, disclosure, type Review } from '../../../lib/reviews';
+import {
+  getWalks, walkSlug, walkHref, walkMeta, loadTrack, walkStats,
+  formatKm, formatM, formatNights, formatDate, type Walk,
+} from '../../../lib/walks';
+
+export async function getStaticPaths() {
+  const walks = await getWalks();
+  return walks.map((w: Walk) => ({ params: { region: w.data.region, walk: walkSlug(w) }, props: { walk: w } }));
+}
+
+const { walk: w } = Astro.props as { walk: Walk };
+const r = regions.find((x) => x.slug === w.data.region)!;
+const { Content } = await render(w);
+const track = loadTrack(w);
+const s = walkStats(w, track);
+const nearby = (await getWalks(r.slug)).filter((o: Walk) => o.id !== w.id);
+const gallery = w.data.gallery;
+const reviewed = (await getReviews()).filter((rv: Review) => rv.data.walks.includes(w.id));
+const large = await Promise.all(gallery.map((g) => getImage({ src: g.image, width: 2000, format: 'webp' })));
+const stats = [
+  ['Distance', formatKm(s.distanceKm)],
+  ['Climbing', formatM(s.gainM)],
+  ['Nights', formatNights(s.nights)],
+  ['When', formatDate(s.date)],
+  ['Walkers', w.data.walkers.length ? w.data.walkers.map(crewName).join(', ') : undefined],
+].filter((row): row is [string, string] => Boolean(row[1]));
+---
+<Base title={`${w.data.title}, ${r.name}`} current="places" description={w.data.summary}>
+  <article>
+    <header class="wk-hero">
+      <div class="wk-hero__photo">
+        <Image src={w.data.cover} alt={w.data.coverAlt} widths={[640, 1024, 1600, 2000]} sizes="100vw" loading="eager" fetchpriority="high" quality={72} />
+      </div>
+      <div class="wk-hero__text wrap">
+        <a class="wk-back" href={`/places/${r.slug}/`}><Icon name="arrow-left" /> {r.name}</a>
+        <h1>{w.data.title}</h1>
+        <p class="wk-hero__lede">{w.data.summary}</p>
+        <p class="wk-hero__tags">
+          {w.data.sample && <span class="tag tag--draft">Sample</span>}
+          <span class={`tag tag--${r.tag}`}>{r.tag}</span>
+          {s.grade && <span class={`tag tag--grade-${s.grade}`}>Grade {s.grade}</span>}
+          {w.data.author && <span class="muted">Words by {crewName(w.data.author)}</span>}
+        </p>
+        {stats.length > 0 && (
+          <dl class="wk-stats">
+            {stats.map(([k, v]) => (
+              <div><dt>{k}</dt><dd>{v}</dd></div>
+            ))}
+          </dl>
+        )}
+      </div>
+    </header>
+
+    <div class="trail-host">
+      <Trail />
+
+      {track && (
+        <section class="wk-route wrap" aria-labelledby="route-h">
+          <div class="wk-route__head">
+            <h2 id="route-h">Route</h2>
+            <p class="muted">Move along the profile to follow the route.{s.grade && <> Grade {s.grade} on the Australian Walking Track Grading System.</>}</p>
+          </div>
+          <RouteMap track={track} title={w.data.title} sample={w.data.sample} />
+        </section>
+      )}
+
+      <div class="wk-body wrap">
+        <div class="prose">
+          <Content />
+        </div>
+      </div>
+
+      {gallery.length > 0 && (
+        <section class="wk-gallery wrap" aria-labelledby="gallery-h">
+          <h2 id="gallery-h">Photos from the walk</h2>
+          <ul class="wk-gallery__grid" role="list">
+            {gallery.map((g, i) => (
+              <li>
+                <button
+                  class="wk-gallery__btn"
+                  type="button"
+                  data-lightbox={i}
+                  data-src={large[i].src}
+                  data-caption={g.caption}
+                  data-credit={g.by ?? ''}
+                  aria-label={`View larger: ${g.caption}`}
+                >
+                  <Image src={g.image} alt={g.caption} widths={[480, 800, 1200]} sizes="(min-width: 960px) 33vw, 50vw" />
+                </button>
+                <p class="wk-gallery__cap">
+                  <span>{g.caption}</span>
+                  {g.by && <span class="mono muted">{g.by}</span>}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {reviewed.length > 0 && (
+        <section class="wk-more wrap" aria-labelledby="reviewed-h">
+          <h2 id="reviewed-h">Gear reviewed on this walk</h2>
+          <ul class="wk-more__list" role="list">
+            {reviewed.map((rv: Review) => (
+              <li>
+                <Sign
+                  name={rv.data.title}
+                  href={reviewHref(rv)}
+                  meta={`${crewName(rv.data.author)} · ${rv.data.rating}/5${rv.data.partner ? ` · ${rv.data.acquired === 'gifted' ? 'gifted by' : 'paid by'} ${rv.data.partner}` : ''}`}
+                  tag={rv.data.verdict}
+                  tagLabel={verdictLabel[rv.data.verdict]}
+                  tags={[{ key: rv.data.acquired, label: disclosure(rv).short }]}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <nav class="wk-more wrap" aria-labelledby="more-h">
+        <h2 id="more-h">{nearby.length ? `More walks in ${r.name}` : `Back to ${r.name}`}</h2>
+        <ul class="wk-more__list" role="list">
+          {nearby.map((o: Walk) => (
+            <li>
+              <Sign
+                name={o.data.title}
+                href={walkHref(o)}
+                meta={walkMeta(o)}
+                tag={o.data.grade ? `grade-${o.data.grade}` : undefined}
+                tagLabel={o.data.grade ? `Grade ${o.data.grade}` : undefined}
+              />
+            </li>
+          ))}
+          <li>
+            <Sign name={r.name} href={`/places/${r.slug}/`} tag={r.tag} meta={`All walks and photos · ${formatCoord(r.lat, r.lon)}`} />
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </article>
+
+  {large[0] && <Lightbox initialSrc={large[0].src} />}
+</Base>
+
+<style>
+  .wk-hero__photo {
+    height: 56svh;
+    min-height: 300px;
+    overflow: hidden;
+    background: #d9d6cf;
+  }
+  .wk-hero__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08) contrast(1.02);
+  }
+  .wk-hero__text { padding-top: clamp(28px, 4vw, 48px); display: grid; gap: 18px; }
+  .wk-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    justify-self: start;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  .wk-back:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  .wk-hero h1 {
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 16ch;
+  }
+  .wk-hero__lede { font-size: 1.1875rem; color: var(--ink-2); max-width: 56ch; }
+  .wk-hero__tags { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.9375rem; }
+  .wk-stats {
+    margin: 12px 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .wk-stats > div { padding: 16px 20px 18px 0; display: grid; gap: 2px; }
+  .wk-stats > div + div { padding-left: 20px; border-left: 1px solid var(--rule); }
+  .wk-stats dt { font-size: 0.8125rem; color: var(--mute); }
+  .wk-stats dd { margin: 0; font-family: var(--serif); font-size: 1.75rem; line-height: 1.15; }
+  @media (max-width: 600px) {
+    .wk-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .wk-stats > div + div { padding-left: 0; border-left: 0; }
+    .wk-stats > div:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--rule); }
+    .wk-stats > div:nth-child(n + 3) { border-top: 1px solid var(--rule); }
+  }
+
+  .trail-host { position: relative; }
+  .trail-host > * { position: relative; z-index: 1; }
+
+  .wk-route { padding-top: clamp(64px, 9vw, 112px); display: grid; gap: 24px; }
+  .wk-route__head { display: grid; gap: 8px; }
+  .wk-route h2, .wk-gallery h2, .wk-more h2 { font-size: clamp(2.25rem, 4.5vw, 3.5rem); letter-spacing: -0.03em; }
+
+  .wk-body { padding-top: clamp(48px, 7vw, 96px); }
+  .wk-body .prose { margin-inline: auto; }
+  .wk-body .prose > :first-child { margin-top: 0; }
+
+  .wk-gallery { padding-top: var(--section); display: grid; gap: 24px; }
+  .wk-gallery__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .wk-gallery__btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: #e6e3dc;
+  }
+  .wk-gallery__btn img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    filter: saturate(0.82) sepia(0.08);
+    transition: transform 900ms var(--ease);
+  }
+  .wk-gallery__btn:hover img { transform: scale(1.03); }
+  .wk-gallery__cap { display: grid; gap: 2px; margin-top: 8px; font-size: 0.875rem; }
+  .wk-gallery__cap .mono { font-size: 0.75rem; }
+
+  .wk-more {
+    padding-top: var(--section);
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .wk-more__list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 8px; position: relative; }
+  .wk-more__list::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: -24px;
+    bottom: -48px;
+    width: 6px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  @media (max-width: 860px) { .wk-more { grid-template-columns: 1fr; } }
+</style>

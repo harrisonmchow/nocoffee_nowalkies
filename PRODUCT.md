@@ -41,6 +41,16 @@ The content is first-hand: four real friends documenting hikes they actually too
 - **Brand contact:** email only, a plain link to nocoffeenowalkies@gmail.com. No contact form.
 - **People:** the four members are Harry, Kevin, Caleb and Mikey. Each gets a short profile (name, photo, one line), and posts carry author bylines.
 - **Hiking regions:** Blue Mountains, Warrumbungles, Kosciuszko National Park, Tasmania, and Ala Archa National Park (Kyrgyzstan).
+- **Walks:** each region holds many walks. A walk has a write-up, photos, trip stats, an optional GPX route (drawn as a route map with an elevation profile), and a grade on the Australian Walking Track Grading System. Walks live at `/places/<region>/<walk>/`.
+- **Gear:** each person has a current loadout of items. Item fields are name, brand, category (clothing or gear), type, weight in grams, worn or packed, a cut-out image, and notes. Base, worn and total weights are computed from the items.
+  - The section reads like inspecting a character in a video game: a lineup of all four people, then one person in full kit, then a bird's-eye flat-lay of a category, then a single item. Viewers can look but not change anything.
+  - There is no shared gear: every item belongs to the person who carries it.
+- **Gear reviews:** reviews live at `/gear/reviews/`, and each one can be linked from the matching item in someone's loadout.
+  - Each review has a score out of 5 (half steps) and a trail verdict: Still carrying, Would buy again, or Retired.
+  - It can also carry pros and cons, how long the item was tested, and the walks it was used on.
+  - **Disclosure (brand commitment):** every review states how the item was obtained (bought, gifted, or paid partnership), and gifted or paid reviews must name the brand. This follows the ACCC's guidance for Australian creators, and the build enforces it.
+- **Figures:** made from a real full-body photo of each person in kit, cut out to a standard frame. Until those exist, an ink stand-in is drawn.
+- **Samples:** walks and gear currently ship as labelled samples, with generic items and no brands, weights or trip stories. See `CONTENT.md` for how to replace them.
 - **Open decisions:**
   - each member's profile line and photo;
   - the deploy and hosting target;
@@ -65,7 +75,8 @@ Absences that future work must not fabricate:
 - brand names, collaboration results, follower counts and engagement metrics;
 - testimonials;
 - member bios;
-- trip details (dates, routes, distances, stories) beyond the confirmed region names.
+- trip details (dates, routes, distances, stories) beyond the confirmed region names;
+- anyone's actual gear, brands or weights.
 
 Use the real material once it's supplied. Placeholder imagery may stand in during development, but it must never ship as if it were the group's own photos.
 

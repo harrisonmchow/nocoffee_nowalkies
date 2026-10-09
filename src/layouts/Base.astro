@@ -6,7 +6,7 @@ import { site } from '../data/site';
 interface Props {
   title?: string;
   description?: string;
-  current?: 'home' | 'photos' | 'work' | 'credits';
+  current?: 'home' | 'places' | 'photos' | 'gear' | 'work' | 'credits';
 }
 const {
   title,
@@ -17,7 +17,8 @@ const fullTitle = title ? `${title} | ${site.name}` : site.name;
 const nav = [
   { href: '/#places', label: 'Places', key: 'places' },
   { href: '/photos', label: 'Photos', key: 'photos' },
-  { href: '/work', label: 'Work with us', key: 'work' },
+  { href: '/gear/', label: 'Gear', key: 'gear' },
+  { href: '/work', label: 'Work with us', short: 'Work', key: 'work' },
 ];
 ---
 <!doctype html>
@@ -31,6 +32,7 @@ const nav = [
     <meta property="og:description" content={description} />
     <meta name="theme-color" content="#f7f6f3" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -45,7 +47,9 @@ const nav = [
           <ul class="nav__links">
             {nav.map((n) => (
               <li>
-                <a href={n.href} aria-current={current === n.key ? 'page' : undefined}>{n.label}</a>
+                <a href={n.href} aria-current={current === n.key ? 'page' : undefined}>
+                  {n.short ? <><span class="nav__long">{n.label}</span><span class="nav__short">{n.short}</span></> : n.label}
+                </a>
               </li>
             ))}
             <li>
@@ -80,6 +84,8 @@ const nav = [
             <ul class="foot__links">
               <li><a href="/#places">Places</a></li>
               <li><a href="/photos">Photos</a></li>
+              <li><a href="/gear/">Gear</a></li>
+              <li><a href="/gear/reviews/">Gear reviews</a></li>
               <li><a href="/work">Work with us</a></li>
               <li><a href="/credits">Photo credits</a></li>
             </ul>
@@ -176,10 +182,13 @@ const nav = [
       .nav__links a:hover { color: var(--ink); border-bottom-color: var(--ink); }
       .nav__links a[aria-current='page'] { color: var(--ink); border-bottom-color: var(--ink); }
       .nav__ig { display: inline-flex; align-items: center; gap: 0.4em; }
+      .nav__short { display: none; }
 
       @media (max-width: 720px) {
         .nav__mark { font-size: 1.15rem; gap: 0.22em; }
         .nav__links li:first-child { display: none; }
+        .nav__long { display: none; }
+        .nav__short { display: inline; }
         .nav__ig-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
         .nav__links { gap: 14px; font-size: 0.875rem; }
       }

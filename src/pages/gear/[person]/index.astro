@@ -1,0 +1,106 @@
+---
+import GearLayout from '../../../layouts/GearLayout.astro';
+import GearFigure from '../../../components/GearFigure.astro';
+import Sign from '../../../components/Sign.astro';
+import Icon from '../../../components/Icon.astro';
+import WeightBar from '../../../components/WeightBar.astro';
+import { getLoadouts, formatWeight, personTone, gearHref } from '../../../lib/gear';
+import { categories, categoryLabel } from '../../../data/gear-types';
+
+export async function getStaticPaths() {
+  const people = await getLoadouts();
+  return people.map((p, i) => ({
+    params: { person: p.id },
+    props: {
+      person: p,
+      prev: people[(i - 1 + people.length) % people.length],
+      next: people[(i + 1) % people.length],
+    },
+  }));
+}
+
+const { person: p, prev, next } = Astro.props;
+const { Content } = await p.render();
+const t = p.totals;
+const focus = p.loadout.data.focus;
+const updated = p.loadout.data.updated?.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+const weight = (g: number) => (t.hasWeights ? formatWeight(g) : undefined);
+---
+<GearLayout title={`${p.name}’s gear`} description={`${p.name}’s current hiking kit: clothing, pack, sleep system and kitchen.`}>
+  <div class="g-page wrap" data-up="/gear/" data-prev={gearHref(prev.id)} data-next={gearHref(next.id)}>
+    <div class="person">
+      <div class="stage" data-stage>
+        <div class="stage__fig">
+          <GearFigure
+            name={p.name}
+            tone={personTone[p.id]}
+            figure={p.loadout.data.figure}
+            figureAlt={p.loadout.data.figureAlt}
+            transitionName={`figure-${p.id}`}
+            sizes="(min-width: 860px) 36vw, 70vw"
+            eager
+          />
+          {categories.map((c, i) => (
+            <a
+              class:list={['hotspot', { 'hotspot--left': focus[c].x < 55 }]}
+              href={gearHref(p.id, c)}
+              style={`left:${focus[c].x}%;top:${focus[c].y}%`}
+              data-peek={c}
+              data-fx={focus[c].x}
+              data-fy={focus[c].y}
+              aria-label={`${categoryLabel[c]}: ${t.byCategory[c].count} items`}
+            >
+              <span class="hotspot__dot">{i + 1}</span>
+              <span class="hotspot__label">{categoryLabel[c]}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <a class="g-back" href="/gear/"><Icon name="arrow-left" /> Everyone</a>
+          <h1 tabindex="-1"><span transition:name={`name-${p.id}`}>{p.name}</span></h1>
+          <p class="panel__meta">
+            {p.sample && <span class="tag tag--draft">Sample kit</span>}
+            {updated && <span>Kit as of {updated}</span>}
+            <span class="g-keys"><kbd>Esc</kbd> back <kbd>←</kbd><kbd>→</kbd> next person</span>
+          </p>
+        </div>
+
+        <dl class="g-spec">
+          <div><dt>Base weight</dt>{weight(t.baseG) ? <dd class="num">{weight(t.baseG)}</dd> : <dd class="muted">Not weighed yet</dd>}</div>
+          <div><dt>Worn</dt>{weight(t.wornG) ? <dd class="num">{weight(t.wornG)}</dd> : <dd class="muted">Not weighed yet</dd>}</div>
+          <div><dt>Total</dt>{weight(t.totalG) ? <dd class="num">{weight(t.totalG)}</dd> : <dd class="muted">Not weighed yet</dd>}</div>
+          <div><dt>Items</dt><dd class="num">{t.count}{t.hasWeights && t.weighedCount < t.count ? ` (${t.count - t.weighedCount} not weighed yet)` : ''}</dd></div>
+        </dl>
+
+        <ul class="panel__cats" role="list">
+          {categories.map((c, i) => (
+            <li data-peek={c} data-fx={focus[c].x} data-fy={focus[c].y}>
+              <Sign
+                name={categoryLabel[c]}
+                href={gearHref(p.id, c)}
+                tag={String(i + 1)}
+                tagLabel={String(i + 1)}
+                meta={`${t.byCategory[c].count} items · ${t.hasWeights ? formatWeight(t.byCategory[c].weightG) : 'weights to come'}`}
+              />
+            </li>
+          ))}
+        </ul>
+
+        <WeightBar items={p.items} />
+
+        <section aria-labelledby="setup-h">
+          <h2 id="setup-h">The setup</h2>
+          <div class="panel__prose"><Content /></div>
+        </section>
+
+        <nav class="panel__switch" aria-label="Other people">
+          <a class="g-back" href={gearHref(prev.id)}><Icon name="arrow-left" /> {prev.name}</a>
+          <a class="g-back" href={gearHref(next.id)}>{next.name} <Icon name="arrow-right" /></a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</GearLayout>

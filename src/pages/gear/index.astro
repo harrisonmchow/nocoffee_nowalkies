@@ -1,0 +1,71 @@
+---
+import GearLayout from '../../layouts/GearLayout.astro';
+import GearFigure from '../../components/GearFigure.astro';
+import Icon from '../../components/Icon.astro';
+import { getLoadouts, formatWeight, personTone, gearHref } from '../../lib/gear';
+
+const people = await getLoadouts();
+const anySample = people.some((p) => p.sample);
+---
+<GearLayout title="Gear" description="What Harry, Kevin, Caleb and Mikey carry on the trail right now.">
+  <div class="g-page wrap" data-mode="lineup" data-up="/">
+    <header class="lineup-head">
+      <div>
+        <h1 tabindex="-1">Gear</h1>
+        <p class="lineup-head__lede">What the four of us carry right now. Pick someone to see their whole kit, then look closer.</p>
+        <p class="lineup-head__more"><a class="g-back" href="/gear/reviews/">Read our gear reviews <Icon name="arrow-right" /></a></p>
+        {anySample && (
+          <p class="lineup-head__note">
+            <span class="tag tag--draft">Samples</span>
+            <span>Figures and kit lists are stand-ins until our photos and gear lists are in.</span>
+          </p>
+        )}
+      </div>
+      <p class="g-keys"><kbd>←</kbd><kbd>→</kbd> choose <kbd>↵</kbd> open</p>
+    </header>
+
+    <section class="lineup" aria-label="Choose a person">
+      <ul class="lineup__row" role="list">
+        {people.map((p) => (
+          <li>
+            <a class="lineup__person" href={gearHref(p.id)} data-person>
+              <div class="lineup__fig">
+                <GearFigure
+                  name={p.name}
+                  tone={personTone[p.id]}
+                  figure={p.loadout.data.figure}
+                  figureAlt={p.loadout.data.figureAlt}
+                  transitionName={`figure-${p.id}`}
+                  sizes="(min-width: 860px) 22vw, 62vw"
+                  eager
+                />
+              </div>
+              <span class="lineup__plate">
+                <span class="lineup__name" transition:name={`name-${p.id}`}>{p.name}</span>
+                <span class="lineup__meta">
+                  {p.totals.count} items · {p.totals.hasWeights ? `${formatWeight(p.totals.baseG)} base` : 'weights to come'}
+                </span>
+                <span class="lineup__cta">See {p.name}’s kit <Icon name="arrow-right" /></span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="lineup-defs" aria-label="How we count weight">
+      <div>
+        <h2>Base weight</h2>
+        <p>Everything carried in the pack, before food, water and fuel.</p>
+      </div>
+      <div>
+        <h2>Worn</h2>
+        <p>What’s on your body while walking: shoes, socks, the layers you’re wearing.</p>
+      </div>
+      <div>
+        <h2>Total</h2>
+        <p>Base plus worn: everything you set off with, before food, water and fuel.</p>
+      </div>
+    </section>
+  </div>
+</GearLayout>

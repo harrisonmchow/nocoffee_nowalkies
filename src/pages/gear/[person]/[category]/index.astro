@@ -1,0 +1,90 @@
+---
+import GearLayout from '../../../../layouts/GearLayout.astro';
+import GearFigure from '../../../../components/GearFigure.astro';
+import GearArt from '../../../../components/GearArt.astro';
+import Sign from '../../../../components/Sign.astro';
+import Icon from '../../../../components/Icon.astro';
+import { getLoadouts, formatWeight, personTone, gearHref, byZone, isWorn } from '../../../../lib/gear';
+import { categories, categoryLabel, itemTypes, zoneLabel, type Category } from '../../../../data/gear-types';
+
+export async function getStaticPaths() {
+  const people = await getLoadouts();
+  return people.flatMap((p) =>
+    categories.map((category) => ({ params: { person: p.id, category }, props: { person: p, category } })),
+  );
+}
+
+const { person: p, category } = Astro.props as { person: Awaited<ReturnType<typeof getLoadouts>>[number]; category: Category };
+const zones = byZone(p.items, category);
+const items = zones.flatMap((z) => z.items);
+const focus = p.loadout.data.focus[category];
+const other = categories.find((c) => c !== category)!;
+const sum = (xs: typeof items) => xs.reduce((a, i) => a + (i.weightG ?? 0), 0);
+const worn = items.filter(isWorn);
+const packed = items.filter((i) => !isWorn(i));
+const tone = personTone[p.id];
+let n = 0;
+---
+<GearLayout title={`${p.name}’s ${categoryLabel[category].toLowerCase()}`} description={`${p.name}’s ${categoryLabel[category].toLowerCase()}, laid out piece by piece.`}>
+  <div class="dive" aria-hidden="true">
+    <div class="dive__fig" style={`--fx:${focus.x}%;--fy:${focus.y}%`}>
+      <GearFigure name={p.name} tone={tone} figure={p.loadout.data.figure} transitionName={`figure-${p.id}`} sizes="100vw" ghost />
+    </div>
+  </div>
+
+  <div class="g-page wrap" data-up={gearHref(p.id)} data-prev={gearHref(p.id, other)} data-next={gearHref(p.id, other)}>
+    <div class="cat">
+      <div class="cat__top">
+        <a class="g-back" href={gearHref(p.id)}><Icon name="arrow-left" /> {p.name}</a>
+        <ul class="cat__switch" role="list" aria-label="Category">
+          {categories.map((c) => (
+            <li>
+              <Sign size="sm" name={categoryLabel[c]} href={gearHref(p.id, c)} active={c === category} aria-current={c === category ? 'page' : undefined} />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="cat__head">
+        <div>
+          <h1 tabindex="-1">{p.name}’s {categoryLabel[category].toLowerCase()}</h1>
+          <p class="cat__summary">
+            {p.sample && <span class="tag tag--draft">Sample kit</span>}
+            <span class="mono muted">
+              {items.length} items
+              {sum(items) > 0 && <> · {formatWeight(sum(items))}</>}
+              {sum(worn) > 0 && <> · worn {formatWeight(sum(worn))}</>}
+              {sum(packed) > 0 && <> · packed {formatWeight(sum(packed))}</>}
+            </span>
+          </p>
+        </div>
+        <p class="g-keys"><kbd>Esc</kbd> back to {p.name} <kbd>←</kbd><kbd>→</kbd> {categoryLabel[other].toLowerCase()}</p>
+      </div>
+
+      {items.length === 0 ? (
+        <p class="flat flat--empty">No {categoryLabel[category].toLowerCase()} listed yet.</p>
+      ) : (
+        <div class={`flat flat--${category}`} data-cascade>
+          {zones.map((z) => (
+            <section class={`flat__zone flat__zone--${z.zone}`} aria-label={zoneLabel[z.zone]}>
+              <ul class="flat__items" role="list">
+                {z.items.map((item) => (
+                  <li class={`flat__item flat__item--${itemTypes[item.type].size}`} style={`--i:${n++}`}>
+                    <a class="flat__link" href={gearHref(p.id, category, item.id)}>
+                      <span class="flat__art">
+                        <GearArt item={item} tone={tone} transitionName={`item-${p.id}-${item.id}`} sizes="280px" />
+                      </span>
+                      <span class="flat__name">{[item.brand, item.name].filter(Boolean).join(' ')}</span>
+                      {item.weightG && <span class="flat__weight">{formatWeight(item.weightG)}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <p class="flat__label" aria-hidden="true">{zoneLabel[z.zone]}</p>
+            </section>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</GearLayout>

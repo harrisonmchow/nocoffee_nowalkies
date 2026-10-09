@@ -1,0 +1,98 @@
+---
+import GearLayout from '../../../../layouts/GearLayout.astro';
+import GearArt from '../../../../components/GearArt.astro';
+import GearFigure from '../../../../components/GearFigure.astro';
+import Icon from '../../../../components/Icon.astro';
+import Sign from '../../../../components/Sign.astro';
+import { reviewFor, reviewHref, verdictLabel, disclosure } from '../../../../lib/reviews';
+import { getLoadouts, formatWeight, formatOz, personTone, gearHref, byZone, isWorn } from '../../../../lib/gear';
+import { categories, categoryLabel, itemTypes } from '../../../../data/gear-types';
+
+export async function getStaticPaths() {
+  const people = await getLoadouts();
+  return people.flatMap((p) =>
+    categories.flatMap((category) => {
+      // Same order as the flat-lay, so ← and → walk the floor left to right.
+      const items = byZone(p.items, category).flatMap((z) => z.items);
+      return items.map((item, i) => ({
+        params: { person: p.id, category, item: item.id },
+        props: {
+          person: p,
+          category,
+          item,
+          index: i,
+          count: items.length,
+          prev: items[(i - 1 + items.length) % items.length],
+          next: items[(i + 1) % items.length],
+        },
+      }));
+    }),
+  );
+}
+
+const { person: p, category, item, index, count, prev, next } = Astro.props;
+const spec = itemTypes[item.type];
+const label = categoryLabel[category];
+const up = gearHref(p.id, category);
+const focus = p.loadout.data.focus[category];
+const review = await reviewFor(p.id, item.id);
+---
+<GearLayout title={`${item.name} | ${p.name}’s ${label.toLowerCase()}`} description={`${p.name}’s ${item.name.toLowerCase()}${item.brand ? ` from ${item.brand}` : ''}.`}>
+  {/* Same settled backdrop as the flat-lay, so stepping in and out only moves the item. */}
+  <div class="dive" aria-hidden="true">
+    <div class="dive__fig" style={`--fx:${focus.x}%;--fy:${focus.y}%`}>
+      <GearFigure name={p.name} tone={personTone[p.id]} figure={p.loadout.data.figure} transitionName={`figure-${p.id}`} sizes="100vw" ghost />
+    </div>
+  </div>
+  <div class="g-page wrap" data-up={up} data-prev={gearHref(p.id, category, prev.id)} data-next={gearHref(p.id, category, next.id)}>
+    <div class="item">
+      <div class="item__floor">
+        <div class="item__art">
+          <GearArt item={item} tone={personTone[p.id]} transitionName={`item-${p.id}-${item.id}`} sizes="(min-width: 860px) 520px, 340px" eager />
+        </div>
+      </div>
+
+      <div class="item__info">
+        <div>
+          <a class="g-back" href={up}><Icon name="arrow-left" /> {p.name}’s {label.toLowerCase()}</a>
+          <h1 tabindex="-1">{item.name}</h1>
+          {item.brand && <p class="item__brand">{item.brand}</p>}
+        </div>
+
+        <dl class="g-spec">
+          <div><dt>Type</dt><dd>{spec.label}</dd></div>
+          <div><dt>Weight</dt><dd class={item.weightG ? 'num' : undefined}>{item.weightG ? `${formatWeight(item.weightG)} · ${formatOz(item.weightG)}` : 'Not weighed yet'}</dd></div>
+          <div><dt>Carried</dt><dd>{isWorn(item) ? 'Worn' : 'In the pack'}</dd></div>
+          <div><dt>Owner</dt><dd>{p.name}</dd></div>
+        </dl>
+
+        {item.notes && <p class="item__notes">{item.notes}</p>}
+        {review && (
+          <div class="item__review">
+            <Sign
+              name={`Read ${p.name}’s review`}
+              href={reviewHref(review)}
+              tag={review.data.verdict}
+              tagLabel={verdictLabel[review.data.verdict]}
+              tags={[{ key: review.data.acquired, label: disclosure(review).short }]}
+              meta={`${review.data.rating}/5${review.data.partner ? ` · ${review.data.acquired === 'gifted' ? 'gifted by' : 'paid by'} ${review.data.partner}` : ''}`}
+            />
+          </div>
+        )}
+        {item.link && (
+          <p><a class="g-back" href={item.link} rel="noopener" target="_blank">Product page <Icon name="arrow-up-right" /></a></p>
+        )}
+        {p.sample && (
+          <p class="panel__meta"><span class="tag tag--draft">Sample item</span><span>Brand, weight and notes go here once the real kit list is in.</span></p>
+        )}
+
+        <nav class="item__step" aria-label={`Other ${label.toLowerCase()}`}>
+          <a href={gearHref(p.id, category, prev.id)}><Icon name="arrow-left" /> {prev.name}</a>
+          <span class="mono muted">{index + 1} of {count}</span>
+          <a href={gearHref(p.id, category, next.id)}>{next.name} <Icon name="arrow-right" /></a>
+        </nav>
+        <p class="g-keys"><kbd>Esc</kbd> back to the {label.toLowerCase()} <kbd>←</kbd><kbd>→</kbd> step through</p>
+      </div>
+    </div>
+  </div>
+</GearLayout>

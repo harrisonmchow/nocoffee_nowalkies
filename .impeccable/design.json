@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-09T00:55:30.983Z",
+  "generatedAt": "2026-10-09T12:00:00.000Z",
   "title": "Design System: No Coffee / No Walkies",
   "extensions": {
     "colorMeta": {
@@ -268,7 +268,7 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Page h1s and closing statements. The home hero word uses min(10.5vw, band x 0.78) at -0.035em, always on one line."
+        "purpose": "Page h1s and closing statements. The home hero word uses min(10.5vw, band x 0.78) at -0.035em, always on one line. Gear h1s step down as the camera moves in: lineup, person, category clamp(3rem, 7.5vw, 6rem), item clamp(3rem, 6.5vw, 5.5rem)."
       },
       "headline": {
         "displayName": "Headline",
@@ -285,6 +285,14 @@
       "body-small": {
         "displayName": "Body Small",
         "purpose": "Buttons, nav, blurbs, list rows."
+      },
+      "body-large": {
+        "displayName": "Body Large",
+        "purpose": "Long-form prose (68ch, 1.7), page ledes, item brand line."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Spec-list terms, meta rows, weight-bar legends, lineup CTAs, notes beside a draft tag."
       },
       "label": {
         "displayName": "Label",
@@ -314,6 +322,21 @@
         "name": "bar-blur",
         "value": "backdrop-filter: saturate(1.2) blur(10px)",
         "purpose": "Sticky nav and photo sign bar over 86-90% bone."
+      },
+      {
+        "name": "hotspot-halo",
+        "value": "0 0 0 6px rgba(247, 246, 243, 0.85)",
+        "purpose": "Spread ring separating hotspot discs from the drawing; no offset, no blur."
+      },
+      {
+        "name": "floor-dots",
+        "value": "background: #fbfbfa url(data:image/svg+xml,...24x24 grid, r=1 #111 at 0.08)",
+        "purpose": "Paper floor under flat-lays and the item stage; depth by texture, not shadow."
+      },
+      {
+        "name": "dive-ghost",
+        "value": "opacity: 0.08; filter: blur(2px) grayscale(0.4)",
+        "purpose": "Set on the ghosted figure's content (not an ancestor) so view-transition snapshots carry it."
       }
     ],
     "motion": [
@@ -348,9 +371,44 @@
         "purpose": "Photo hover inside clipped tiles."
       },
       {
+        "name": "view-transition-group",
+        "value": "640ms, house ease",
+        "purpose": "Shared-element morph between gear views: figure-<person>, name-<person> (lineup to person only), item-<person>-<id>."
+      },
+      {
+        "name": "view-transition-old-new",
+        "value": "420ms; root old 180ms, root new 360ms after 90ms; figure old 240ms, new 320ms",
+        "purpose": "The page underneath swaps quickly so two pages never sit ghosted together; figures cross-fade early so the dive reads as a camera move."
+      },
+      {
+        "name": "lineup-dim",
+        "value": "360ms; others opacity 0.38 + grayscale(1); chosen translateY(-6px)",
+        "purpose": "Character-select hover/focus on the lineup."
+      },
+      {
+        "name": "stage-peek",
+        "value": "700ms; scale(1.14) toward the category focus point",
+        "purpose": "Person stage leans in when a category sign or hotspot is hovered or focused."
+      },
+      {
+        "name": "lay-down",
+        "value": "640ms; from translateY(-16px) scale(1.04) opacity 0; delay calc(220ms + var(--i) * 70ms)",
+        "purpose": "Flat-lay cascade on arrival from above; skipped when stepping back from an item."
+      },
+      {
+        "name": "tile-lift",
+        "value": "300ms; translateY(-5px)",
+        "purpose": "Flat-lay tile hover."
+      },
+      {
+        "name": "lightbox-in",
+        "value": "320ms opacity",
+        "purpose": "Lightbox dialog entry."
+      },
+      {
         "name": "reduced-motion",
         "value": "0.01ms",
-        "purpose": "All transitions and animations collapse under prefers-reduced-motion."
+        "purpose": "All transitions and animations collapse under prefers-reduced-motion; view-transition animations are set to none."
       }
     ],
     "breakpoints": [
@@ -365,6 +423,10 @@
       {
         "name": "nav",
         "value": "720px"
+      },
+      {
+        "name": "keys",
+        "value": "700px (hover: hover) and (pointer: fine)"
       },
       {
         "name": "md",
@@ -440,23 +502,70 @@
       "description": "44px square white control used in the lightbox bar.",
       "html": "<button class=\"ds-ibtn\" aria-label=\"Next photo\"><svg viewBox=\"0 0 256 256\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z\"/></svg></button>",
       "css": ".ds-ibtn{display:grid;place-items:center;width:44px;height:44px;padding:0;background:var(--white,#ffffff);color:var(--ink,#111111);border:1px solid var(--rule,#eaeaea);border-radius:5px;cursor:pointer;transition:background-color 200ms cubic-bezier(0.16,1,0.3,1),transform 200ms cubic-bezier(0.16,1,0.3,1)}.ds-ibtn:hover{background:var(--bone,#f7f6f3)}.ds-ibtn:active{transform:scale(0.96)}.ds-ibtn:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}"
+    },
+    {
+      "name": "Flat-lay Tile",
+      "kind": "custom",
+      "refersTo": "flat-tile",
+      "description": "Knolled item on the dotted paper floor: ink drawing over the owner's pastel offset tile, name, mono weight.",
+      "html": "<div class=\"ds-floor\"><a class=\"ds-tile\" href=\"#\"><span class=\"ds-art\"><span class=\"ds-art__shape\"></span><svg class=\"ds-art__draw\" viewBox=\"0 0 200 200\" aria-hidden=\"true\"><path class=\"f\" d=\"M58 46 Q58 26 78 26 L122 26 Q142 26 142 46 L146 170 Q146 182 134 182 L66 182 Q54 182 54 170 Z\"/><path class=\"f\" d=\"M58 46 L142 46 L142 74 Q100 86 58 74 Z\"/><rect class=\"f\" x=\"72\" y=\"104\" width=\"56\" height=\"58\" rx=\"10\"/><path d=\"M86 26 Q100 10 114 26 M78 126 L122 126\"/></svg></span><span class=\"ds-tile__name\">Pack</span><span class=\"ds-tile__w\">1.12 kg</span></a></div>",
+      "css": ".ds-floor{display:flex;justify-content:center;padding:40px;background-color:var(--paper,#fbfbfa);background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='1' cy='1' r='1' fill='%23111' fill-opacity='0.08'/%3E%3C/svg%3E\");border:1px solid var(--rule,#eaeaea);border-radius:12px}.ds-tile{display:grid;gap:8px;justify-items:center;width:180px;padding:6px;border-radius:8px;color:var(--ink,#111111);text-decoration:none}.ds-art{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:8px;transition:transform 300ms cubic-bezier(0.16,1,0.3,1)}.ds-art__shape{position:absolute;width:64%;height:64%;left:24%;top:22%;border-radius:12%;background:var(--green-bg,#edf3ec)}.ds-art__draw{position:relative;width:86%;height:86%;overflow:visible;fill:none;stroke:var(--ink,#111111);stroke-width:2.5px;stroke-linecap:round;stroke-linejoin:round}.ds-art__draw *{vector-effect:non-scaling-stroke}.ds-art__draw .f{fill:#ffffff}.ds-tile:hover .ds-art{transform:translateY(-5px)}.ds-tile:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}.ds-tile__name{font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.9375rem;line-height:1.3;text-align:center}.ds-tile__w{font-family:'Geist Mono Variable','SF Mono',monospace;font-size:0.75rem;color:var(--mute,#787774);font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Hotspot",
+      "kind": "custom",
+      "refersTo": "hotspot-dot",
+      "description": "Ink disc with a mono number and a sign-style serif label, pinned to the figure on the person stage.",
+      "html": "<div class=\"ds-hs-wrap\"><a class=\"ds-hs\" href=\"#\"><span class=\"ds-hs__dot\">1</span><span class=\"ds-hs__label\">Clothing</span></a></div>",
+      "css": ".ds-hs-wrap{padding:24px;background:var(--bone,#f7f6f3)}.ds-hs{display:inline-flex;align-items:center;gap:8px;color:var(--ink,#111111);text-decoration:none}.ds-hs__dot{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--ink,#111111);color:#ffffff;font-family:'Geist Mono Variable','SF Mono',monospace;font-size:0.8125rem;box-shadow:0 0 0 6px rgba(247,246,243,0.85);transition:transform 260ms cubic-bezier(0.16,1,0.3,1)}.ds-hs__label{padding:5px 10px;background:#ffffff;border:1px solid var(--rule,#eaeaea);border-radius:3px;font-family:'Instrument Serif',Georgia,serif;font-size:1.25rem;line-height:1.1;white-space:nowrap}.ds-hs:hover .ds-hs__dot,.ds-hs:focus-visible .ds-hs__dot{transform:scale(1.12)}.ds-hs:focus-visible{outline:2px solid var(--ink,#111111);outline-offset:3px}"
+    },
+    {
+      "name": "Walk Grade Tags",
+      "kind": "chip",
+      "refersTo": "tag-grade-1",
+      "description": "Australian Walking Track Grading System, 1 (easiest) to 5 (hardest).",
+      "html": "<span class=\"ds-tag ds-g1\">Grade 1</span> <span class=\"ds-tag ds-g2\">Grade 2</span> <span class=\"ds-tag ds-g3\">Grade 3</span> <span class=\"ds-tag ds-g4\">Grade 4</span> <span class=\"ds-tag ds-g5\">Grade 5</span>",
+      "css": ".ds-tag{display:inline-flex;align-items:center;padding:0.2em 0.65em;border-radius:9999px;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.6875rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;line-height:1.5}.ds-g1{background:var(--green-bg,#edf3ec);color:var(--green-fg,#346538)}.ds-g2{background:var(--blue-bg,#e1f3fe);color:var(--blue-fg,#1f6c9f)}.ds-g3{background:var(--yellow-bg,#fbf3db);color:var(--yellow-fg,#956400)}.ds-g4{background:var(--red-bg,#fdebec);color:var(--red-fg,#9f2f2d)}.ds-g5{background:var(--ink,#111111);color:#ffffff}"
+    },
+    {
+      "name": "Weight Bar",
+      "kind": "custom",
+      "refersTo": "weight-bar",
+      "description": "Ink-outlined proportional strip with pastel category segments and a mono legend.",
+      "html": "<figure class=\"ds-wbar\"><div class=\"ds-wbar__bar\"><span class=\"ds-wbar__seg ds-c\" style=\"flex-grow:3\"></span><span class=\"ds-wbar__seg ds-k\" style=\"flex-grow:5\"></span></div><ul class=\"ds-wbar__legend\"><li><span class=\"ds-wbar__key ds-c\"></span><span>Clothing</span><span class=\"ds-mono\">2.40 kg</span></li><li><span class=\"ds-wbar__key ds-k\"></span><span>Gear</span><span class=\"ds-mono\">4.10 kg</span></li></ul></figure>",
+      "css": ".ds-wbar{margin:0;display:grid;gap:14px;max-width:420px;font-family:'Geist Variable','Helvetica Neue',sans-serif}.ds-wbar__bar{display:flex;height:28px;border:1px solid var(--ink,#111111);border-radius:3px;overflow:hidden}.ds-wbar__seg{flex-basis:0;min-width:3px}.ds-wbar__seg+.ds-wbar__seg{border-left:1px solid var(--ink,#111111)}.ds-c{background:var(--green-bg,#edf3ec)}.ds-k{background:var(--blue-bg,#e1f3fe)}.ds-wbar__legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 20px;font-size:0.875rem}.ds-wbar__legend li{display:grid;grid-template-columns:12px 1fr auto;align-items:center;gap:8px}.ds-wbar__key{width:12px;height:12px;border:1px solid var(--ink,#111111);border-radius:2px}.ds-mono{font-family:'Geist Mono Variable','SF Mono',monospace;font-size:0.75rem;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Keyboard Hints",
+      "kind": "custom",
+      "refersTo": "kbd",
+      "description": "Key caps with mute phrases; fine pointers at 700px and up only.",
+      "html": "<p class=\"ds-keys\"><kbd class=\"ds-kbd\">Esc</kbd> back <kbd class=\"ds-kbd\">&larr;</kbd><kbd class=\"ds-kbd\">&rarr;</kbd> next person</p>",
+      "css": ".ds-keys{display:inline-flex;align-items:center;gap:8px;margin:0;font-family:'Geist Variable','Helvetica Neue',sans-serif;font-size:0.8125rem;color:var(--mute,#787774)}.ds-kbd{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;font-family:'Geist Mono Variable','SF Mono',monospace;font-size:0.75rem;color:var(--ink-2,#2f3437);background:var(--bone,#f7f6f3);border:1px solid var(--rule,#eaeaea);border-bottom-width:2px;border-radius:4px}"
     }
   ],
   "narrative": {
     "northStar": "The Trackhead",
-    "overview": "The site is the sign at the start of a walk. Australian national-park trackhead signage sets the system: a timber-black post, white fingerpost plates with a pointed end, a serif place name, mono coordinates and a bold arrow. The fingerposts are both the navigation and the identity. Around them sits a warm, flat editorial page (the user-confirmed minimalist-ui guide in SKILL.md is binding): bone ground, charcoal ink, hairline 1px borders, and colour only in small washed-out pastel tags.\n\nDensity is low and the type contrast is high. Huge Instrument Serif words carry the places; Geist does the plain talking; Geist Mono carries coordinates, credits and counts. Photography is desaturated and warmed by one filter, so stand-in and real photos sit in the same palette. One continuous hand-drawn hairline trail runs down the left gutter of each long page, starting at an open ring and ending at a filled dot. A to-scale latitude figure plots all five regions on a 10-degree grid as the one data illustration.\n\nMotion is quiet: one long-tailed ease (`cubic-bezier(0.16, 1, 0.3, 1)`), a 12px rise-and-fade scroll entry, signs that slide 4px toward where they point, and photos that crossfade. Everything collapses to near-instant under reduced motion.",
+    "overview": "The site is the sign at the start of a walk. Australian national-park trackhead signage sets the system: a timber-black post, white fingerpost plates with a pointed end, a serif place name, mono coordinates and a bold arrow. The fingerposts are both the navigation and the identity. Around them sits a warm, flat editorial page (the user-confirmed minimalist-ui guide in SKILL.md is binding): bone ground, charcoal ink, hairline 1px borders, and colour only in small washed-out pastel tags.\n\nDensity is low and the type contrast is high. Huge Instrument Serif words carry the places; Geist does the plain talking; Geist Mono carries coordinates, credits and counts. Photography is desaturated and warmed by one filter, so stand-in and real photos sit in the same palette. One continuous hand-drawn hairline trail runs down the left gutter of each long page, starting at an open ring and ending at a filled dot. A to-scale latitude figure plots all five regions on a 10-degree grid. Two later data figures follow the same ink-on-white language: a route trace with an elevation profile on walk pages, and a weight bar on gear pages.\n\nIllustration is ink line on white: stand-in figures and top-down item drawings use a 2.5px non-scaling charcoal stroke, white fills, and one flat pastel shape set behind and off-centre. That shape is the person's tone. The gear section adds a game-style inspect camera to the same world. A lineup of four figures standing on 1px ink floor lines leads to a person stage with ink hotspots. From there the view dives into a knolled flat-lay on a dotted paper floor, then into a single item. Signs and the 6px post still carry navigation at every level.\n\nMotion is quiet: one long-tailed ease (`cubic-bezier(0.16, 1, 0.3, 1)`), a 12px rise-and-fade scroll entry, signs that slide 4px toward where they point, and photos that crossfade. Between gear views, one camera move carries the eye: the same figure, name and item morph from page to page as shared elements, while the page underneath swaps quickly. Everything collapses to near-instant under reduced motion, and view transitions are switched off.",
     "keyCharacteristics": [
       "Fingerpost signs (plate + authored SVG pointed tip + serif name + mono coordinates + Phosphor bold arrow) as navigation and selectors.",
       "Warm monochrome with spot pastels used only for region tags and figure highlights.",
       "Flat surfaces: 1px #EAEAEA borders and white-on-bone tonal steps, no resting shadows.",
       "One enormous serif region word that never shrinks below its band.",
       "A single continuous hairline trail per long page.",
-      "Photos graded `saturate(0.82) sepia(0.08)`."
+      "Photos graded `saturate(0.82) sepia(0.08)`.",
+      "Ink drawings: 2.5px non-scaling charcoal line, white fills, one pastel offset shape in the owner's tone.",
+      "Shared-element view transitions as the gear camera: lineup to person to flat-lay to item."
     ],
     "rules": [
       {
         "name": "The Grade Tag Rule",
-        "body": "Pastels appear only as pill tags or small figure highlights, always as a bg/fg pair. They never fill a section, a button or a card.",
+        "body": "Pastels appear only as pill tags (always as a bg/fg pair), small figure highlights, or the flat grounds of ink drawings and data figures (person offset shapes, weight-bar segments, the elevation fill). Those grounds always sit under or inside charcoal line. Pastels never fill a section, a button or a card.",
+        "section": "colors"
+      },
+      {
+        "name": "The Person Tone Rule",
+        "body": "Each crew member owns one pastel ground, and it appears only on their own figure and item drawings. Never mix two people's tones in one drawing.",
         "section": "colors"
       },
       {
@@ -471,8 +580,13 @@
       },
       {
         "name": "The Coordinates Are Mono Rule",
-        "body": "Any latitude, longitude, count or licence string is set in mono with tabular figures.",
+        "body": "Any latitude, longitude, count, weight, distance or licence string is set in mono with tabular figures. This includes spec-list values, hotspot numbers, keyboard keys and route-map axes.",
         "section": "typography"
+      },
+      {
+        "name": "The Knolling Rule",
+        "body": "A flat-lay lays items out unrotated, at one scale per footprint class (large 240px, medium 180px, small 132px). Groups sit side by side on one shared bottom baseline, separated by one gutter (`clamp(20px, 3vw, 40px)`; ×2 between groups, ×1.6 between rows), each with a mute label under a hairline. Clothing reads head to toe with one group per row. Below 860px tiles go to a 2-column grid, and large items span both columns, capped at 260px.",
+        "section": "layout"
       },
       {
         "name": "The Flat Plate Rule",
@@ -487,17 +601,22 @@
       "Do set coordinates, counts and licences in Geist Mono with tabular figures.",
       "Do use Phosphor Icons in the bold weight, inlined as SVG.",
       "Do animate with `cubic-bezier(0.16, 1, 0.3, 1)`: 600ms 12px scroll entry staggered by 80ms, and 200 to 260ms state changes.",
-      "Do keep h1 to h3 in Instrument Serif at weight 400 with negative tracking."
+      "Do keep h1 to h3 in Instrument Serif at weight 400 with negative tracking.",
+      "Do draw stand-ins as ink on white: a 2.5px non-scaling charcoal stroke, white fills, and one pastel ground in the owner's tone.",
+      "Do carry a gear view change as one camera move: give the same element the same view-transition name on both pages (`figure-<person>`, `name-<person>`, `item-<person>-<id>`), with a 640ms group morph and a fast root swap (180ms out, 360ms in after 90ms).",
+      "Do knoll flat-lays: unrotated items, one scale per footprint class, one baseline and one gutter.",
+      "Do give every inspect view a way up (Esc and a back link) and a way sideways (arrow keys and previous/next links)."
     ],
     "donts": [
       "Don't use Inter, Roboto or Open Sans, or thin-line icon sets (Lucide, Feather, Heroicons).",
       "Don't use gradients, neon colours or glassmorphism beyond the sticky-bar blur.",
-      "Don't fill sections, buttons or cards with pastel or saturated colour; pastels are tags and figure highlights only.",
+      "Don't fill sections, buttons or cards with pastel or saturated colour; pastels are tags, figure highlights and the grounds of ink drawings and data figures only.",
       "Don't use shadows heavier than `0 2px 8px rgba(0,0,0,0.04)`, or any shadow at rest.",
       "Don't use pill radius for cards, panels or primary buttons.",
       "Don't use pure black (#000000) for text.",
       "Don't put a small label or eyebrow above a heading; labels name fields, not sections.",
-      "Don't use emojis."
+      "Don't use emojis.",
+      "Don't rotate, scatter or overlap flat-lay items."
     ]
   }
 }

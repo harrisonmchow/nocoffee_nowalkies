@@ -1,0 +1,165 @@
+---
+import { Image } from 'astro:assets';
+import GearLayout from '../../../layouts/GearLayout.astro';
+import GearArt from '../../../components/GearArt.astro';
+import Rating from '../../../components/Rating.astro';
+import Sign from '../../../components/Sign.astro';
+import Icon from '../../../components/Icon.astro';
+import { itemTypes, categories, categoryLabel } from '../../../data/gear-types';
+import { personTone } from '../../../lib/gear';
+import {
+  getReviews, reviewHref, verdictLabel, disclosure, reviewCategory, reviewArtItem, reviewMeta,
+  type Review,
+} from '../../../lib/reviews';
+
+const reviews = await getReviews();
+const anySample = reviews.some((r: Review) => r.data.sample);
+---
+<GearLayout title="Gear reviews" description="Honest reviews of the gear Harry, Kevin, Caleb and Mikey carry. Every review says how we got the item.">
+  <div class="g-page wrap" data-up="/gear/">
+    <header class="rvh-head">
+      <a class="g-back" href="/gear/"><Icon name="arrow-left" /> Gear</a>
+      <h1 tabindex="-1">Reviews</h1>
+      <p class="rvh-head__lede">Gear we’ve carried long enough to have an opinion on. Every review says how we got the item, and gifted or paid items name the brand.</p>
+      {anySample && (
+        <p class="rvh-head__note">
+          <span class="tag tag--draft">Samples</span>
+          <span>These are layout samples until our first reviews are written.</span>
+        </p>
+      )}
+    </header>
+
+    {reviews.length > 0 && (
+      <div class="rvh-filter" role="group" aria-label="Show reviews of" data-filter hidden>
+        <Sign size="sm" name="Everything" active data-show="all" />
+        {categories.map((c) => (
+          <Sign size="sm" name={categoryLabel[c]} data-show={c} />
+        ))}
+      </div>
+    )}
+
+    {reviews.length === 0 ? (
+      <p class="rvh-empty">No reviews yet. The first one goes up after a few more trips.</p>
+    ) : (
+      <ol class="rvh-list" role="list" data-list>
+        {reviews.map((r: Review) => {
+          const d = disclosure(r);
+          return (
+            <li data-cat={reviewCategory(r)}>
+              <a class="rvh-row" href={reviewHref(r)}>
+                <span class="rvh-row__art">
+                  {r.data.cover ? (
+                    <span class="rvh-row__photo" transition:name={`review-${r.id}`}>
+                      <Image src={r.data.cover} alt="" widths={[240, 480]} sizes="160px" />
+                    </span>
+                  ) : (
+                    <GearArt item={reviewArtItem(r)} tone={personTone[r.data.author]} transitionName={`review-${r.id}`} sizes="160px" />
+                  )}
+                </span>
+                <span class="rvh-row__body">
+                  <span class="rvh-row__title">{r.data.title}</span>
+                  <span class="rvh-row__item">
+                    {[r.data.brand, r.data.itemName].filter(Boolean).join(' ')}
+                    {itemTypes[r.data.type].label !== r.data.itemName && <> · {itemTypes[r.data.type].label}</>}
+                  </span>
+                  <span class="rvh-row__summary">{r.data.summary}</span>
+                  <span class="rvh-row__meta">
+                    <Rating value={r.data.rating} />
+                    <span class={`tag tag--${r.data.verdict}`}>{verdictLabel[r.data.verdict]}</span>
+                    <span class="rvh-row__disc">
+                      <span class={`tag tag--${r.data.acquired}`}>{d.short}</span>
+                      {r.data.partner && <span class="rvh-row__partner">{r.data.acquired === 'gifted' ? 'by' : 'with'} {r.data.partner}</span>}
+                    </span>
+                    {r.data.sample && <span class="tag tag--draft">Sample</span>}
+                    <span class="rvh-row__by">{reviewMeta(r)}</span>
+                  </span>
+                </span>
+                <span class="rvh-row__go" aria-hidden="true"><Icon name="arrow-right" /></span>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    )}
+    <p class="rvh-none" hidden data-none>No reviews in this category yet.</p>
+  </div>
+</GearLayout>
+
+<script>
+  // Category filter. Without JS every review is listed.
+  function init() {
+    const group = document.querySelector<HTMLElement>('[data-filter]');
+    const list = document.querySelector<HTMLElement>('[data-list]');
+    const none = document.querySelector<HTMLElement>('[data-none]');
+    if (!group || !list || group.dataset.ready) return;
+    group.dataset.ready = '1';
+    group.hidden = false;
+    const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>('[data-show]'));
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        const show = b.dataset.show!;
+        buttons.forEach((x) => {
+          x.classList.toggle('is-active', x === b);
+          x.setAttribute('aria-pressed', String(x === b));
+        });
+        let visible = 0;
+        list.querySelectorAll<HTMLElement>('li[data-cat]').forEach((li) => {
+          const on = show === 'all' || li.dataset.cat === show;
+          li.hidden = !on;
+          if (on) visible++;
+        });
+        if (none) none.hidden = visible > 0;
+      }),
+    );
+  }
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .rvh-head { padding-top: clamp(32px, 6vw, 80px); display: grid; gap: 14px; }
+  .rvh-head .g-back { justify-self: start; }
+  .rvh-head h1 { font-size: clamp(4rem, 11vw, 9rem); letter-spacing: -0.04em; line-height: 0.95; }
+  .rvh-head__lede { max-width: 50ch; font-size: 1.125rem; color: var(--ink-2); }
+  .rvh-head__note { display: flex; align-items: baseline; gap: 10px; font-size: 0.875rem; color: var(--ink-2); }
+
+  .rvh-filter[hidden] { display: none; }
+  .rvh-filter { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: clamp(32px, 5vw, 56px); }
+  .rvh-filter :global(.sign) { width: auto; }
+
+  .rvh-list { list-style: none; margin: 24px 0 0; padding: 0; border-top: 1px solid var(--rule); }
+  .rvh-list > li { border-bottom: 1px solid var(--rule); }
+  .rvh-row {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) auto;
+    gap: clamp(16px, 3vw, 40px);
+    align-items: center;
+    padding: 22px 0;
+    text-decoration: none;
+  }
+  .rvh-row__art { display: block; width: 160px; transition: transform 300ms var(--ease); }
+  .rvh-row__photo { display: block; aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
+  .rvh-row__photo img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.82) sepia(0.08); }
+  .rvh-row:hover .rvh-row__art { transform: translateY(-4px); }
+  .rvh-row__body { display: grid; gap: 6px; min-width: 0; }
+  .rvh-row__title {
+    font-family: var(--serif);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .rvh-row__item { font-size: 0.875rem; color: var(--mute); }
+  .rvh-row__summary { max-width: 64ch; color: var(--ink-2); font-size: 0.9375rem; }
+  .rvh-row__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 6px; }
+  .rvh-row__by { font-size: 0.8125rem; color: var(--mute); }
+  .rvh-row__disc { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .rvh-row__partner { font-size: 0.8125rem; color: var(--ink); }
+  .rvh-row__go { display: inline-flex; font-size: 1.25rem; transition: transform 200ms var(--ease); }
+  .rvh-row:hover .rvh-row__go { transform: translateX(4px); }
+  .rvh-empty, .rvh-none { margin-top: 32px; color: var(--mute); }
+
+  @media (max-width: 700px) {
+    .rvh-row { grid-template-columns: 96px minmax(0, 1fr); align-items: start; }
+    .rvh-row__art { width: 96px; }
+    .rvh-row__go { display: none; }
+  }
+</style>

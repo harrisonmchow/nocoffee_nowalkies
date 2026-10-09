@@ -1,0 +1,67 @@
+---
+// One bar, split by item type, showing where a loadout's weight goes.
+// Renders nothing until at least one item has a weight.
+import { itemTypes } from '../data/gear-types';
+import { formatWeight, type GearItem } from '../lib/gear';
+
+interface Props {
+  items: GearItem[];
+}
+const { items } = Astro.props;
+const weighed = items.filter((i) => i.weightG);
+const total = weighed.reduce((a, i) => a + i.weightG!, 0);
+const byType = new Map<string, { label: string; g: number; category: string }>();
+for (const i of weighed) {
+  const spec = itemTypes[i.type];
+  const row = byType.get(i.type) ?? { label: spec.label, g: 0, category: spec.category };
+  row.g += i.weightG!;
+  byType.set(i.type, row);
+}
+const rows = [...byType.values()].sort((a, b) => b.g - a.g);
+---
+{total > 0 && (
+  <figure class="wbar">
+    <div class="wbar__bar" role="img" aria-label={`Weight by type: ${rows.map((r) => `${r.label} ${formatWeight(r.g)}`).join(', ')}`}>
+      {rows.map((r) => (
+        <span class={`wbar__seg wbar__seg--${r.category}`} style={`flex-grow:${r.g}`} title={`${r.label}: ${formatWeight(r.g)}`}></span>
+      ))}
+    </div>
+    <figcaption>
+      <ul class="wbar__legend" role="list">
+        {rows.map((r) => (
+          <li>
+            <span class={`wbar__key wbar__seg--${r.category}`} aria-hidden="true"></span>
+            <span>{r.label}</span>
+            <span class="mono">{formatWeight(r.g)}</span>
+          </li>
+        ))}
+      </ul>
+    </figcaption>
+  </figure>
+)}
+
+<style>
+  .wbar { margin: 0; display: grid; gap: 14px; }
+  .wbar__bar {
+    display: flex;
+    height: 28px;
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .wbar__seg { flex-basis: 0; min-width: 3px; }
+  .wbar__seg + .wbar__seg { border-left: 1px solid var(--ink); }
+  .wbar__seg--clothing { background: var(--green-bg); }
+  .wbar__seg--gear { background: var(--blue-bg); }
+  .wbar__legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 6px 20px;
+    font-size: 0.875rem;
+  }
+  .wbar__legend li { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: 8px; }
+  .wbar__key { width: 12px; height: 12px; border: 1px solid var(--ink); border-radius: 2px; }
+</style>

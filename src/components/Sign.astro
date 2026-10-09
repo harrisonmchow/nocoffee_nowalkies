@@ -7,12 +7,16 @@ interface Props {
   name: string;
   meta?: string;
   tag?: string;
+  /** Visible text for the tag; defaults to the tag key. */
+  tagLabel?: string;
+  /** Extra tags after the first, e.g. a verdict and a disclosure. */
+  tags?: { key: string; label: string }[];
   href?: string;
   active?: boolean;
   size?: 'lg' | 'sm';
   [key: string]: unknown;
 }
-const { name, meta, tag, href, active = false, size = 'lg', ...rest } = Astro.props;
+const { name, meta, tag, tagLabel, tags = [], href, active = false, size = 'lg', ...rest } = Astro.props;
 const Tag = href ? 'a' : 'button';
 ---
 <Tag
@@ -24,9 +28,10 @@ const Tag = href ? 'a' : 'button';
 >
   <span class="sign__body">
     <span class="sign__name">{name}</span>
-    {(meta || tag) && (
+    {(meta || tag || tags.length > 0) && (
       <span class="sign__meta">
-        {tag && <span class={`tag tag--${tag}`}>{tag}</span>}
+        {tag && <span class={`tag tag--${tag}`}>{tagLabel ?? tag}</span>}
+        {tags.map((t) => <span class={`tag tag--${t.key}`}>{t.label}</span>)}
         {meta && <span class="mono">{meta}</span>}
       </span>
     )}
