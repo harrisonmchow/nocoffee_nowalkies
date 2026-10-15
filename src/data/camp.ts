@@ -1,9 +1,10 @@
-// The camp on the /camp island. Proof of concept: generic gear and
+// The camp on the /camp mountain. Proof of concept: generic gear and
 // downloaded models. Later each of us gets our own list with our own kit.
 //
 // `model` is a .glb in /public/models. If the file is missing the scene
 // draws a simple stand-in so the page still works.
 // `inside: true` items only appear once you open the tent.
+import { mountains } from './mountains';
 
 export type ModelCredit = {
   title: string;
@@ -105,20 +106,7 @@ export const camp: GearItem[] = [
   },
 ];
 
-// The mountain the camp sits on. The file is a terrain tile, processed
-// from the original: transforms baked, simplified, and a flat shelf
-// levelled into it for the camp. `shelf` and `baseY` are in the file's
-// own units and must match the processed file.
-export const mountain = {
-  model: '/models/mountain.glb',
-  shelf: { x: -0.3, y: 1.53482, z: -1.414 },
-  baseY: 0.04745,
-  credit: {
-    title: 'Mountain peak',
-    author: 'Bapichu',
-    license: 'CC BY 4.0',
-    source: 'https://sketchfab.com/3d-models/mountain-peak-fbd8fd40b51d40f5a7c0a7dc7526a192',
-  } satisfies ModelCredit,
-};
-
-export const modelCredits = [mountain.credit, ...camp.flatMap((g) => (g.credit ? [g.credit] : []))];
+export const modelCredits = [
+  ...mountains.map((m) => m.credit),
+  ...camp.flatMap((g) => (g.credit ? [g.credit] : [])),
+];

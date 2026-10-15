@@ -9,14 +9,17 @@ export type MistOptions = {
   bottom: number;
   /** Clear at or above this height. */
   top: number;
+  /** A dense floor of mist: solid at the ground, gone by this height. 0 for none. */
+  floor: number;
   /** How quickly the mist thickens with distance, per metre. */
   density: number;
+  /** Fade the ground out with distance from `centre` on x/z: [start, end]. */
+  radial?: { centre: [number, number]; fade: [number, number] };
   /**
-   * Fade the terrain into the mist toward the tile's side and front
-   * edges: [start, end] distances from the centre on x, and on +z.
-   * The back edge is left alone; it's the summit's skyline.
+   * For open terrain tiles: fade toward the side edges (|x|) and the
+   * front edge (+z). The back edge is left alone; it's the skyline.
    */
-  edges: { x: [number, number]; front: [number, number] };
+  tile?: { x: [number, number]; front: [number, number] };
 };
 
 /**
@@ -51,17 +54,31 @@ export function installHeightFog(o: MistOptions) {
   uniform float fogNear;
   uniform float fogFar;
 #endif`;
+  const f = (n: number) => n.toFixed(2);
+  const floor = o.floor > 0
+    ? `heightFog = max( heightFog, 1.0 - smoothstep( ${f(o.floor * 0.25)}, ${f(o.floor)}, vFogWorld.y ) );`
+    : '';
+  const radial = o.radial
+    ? `edgeFog = max( edgeFog, smoothstep( ${f(o.radial.fade[0])}, ${f(o.radial.fade[1])},
+        length( vFogWorld.xz - vec2( ${f(o.radial.centre[0])}, ${f(o.radial.centre[1])} ) ) ) );`
+    : '';
+  const tile = o.tile
+    ? `edgeFog = max( edgeFog, max(
+        smoothstep( ${f(o.tile.x[0])}, ${f(o.tile.x[1])}, abs( vFogWorld.x ) ),
+        smoothstep( ${f(o.tile.front[0])}, ${f(o.tile.front[1])}, vFogWorld.z ) ) );`
+    : '';
   c.fog_fragment = /* glsl */ `
 #ifdef USE_FOG
   float distFog = smoothstep( fogNear, fogFar, vFogDepth );
-  float h = clamp( ( ${o.top.toFixed(2)} - vFogWorld.y ) / ${(o.top - o.bottom).toFixed(2)}, 0.0, 1.0 );
-  h = h * h * ( 3.0 - 2.0 * h );
-  float heightFog = h * ( 1.0 - exp( - vFogDepth * ${o.density.toFixed(5)} ) );
-  heightFog = max( heightFog, h * h );
-  float edgeFog = max(
-    smoothstep( ${o.edges.x[0].toFixed(2)}, ${o.edges.x[1].toFixed(2)}, abs( vFogWorld.x ) ),
-    smoothstep( ${o.edges.front[0].toFixed(2)}, ${o.edges.front[1].toFixed(2)}, vFogWorld.z )
-  );
+  // A long, soft gradient: thickest at the foot, thinning with height,
+  // and denser the more of it you look through.
+  float h = clamp( ( ${f(o.top)} - vFogWorld.y ) / ${f(o.top - o.bottom)}, 0.0, 1.0 );
+  float heightFog = pow( h, 1.5 ) * ( 1.0 - exp( - vFogDepth * ${o.density.toFixed(5)} ) );
+  heightFog = max( heightFog, pow( h, 2.2 ) );
+  ${floor}
+  float edgeFog = 0.0;
+  ${radial}
+  ${tile}
   gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, max( max( distFog, heightFog ), edgeFog ) );
 #endif`;
 }

@@ -1,37 +1,24 @@
 // The /camp scene: a big misty mountain with our camp on the summit.
 // Three levels, each a zoom deeper:
 //   mountain  the whole peak, mist round its foot
-//   camp      life-size on a shelf just below the summit
+//   camp      life-size on a shelf levelled into the summit
 //   tent      the tent fades away to show the sleeping gear
 // Zoom in far enough (or flick hard) on the mountain to dive to the camp;
-// zoom out far enough at camp to fly back.
+// zoom out far enough at camp to fly back. Everything that differs
+// between mountains comes from its config in data/mountains.ts.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { camp, mountain, type GearItem } from '../../data/camp';
+import { camp, type GearItem } from '../../data/camp';
+import type { MountainConfig } from '../../data/mountains';
 import { installHeightFog, makeMist } from './mist';
 import { makeStandIn } from './props';
 import { makeRock, rng } from './rocks';
 
 export type Mode = 'mountain' | 'camp' | 'tent';
 
-// The mountain file is a 3.15-unit terrain tile; at this scale it's
-// about 630 m across and 320 m tall, so the camp is a speck from afar.
-const SCALE = 200;
-// The levelled shelf baked into mountain.glb (see mountain.shelf in data).
-const shelf = new THREE.Vector3(mountain.shelf.x, mountain.shelf.y, mountain.shelf.z).multiplyScalar(SCALE);
-const BASE = mountain.baseY * SCALE;
-shelf.y -= BASE;
-
-const HALF = 1.5736 * SCALE; // half the tile's width
-const MIST = {
-  bottom: 20,
-  top: 150,
-  density: 0.0035,
-  edges: { x: [HALF * 0.55, HALF * 0.97], front: [HALF * 0.35, HALF * 0.95] },
-} satisfies Parameters<typeof installHeightFog>[0];
 const SKY = new THREE.Color('#dcd9d2');
 
 // Camp layout in metres around the shelf centre. Tent door faces +z.
@@ -54,16 +41,7 @@ const inside: Record<string, { x: number; z: number; rot: number }> = {
 // Where the camera sits at each level: a target, a direction to look
 // from (azimuth, polar), and a distance.
 type View = { target: THREE.Vector3; az: number; polar: number; dist: number };
-const views = {
-  mountain: { target: new THREE.Vector3(-20, 130, -60), az: 0.18, polar: 1.25, dist: 1180 },
-  camp: { target: shelf.clone().add(new THREE.Vector3(0, 0.6, 0)), az: 0.35, polar: 1.12, dist: 14 },
-} satisfies Record<string, View>;
-const limits = {
-  mountain: { min: 640, max: 1600, az: [-0.9, 1.1], polar: [0.8, 1.5] },
-  camp: { min: 4, max: 42, az: [-1.4, 1.9], polar: [0.35, 1.45] },
-  tent: { min: 2.5, max: 8, az: [-Infinity, Infinity], polar: [0.2, 1.3] },
-} as const;
-const DIVE_AT = 655; // zooming in past this on the mountain dives to camp
+type Limits = { min: number; max: number; az: readonly [number, number]; polar: readonly [number, number] };
 const LEAVE_AT = 40; // zooming out past this at camp flies back out
 
 export type CampUI = {
@@ -90,9 +68,36 @@ export function supportsWebGL() {
 const dirFrom = (az: number, polar: number) =>
   new THREE.Vector3(Math.sin(polar) * Math.sin(az), Math.cos(polar), Math.sin(polar) * Math.cos(az));
 
-export function initCamp(ui: CampUI) {
+export function initCamp(ui: CampUI, cfg: MountainConfig) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  installHeightFog(MIST);
+  // Everything registered here is removed again by dispose().
+  const life = new AbortController();
+  const on = { signal: life.signal };
+  let disposed = false;
+
+  // The levelled shelf, in world metres with the mountain's foot at y = 0.
+  const shelf = new THREE.Vector3(cfg.shelf.x, cfg.shelf.y - cfg.baseY, cfg.shelf.z).multiplyScalar(cfg.scale);
+  const centre = cfg.mist.centre === 'shelf' ? shelf : new THREE.Vector3();
+  installHeightFog({
+    bottom: cfg.mist.bottom,
+    top: cfg.mist.top,
+    floor: cfg.mist.floor,
+    density: cfg.mist.density,
+    radial: cfg.mist.radial && { centre: [centre.x, centre.z], fade: cfg.mist.radial },
+    tile: cfg.mist.tile,
+  });
+
+  const cam = cfg.camera;
+  const [ox, oz] = cam.targetOffset ?? [0, 0];
+  const views = {
+    mountain: { target: new THREE.Vector3(shelf.x + ox, cam.targetY, shelf.z + oz), az: cam.az, polar: cam.polar, dist: cam.dist },
+    camp: { target: shelf.clone().add(new THREE.Vector3(0, 0.6, 0)), az: 0.35, polar: 1.12, dist: 14 },
+  } satisfies Record<string, View>;
+  const limits: Record<Mode, Limits> = {
+    mountain: { min: cam.min, max: cam.max, az: cam.azRange, polar: cam.polarRange },
+    camp: { min: 4, max: 42, az: cam.campAz ?? [-Infinity, Infinity], polar: [0.35, 1.45] },
+    tent: { min: 2.5, max: 8, az: [-Infinity, Infinity], polar: [0.2, 1.3] },
+  };
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -104,9 +109,9 @@ export function initCamp(ui: CampUI) {
 
   const scene = new THREE.Scene();
   scene.background = SKY;
-  scene.fog = new THREE.Fog(SKY, 1500, 4200);
+  scene.fog = new THREE.Fog(SKY, ...cfg.mist.distance);
 
-  const camera = new THREE.PerspectiveCamera(34, 1, 1, 6000);
+  const camera = new THREE.PerspectiveCamera(34, 1, 1, 9000);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.enablePan = false;
@@ -127,13 +132,15 @@ export function initCamp(ui: CampUI) {
   sun.shadow.normalBias = 0.04;
   scene.add(sun, sun.target);
 
-  // Mist: a thick band round the foot, thinner wisps higher up that the
-  // camera passes through on the way to the summit.
-  const mist = makeMist(SKY, [
-    { count: 34, y: [10, 95], x: [-650, 650], z: [-250, 420], size: [220, 420], opacity: [0.55, 0.85] },
-    { count: 12, y: [150, 240], x: [-500, 500], z: [-150, 300], size: [120, 260], opacity: [0.25, 0.45] },
-    { count: 6, y: [shelf.y - 45, shelf.y - 20], x: [-300, 200], z: [-330, -150], size: [70, 140], opacity: [0.3, 0.5] },
-  ]);
+  // Mist: drifting cloud bands, positioned around the mountain's centre.
+  const mist = makeMist(
+    SKY,
+    cfg.mist.bands.map((b) => ({
+      ...b,
+      x: [centre.x + b.x[0], centre.x + b.x[1]] as [number, number],
+      z: [centre.z + b.z[0], centre.z + b.z[1]] as [number, number],
+    })),
+  );
   scene.add(mist.group);
 
   const loader = new GLTFLoader();
@@ -168,17 +175,22 @@ export function initCamp(ui: CampUI) {
   }
 
   async function loadMountain() {
-    const gltf = await loader.loadAsync(mountain.model);
+    const gltf = await loader.loadAsync(cfg.model);
+    if (disposed) return;
     const m = gltf.scene;
-    m.scale.setScalar(SCALE);
-    m.position.y = -BASE;
+    m.scale.setScalar(cfg.scale);
+    m.position.y = -cfg.baseY * cfg.scale;
     m.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       mesh.receiveShadow = true;
       const mat = mesh.material as THREE.MeshStandardMaterial;
-      // A touch warmer so the rock sits with the site's palette.
-      mat.color.set('#efe9df');
+      if (cfg.tint) mat.color.set(cfg.tint);
+      // Files with no roughness map render glossy; make them matte rock.
+      if (cfg.matte) {
+        mat.metalness = 0;
+        mat.roughness = 1;
+      }
     });
     scene.add(m);
     m.updateMatrixWorld(true);
@@ -223,6 +235,7 @@ export function initCamp(ui: CampUI) {
     if (item.model) {
       try {
         const gltf = await loader.loadAsync(item.model);
+        if (disposed) return;
         obj = gltf.scene;
         // Some models ship invisible collision meshes; drop them.
         obj.getObjectsByProperty('isMesh', true)
@@ -283,13 +296,14 @@ export function initCamp(ui: CampUI) {
   ui.status.textContent = 'Loading the mountain…';
   loadMountain()
     .then(() => {
+      if (disposed) return;
       ui.stage.classList.add('is-ready');
       ui.status.textContent = '';
       scatterRocks();
       return Promise.all(camp.map(place));
     })
     .catch(() => {
-      ui.status.textContent = 'The mountain didn’t load. Try refreshing.';
+      if (!disposed) ui.status.textContent = 'The mountain didn’t load. Try refreshing.';
     });
 
   // Camera ----------------------------------------------------------
@@ -309,8 +323,8 @@ export function initCamp(ui: CampUI) {
     controls.target.copy(v.target);
     camera.position.copy(v.target).addScaledVector(dirFrom(v.az, v.polar), v.dist);
   }
-  // Portrait screens start closer so the mountain still fills the frame.
-  if (ui.stage.clientWidth / ui.stage.clientHeight < 0.8) views.mountain.dist *= 0.8;
+  // Portrait screens frame the mountain differently (see camera.portrait).
+  if (ui.stage.clientWidth / ui.stage.clientHeight < 0.8) views.mountain.dist *= cam.portrait;
   setView(views.mountain);
   applyLimits('mountain');
 
@@ -360,9 +374,10 @@ export function initCamp(ui: CampUI) {
     const dist = Math.exp(THREE.MathUtils.lerp(Math.log(trip.r0), Math.log(trip.r1), k));
     camera.position.copy(controls.target).addScaledVector(dir, dist);
     camera.lookAt(controls.target);
-    // Through the cloud: the veil is solid while the scale changes most.
-    const veil = THREE.MathUtils.smoothstep(k, 0.12, 0.4) * (1 - THREE.MathUtils.smoothstep(k, 0.62, 0.9));
-    ui.veil.style.opacity = trip.veil ? String(veil * 0.97) : '0';
+    // A light haze as the camera passes the cloud layer, never a cut:
+    // the landing should stay visible the whole way down.
+    const veil = Math.pow(Math.sin(Math.PI * THREE.MathUtils.clamp((k - 0.15) / 0.55, 0, 1)), 2);
+    ui.veil.style.opacity = trip.veil ? String(veil * 0.35) : '0';
     if (trip.t >= 1) {
       const done = trip.done;
       trip = null;
@@ -385,7 +400,7 @@ export function initCamp(ui: CampUI) {
   function dive() {
     if (mode !== 'mountain' || trip) return;
     setMode('camp');
-    travel(views.camp, reduce ? 0.01 : 2.6, true, () => {
+    travel(views.camp, reduce ? 0.01 : 3.2, true, () => {
       if (queued) {
         const id = queued;
         queued = null;
@@ -399,7 +414,7 @@ export function initCamp(ui: CampUI) {
     if (mode === 'tent') leaveTent();
     select(null);
     setMode('mountain');
-    travel(views.mountain, reduce ? 0.01 : 2.4, true);
+    travel(views.mountain, reduce ? 0.01 : 2.8, true);
   }
 
   // Zoom intent: past the threshold on the mountain dives, past the far
@@ -407,7 +422,7 @@ export function initCamp(ui: CampUI) {
   controls.addEventListener('change', () => {
     if (trip || !controls.enabled) return;
     const d = controls.getDistance();
-    if (mode === 'mountain' && d <= DIVE_AT) dive();
+    if (mode === 'mountain' && d <= cam.diveAt) dive();
     else if (mode === 'camp' && d >= LEAVE_AT) climbOut();
   });
   // A hard flick of the wheel dives straight away, wherever you are.
@@ -425,8 +440,8 @@ export function initCamp(ui: CampUI) {
     },
     { passive: true },
   );
-  ui.summit.addEventListener('click', dive);
-  ui.back.addEventListener('click', () => (mode === 'tent' ? leaveTent() : climbOut()));
+  ui.summit.addEventListener('click', dive, on);
+  ui.back.addEventListener('click', () => (mode === 'tent' ? leaveTent() : climbOut()), on);
 
   // Picking ---------------------------------------------------------
   const ray = new THREE.Raycaster();
@@ -547,7 +562,7 @@ export function initCamp(ui: CampUI) {
     if (selected) select(null);
     else if (mode === 'tent') leaveTent();
     else if (mode === 'camp') climbOut();
-  });
+  }, on);
 
   function select(id: string | null) {
     const item = id ? (roots.get(id)?.userData.gear as GearItem | undefined) : undefined;
@@ -581,11 +596,13 @@ export function initCamp(ui: CampUI) {
     camera.fov = THREE.MathUtils.clamp(vfov, 34, 72);
     camera.updateProjectionMatrix();
   }
-  new ResizeObserver(resize).observe(ui.stage);
+  const sizer = new ResizeObserver(resize);
+  sizer.observe(ui.stage);
   resize();
 
   let visible = true;
-  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(ui.stage);
+  const seen = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
+  seen.observe(ui.stage);
 
   const clock = new THREE.Clock();
   const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -610,11 +627,34 @@ export function initCamp(ui: CampUI) {
     // Keep depth precision across a 1000:1 range of distances.
     const d = camera.position.distanceTo(controls.target);
     camera.near = THREE.MathUtils.clamp(d * 0.02, 0.05, 20);
-    camera.far = d + 4000;
+    camera.far = d + 7000;
     camera.updateProjectionMatrix();
 
     renderer.render(scene, camera);
   });
 
-  return { select, dive, climbOut };
+  /** Stop, free the GPU and remove every listener, ready for another mountain. */
+  function dispose() {
+    disposed = true;
+    life.abort();
+    sizer.disconnect();
+    seen.disconnect();
+    renderer.setAnimationLoop(null);
+    controls.dispose();
+    scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      m.geometry?.dispose();
+      for (const mat of [m.material ?? []].flat()) {
+        for (const v of Object.values(mat)) if (v instanceof THREE.Texture) v.dispose();
+        mat.dispose();
+      }
+    });
+    renderer.dispose();
+    renderer.forceContextLoss();
+    renderer.domElement.remove();
+    ui.veil.style.opacity = '0';
+    ui.label.hidden = true;
+  }
+
+  return { select, dive, climbOut, dispose };
 }
