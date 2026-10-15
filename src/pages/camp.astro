@@ -1,0 +1,308 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { camp } from '../data/camp';
+
+const outside = camp.filter((g) => !g.inside);
+const tent = camp.filter((g) => g.inside);
+---
+<Base title="Camp" current="camp" description="A mountain in the mist, with our camp on the summit. Zoom in to climb it, click the gear, open the tent.">
+  <header class="cp-head wrap">
+    <h1>Camp</h1>
+    <p class="cp-lede">A mountain in the mist, and our camp on top of it. Zoom in to climb it, click anything at camp to see what it is, and open the tent to look inside.</p>
+    <p class="cp-note">
+      <span class="tag tag--draft">Proof of concept</span>
+      <span>Generic gear and borrowed models for now. Our own kit is coming. <a href="/credits#models">Model credits</a></span>
+    </p>
+  </header>
+
+  <div class="cp-stage-wrap wrap">
+    <div class="cp-stage" id="camp-stage">
+      <p class="cp-status mono" id="camp-status" role="status"></p>
+      <div class="cp-label" id="camp-label" hidden></div>
+
+      <button class="cp-back btn" id="camp-back" type="button" hidden>
+        <Icon name="arrow-left" />
+        <span id="camp-back-label">Back to the mountain</span>
+      </button>
+
+      <button class="cp-summit btn" id="camp-summit" type="button">
+        Go to the summit
+        <Icon name="arrow-up-right" />
+      </button>
+
+      <div class="cp-veil" id="camp-veil" aria-hidden="true"></div>
+
+      <aside class="cp-card" id="camp-card" hidden aria-live="polite">
+        <button class="cp-card__close" id="camp-card-close" type="button" aria-label="Close">
+          <Icon name="close" />
+        </button>
+        <p class="label" id="camp-card-kind"></p>
+        <h2 id="camp-card-name"></h2>
+        <p class="cp-card__note" id="camp-card-note"></p>
+        <p class="cp-card__credit mono muted" id="camp-card-credit"></p>
+      </aside>
+
+      <p class="cp-hint mono" id="camp-hint">Drag to look around · zoom in to climb</p>
+
+      <div class="cp-fallback" id="camp-fallback" hidden>
+        <p>This part of the site needs 3D graphics, which your browser has switched off. The gear list below has everything at camp.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="cp-list wrap" aria-labelledby="cp-list-h">
+    <h2 id="cp-list-h">At camp</h2>
+    <div class="cp-list__cols">
+      <div>
+        <p class="label">Around camp</p>
+        <ul role="list">
+          {outside.map((g) => (
+            <li>
+              <button type="button" data-gear={g.id}>
+                <span class="cp-list__name">{g.name}</span>
+                <span class="cp-list__note">{g.note}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <p class="label">Inside the tent</p>
+        <ul role="list">
+          {tent.map((g) => (
+            <li>
+              <button type="button" data-gear={g.id}>
+                <span class="cp-list__name">{g.name}</span>
+                <span class="cp-list__note">{g.note}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import type { GearItem } from '../data/camp';
+  import { initCamp, supportsWebGL } from '../scripts/camp/scene';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const stage = $('camp-stage');
+  const card = $('camp-card');
+  const hint = $('camp-hint');
+  const kinds: Record<GearItem['kind'], string> = {
+    shelter: 'Shelter', sit: 'Camp', fire: 'Camp', person: 'Crew', clothes: 'Clothing', sleep: 'Sleep system',
+  };
+
+  function showCard(item: GearItem | null) {
+    if (!item) {
+      card.hidden = true;
+      return;
+    }
+    $('camp-card-kind').textContent = kinds[item.kind];
+    $('camp-card-name').textContent = item.name;
+    $('camp-card-note').textContent = item.note;
+    $('camp-card-credit').textContent = item.credit
+      ? `Model: ${item.credit.title} by ${item.credit.author}`
+      : item.model ? '' : 'Drawn for this page';
+    card.hidden = false;
+  }
+
+  if (!supportsWebGL()) {
+    $('camp-fallback').hidden = false;
+    $('camp-summit').hidden = true;
+    hint.hidden = true;
+  } else {
+    const scene = initCamp({
+      stage,
+      label: $('camp-label'),
+      back: $<HTMLButtonElement>('camp-back'),
+      backLabel: $('camp-back-label'),
+      summit: $<HTMLButtonElement>('camp-summit'),
+      veil: $('camp-veil'),
+      status: $('camp-status'),
+      onSelect: showCard,
+      onMode: (mode) => {
+        hint.textContent = {
+          mountain: 'Drag to look around · zoom in to climb',
+          camp: 'Click the gear · open the tent · zoom out to leave',
+          tent: 'Click the sleeping gear · Esc or Back to leave',
+        }[mode];
+      },
+    });
+    $('camp-card-close').addEventListener('click', () => scene.select(null));
+    document.querySelectorAll<HTMLButtonElement>('[data-gear]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const id = b.dataset.gear!;
+        stage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scene.select(id);
+      });
+    });
+  }
+</script>
+
+<style>
+  .cp-head { padding-top: clamp(56px, 9vw, 120px); }
+  .cp-head h1 { font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -0.04em; }
+  .cp-lede { margin-top: 18px; max-width: 58ch; color: var(--ink-2); }
+  .cp-note {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    color: var(--mute);
+  }
+
+  .cp-stage-wrap { margin-top: clamp(32px, 5vw, 56px); }
+  .cp-stage {
+    position: relative;
+    height: min(78vh, 760px);
+    min-height: 460px;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bone);
+    touch-action: none;
+  }
+  .cp-stage :global(.camp-canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 900ms var(--ease);
+  }
+  .cp-stage:global(.is-ready) :global(.camp-canvas) { opacity: 1; }
+  .cp-stage :global(.camp-canvas:active) { cursor: grabbing; }
+
+  .cp-status {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    color: var(--mute);
+    pointer-events: none;
+  }
+  .cp-status:empty { display: none; }
+
+  .cp-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 4px 9px;
+    background: var(--ink);
+    color: var(--white);
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .cp-back {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+  }
+
+  .cp-summit {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .cp-veil {
+    position: absolute;
+    inset: 0;
+    background: #dcd9d2;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cp-card {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: min(320px, calc(100% - 32px));
+    padding: 22px 24px;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+  .cp-card h2 { font-size: 1.875rem; margin-top: 4px; }
+  .cp-card__note { margin-top: 8px; font-size: 0.9375rem; color: var(--ink-2); line-height: 1.5; }
+  .cp-card__credit { margin-top: 14px; }
+  .cp-card__credit:empty { display: none; }
+  .cp-card__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--mute);
+    cursor: pointer;
+  }
+  .cp-card__close:hover { background: var(--bone); color: var(--ink); }
+
+  .cp-hint {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    margin: 0;
+    color: var(--mute);
+    pointer-events: none;
+  }
+
+  .cp-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .cp-fallback p { max-width: 42ch; }
+
+  .cp-list { margin-top: clamp(64px, 9vw, 112px); }
+  .cp-list h2 { font-size: clamp(2rem, 4vw, 3rem); }
+  .cp-list__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+    margin-top: 28px;
+  }
+  .cp-list .label { padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+  .cp-list ul { list-style: none; margin: 0; padding: 0; }
+  .cp-list li { border-bottom: 1px solid var(--rule); }
+  .cp-list button {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    padding: 14px 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .cp-list__name { font-family: var(--serif); font-size: 1.375rem; line-height: 1.2; }
+  .cp-list__note { font-size: 0.875rem; color: var(--mute); }
+  .cp-list button:hover .cp-list__name { text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+
+  @media (max-width: 720px) {
+    .cp-stage { height: 72vh; min-height: 420px; }
+    .cp-list__cols { grid-template-columns: 1fr; }
+    .cp-hint { display: none; }
+    .cp-card { left: 16px; right: 16px; width: auto; padding: 18px 20px; }
+  }
+</style>

@@ -56,6 +56,8 @@ body {
   accent-color: var(--ink);
 }
 
+[hidden] { display: none !important; }
+
 img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.22em; }
 button { font: inherit; color: inherit; }

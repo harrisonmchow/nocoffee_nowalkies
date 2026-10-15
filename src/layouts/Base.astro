@@ -6,7 +6,7 @@ import { site } from '../data/site';
 interface Props {
   title?: string;
   description?: string;
-  current?: 'home' | 'photos' | 'work' | 'credits';
+  current?: 'home' | 'photos' | 'camp' | 'work' | 'credits';
 }
 const {
   title,
@@ -17,6 +17,7 @@ const fullTitle = title ? `${title} | ${site.name}` : site.name;
 const nav = [
   { href: '/#places', label: 'Places', key: 'places' },
   { href: '/photos', label: 'Photos', key: 'photos' },
+  { href: '/camp', label: 'Camp', key: 'camp' },
   { href: '/work', label: 'Work with us', key: 'work' },
 ];
 ---
@@ -80,6 +81,7 @@ const nav = [
             <ul class="foot__links">
               <li><a href="/#places">Places</a></li>
               <li><a href="/photos">Photos</a></li>
+              <li><a href="/camp">Camp</a></li>
               <li><a href="/work">Work with us</a></li>
               <li><a href="/credits">Photo credits</a></li>
             </ul>

@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { photos } from '../data/photos';
 import { regions } from '../data/regions';
+import { modelCredits } from '../data/camp';
 
 const standIns = photos.filter((p) => p.standIn);
 const regionName = (slug: string) => regions.find((r) => r.slug === slug)?.name ?? slug;
@@ -25,6 +26,20 @@ const regionName = (slug: string) => regions.find((r) => r.slug === slug)?.name 
         </li>
       ))}
     </ul>
+
+    <h2 id="models" class="cr__h2">3D models</h2>
+    <p class="cr__lede">The <a href="/camp">camp</a> page uses free models from Sketchfab while we make our own.</p>
+    <ul class="cr__list cr__list--plain" role="list">
+      {modelCredits.map((m) => (
+        <li>
+          <div>
+            <p class="cr__title">{m.title}</p>
+            <p class="mono muted">{m.author} · {m.license}</p>
+          </div>
+          <a href={m.source} rel="noopener" target="_blank">Source</a>
+        </li>
+      ))}
+    </ul>
   </section>
 </Base>
 
@@ -43,6 +58,8 @@ const regionName = (slug: string) => regions.find((r) => r.slug === slug)?.name 
   }
   .cr__list img { width: 80px; height: 56px; object-fit: cover; border-radius: 4px; }
   .cr__title { font-size: 0.9375rem; }
+  .cr__h2 { margin-top: clamp(64px, 9vw, 112px); font-size: clamp(2rem, 4vw, 3rem); }
+  .cr__list.cr__list--plain li { grid-template-columns: 1fr auto; }
   .cr__list a { font-size: 0.875rem; }
   @media (max-width: 600px) {
     .cr__list li { grid-template-columns: 64px 1fr; }
