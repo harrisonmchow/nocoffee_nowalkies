@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "checks": {
+    "silhouetteIoU": 0.9017,
+    "aspectRatioDelta": 0.0,
+    "scaleDelta": 0.0,
+    "bilateralSymmetryError": 0.0187,
+    "colorDelta": {
+      "checked": 11,
+      "maxDeltaE": 53.61,
+      "perComponent": [
+        {
+          "componentId": null,
+          "deltaE": 38.05
+        },
+        {
+          "componentId": null,
+          "deltaE": 38.05
+        },
+        {
+          "componentId": null,
+          "deltaE": 13.66
+        },
+        {
+          "componentId": null,
+          "deltaE": 42.59
+        },
+        {
+          "componentId": null,
+          "deltaE": 53.61
+        },
+        {
+          "componentId": null,
+          "deltaE": 42.59
+        },
+        {
+          "componentId": null,
+          "deltaE": 42.59
+        },
+        {
+          "componentId": null,
+          "deltaE": 42.59
+        },
+        {
+          "componentId": null,
+          "deltaE": 38.05
+        },
+        {
+          "componentId": null,
+          "deltaE": 38.05
+        },
+        {
+          "componentId": null,
+          "deltaE": 38.05
+        }
+      ],
+      "gated": false
+    }
+  },
+  "failures": [],
+  "maskWarnings": [],
+  "renderHash": "b037b51d2667b892",
+  "passId": "blockout",
+  "mapStrippedRender": "renders/blockout-r1/cmp-render-flat.png"
+}

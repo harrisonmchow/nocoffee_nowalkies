@@ -41,15 +41,9 @@ export const camp: GearItem[] = [
   {
     id: 'chair',
     name: 'Chair',
-    note: 'An armchair, for now. Our real folding chairs are lighter and less comfortable.',
+    note: 'Our real folding chair, scanned on 16 October 2026.',
     kind: 'sit',
     model: '/models/chair.glb',
-    credit: {
-      title: 'Vintage Wooden Armchair - Low Poly / Game Ready',
-      author: 'RenendStudio',
-      license: 'CC BY 4.0',
-      source: 'https://sketchfab.com/3d-models/vintage-wooden-armchair-low-poly-game-ready-2b7ae6f828844ee4a64c7417a7b78486',
-    },
   },
   {
     id: 'fire',
@@ -66,16 +60,10 @@ export const camp: GearItem[] = [
   },
   {
     id: 'person',
-    name: 'One of us',
-    note: 'A stand-in for now. Harry, Kevin, Caleb or Mikey, eventually.',
+    name: 'Harry',
+    note: 'Harry, scanned with a coffee in hand. Kevin, Caleb and Mikey next.',
     kind: 'person',
-    model: '/models/person.glb',
-    credit: {
-      title: 'Fisherman',
-      author: 'CharlieCatling',
-      license: 'Sketchfab Free Standard',
-      source: 'https://sketchfab.com/3d-models/fisherman-79c8c6391e1d4a6c9b0a2a4b165017b2',
-    },
+    model: '/models/harry.glb',
   },
   {
     id: 'clothes',

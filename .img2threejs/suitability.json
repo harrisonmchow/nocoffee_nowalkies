@@ -1,0 +1,4 @@
+{"reference":"IMG_4842.JPG","secondary":"IMG_4850.JPG","verdict":"conditional",
+ "pass":["one obvious target object","strong silhouette (low ridge dome)","fly + pole materials visible","approximable with lofted surfaces + tubes"],
+ "conditional":["vegetation occludes hem/ground line and lower far side","dusk blue cast: albedo must be de-lit","no orthographic views; no visual hull","back end, stakes, guy-lines hidden -> inferred"],
+ "reject":[]}

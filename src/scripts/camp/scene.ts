@@ -27,7 +27,7 @@ type Spot = { x: number; z: number; rot: number; fit?: Fit };
 const layout: Record<string, Spot> = {
   tent: { x: -1.9, z: -1.3, rot: 0.35, fit: { by: 'width', size: 2.6 } },
   fire: { x: 1.3, z: 1.0, rot: 0, fit: { by: 'width', size: 0.9 } },
-  chair: { x: 2.5, z: 0.1, rot: -2.1, fit: { by: 'height', size: 0.95 } },
+  chair: { x: 2.5, z: 0.1, rot: -0.95, fit: { by: 'height', size: 0.75 } },
   person: { x: 2.1, z: 2.2, rot: -2.4, fit: { by: 'height', size: 1.75 } },
   clothes: { x: -1.4, z: 2.0, rot: 0.2 },
 };

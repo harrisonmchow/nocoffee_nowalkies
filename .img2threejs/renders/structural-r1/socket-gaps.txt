@@ -1,0 +1,12 @@
+contact = fraction of the tube vertices nearest the socket (end ring) that lie inside the socket part bbox
+leg-front-left     -> hub-front       end-ring inside socket: 1.00  EMBEDDED
+leg-front-right    -> hub-front       end-ring inside socket: 1.00  EMBEDDED
+leg-back-left      -> hub-back        end-ring inside socket: 1.00  EMBEDDED
+leg-back-right     -> hub-back        end-ring inside socket: 1.00  EMBEDDED
+ridge-strut-front  -> hub-front       end-ring inside socket: 1.00  EMBEDDED
+ridge-strut-back   -> hub-back        end-ring inside socket: 1.00  EMBEDDED
+ridge-strut-front  -> ridge-fitting   end-ring inside socket: 1.00  EMBEDDED
+ridge-strut-back   -> ridge-fitting   end-ring inside socket: 1.00  EMBEDDED
+ridge-pole         -> ridge-fitting   end-ring inside socket: 1.00  EMBEDDED
+leg-front-left     -> tip-front-left  end-ring inside socket: 0.67  TOUCHING
+leg-back-right     -> tip-back-right  end-ring inside socket: 0.50  TOUCHING

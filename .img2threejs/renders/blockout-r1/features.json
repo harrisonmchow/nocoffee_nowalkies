@@ -1,0 +1,1 @@
+[{"id":"overall-silhouette","score":0.72,"notes":"IoU 0.904 after alignment, trapezoid door face and end walls read right; but roof plateau above the hub is missing (top-band interior diff 0.154) and legs read too straight near the hub."}]

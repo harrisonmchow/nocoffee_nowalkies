@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "door-three-quarter",
+    "sourcePath": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/ref-4842-masked.png",
+    "width": 2520,
+    "height": 1612,
+    "foregroundCoverage": 0.4967,
+    "largestComponentFraction": 1.0,
+    "pHash": 12658115157950638241,
+    "duplicateOfHash": null
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "sourceImage": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/ref-4842-masked.png",
+  "zonesDir": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory",
+  "detailInventory": {
+    "scanMethod": "grid-3x3",
+    "targetMinDetails": 6,
+    "details": [
+      {
+        "id": "hub-strut-junction",
+        "kind": "fastener",
+        "description": "Apex hub (pale grey) where the four legs meet; a short strut rises from it to a fitting at the ridge-pole midpoint. This is the \"pole crossing\".",
+        "region": {
+          "x": 0.43,
+          "y": 0.08,
+          "width": 0.06,
+          "height": 0.1,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "frame-hub.hub-strut-junction"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
+        "confidence": 0.8
+      },
+      {
+        "id": "ridge-pole-proud",
+        "kind": "contour",
+        "description": "Ridge pole runs along X ~8-12 cm proud of the fly, ends curving down to clip at the fly ridge corners.",
+        "region": {
+          "x": 0.23,
+          "y": 0.08,
+          "width": 0.42,
+          "height": 0.08,
+          "units": "normalized"
+        },
+        "scale": "macro",
+        "affects": "silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "ridge-pole.ridge-arch"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "door-vent-awning",
+        "kind": "seam",
+        "description": "Peaked triangular vent hood below the hub on the door face, propped by a short kickstand; dark webbing tab visible in the opening.",
+        "region": {
+          "x": 0.38,
+          "y": 0.16,
+          "width": 0.18,
+          "height": 0.12,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "awning.peaked-vent-hood"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "back-vent",
+        "kind": "seam",
+        "description": "Matching peaked vent hood on the far (-Z) face, seen in IMG_4850.",
+        "region": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 0.0,
+          "height": 0.0,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "vent-back.peaked-vent-hood"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
+        "confidence": 0.6
+      },
+      {
+        "id": "leg-clips",
+        "kind": "fastener",
+        "description": "Small black plastic clips joining fly to each leg, ~4 per leg, evenly spaced from hub to near ground.",
+        "region": {
+          "x": 0.25,
+          "y": 0.16,
+          "width": 0.55,
+          "height": 0.62,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "pole-legs.leg-clips"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
+        "confidence": 0.8
+      },
+      {
+        "id": "panel-seams",
+        "kind": "seam",
+        "description": "Soft panel seams where door/back faces meet the end walls and along the ridge strip; show as faint creased lines, no colour change.",
+        "region": {
+          "x": 0.18,
+          "y": 0.12,
+          "width": 0.66,
+          "height": 0.7,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "normal",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "fly.panel-seams"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c0.png",
+        "confidence": 0.6
+      },
+      {
+        "id": "fabric-sag",
+        "kind": "seam",
+        "description": "Fabric sags inward between pole lines with fine, mostly horizontal wrinkles on the lower door face and diagonal tension creases near the legs.",
+        "region": {
+          "x": 0.2,
+          "y": 0.3,
+          "width": 0.6,
+          "height": 0.6,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "fly.fabric-sag"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
+        "confidence": 0.75
+      },
+      {
+        "id": "velcro-wraps",
+        "kind": "fastener",
+        "description": "Pale green webbing loops/velcro wraps on the fly beside the legs (two visible on door face).",
+        "region": {
+          "x": 0.31,
+          "y": 0.36,
+          "width": 0.33,
+          "height": 0.1,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "fly.velcro-wraps"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
+        "confidence": 0.65
+      },
+      {
+        "id": "door-toggle",
+        "kind": "fastener",
+        "description": "Small pale tab at the centre of the door face (door tie-back toggle / zip garage).",
+        "region": {
+          "x": 0.47,
+          "y": 0.53,
+          "width": 0.03,
+          "height": 0.04,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "door.door-toggle"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
+        "confidence": 0.55
+      },
+      {
+        "id": "door-zip",
+        "kind": "linework",
+        "description": "Door zip outline: not resolvable at dusk; inferred curved-top door on +Z face, rendered as a faint coil-zip line.",
+        "region": {
+          "x": 0.25,
+          "y": 0.25,
+          "width": 0.5,
+          "height": 0.6,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "door.door-zip"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
+        "confidence": 0.3
+      },
+      {
+        "id": "hem-gap",
+        "kind": "stain",
+        "description": "Fly hem stops ~4 cm above ground; dark inner bathtub floor visible beneath.",
+        "region": {
+          "x": 0.08,
+          "y": 0.84,
+          "width": 0.82,
+          "height": 0.06,
+          "units": "normalized"
+        },
+        "scale": "meso",
+        "affects": "albedo",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "fly.hem-gap"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r2c1.png",
+        "confidence": 0.6
+      },
+      {
+        "id": "crease-sheen",
+        "kind": "gloss",
+        "description": "Semi-matte coated nylon: soft broad sheen on taut upper panels, slightly glossier along tension creases.",
+        "region": {
+          "x": 0.3,
+          "y": 0.1,
+          "width": 0.4,
+          "height": 0.3,
+          "units": "normalized"
+        },
+        "scale": "micro",
+        "affects": "roughness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "fly-nylon.crease-sheen"
+        },
+        "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
+        "confidence": 0.6
+      }
+    ],
+    "dropped": [
+      {
+        "id": "stakes",
+        "reason": "not visible in either photo"
+      },
+      {
+        "id": "guy-lines",
+        "reason": "not visible in either photo"
+      },
+      {
+        "id": "brow-pole",
+        "reason": "brief reading corrected: no brow pole; the peak is a vent hood on a kickstand"
+      },
+      {
+        "id": "crossing-poles",
+        "reason": "brief reading corrected: legs meet at a hub; crossing represented by hub-strut-junction"
+      }
+    ]
+  },
+  "authoringInstruction": "Open each zone crop under zonesDir and replace every detail stub's kind, description, scale, affects, mapsTo, and confidence with what is actually observed. Add more detail entries per zone if a single zone contains multiple distinct marks; do not leave stubs unfilled or unlinked (mapsTo must reference a real component.localFeatures or material.localOverrides entry)."
+}

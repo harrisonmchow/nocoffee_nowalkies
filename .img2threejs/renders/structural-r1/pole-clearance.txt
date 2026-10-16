@@ -1,0 +1,6 @@
+leg-front-left   min clearance    3.6 mm
+leg-front-right  min clearance    3.5 mm
+leg-back-left    min clearance    2.2 mm
+leg-back-right   min clearance    3.5 mm
+ridge-pole       min clearance    6.8 mm
+ridge-pole ends   clearance 6.8..14.0 mm (pole radius 4.5)

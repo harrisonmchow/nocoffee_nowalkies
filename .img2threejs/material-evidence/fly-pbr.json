@@ -1,0 +1,88 @@
+{
+  "ok": true,
+  "verdict": "pass",
+  "confidence": 0.751,
+  "estimatedFidelity": 0.751,
+  "targetThreshold": 0.7,
+  "materialId": "fly-nylon",
+  "sourceImage": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly-delit.png",
+  "outDir": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly",
+  "palette": [
+    "#3C5E83",
+    "#3F6185",
+    "#385B7F",
+    "#43668A",
+    "#2E5175"
+  ],
+  "maps": {
+    "albedo": {
+      "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly/fly-nylon_albedo.png",
+      "url": "fly-nylon_albedo.png",
+      "channel": "albedo",
+      "source": "reference-pixel-extraction"
+    },
+    "roughness": {
+      "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly/fly-nylon_roughness.png",
+      "url": "fly-nylon_roughness.png",
+      "channel": "roughness",
+      "source": "reference-pixel-extraction"
+    },
+    "height": {
+      "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly/fly-nylon_height.png",
+      "url": "fly-nylon_height.png",
+      "channel": "height",
+      "source": "reference-pixel-extraction"
+    },
+    "normal": {
+      "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly/fly-nylon_normal.png",
+      "url": "fly-nylon_normal.png",
+      "channel": "normal",
+      "source": "reference-pixel-extraction"
+    },
+    "ao": {
+      "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/material-evidence/fly/fly-nylon_ao.png",
+      "url": "fly-nylon_ao.png",
+      "channel": "ao",
+      "source": "reference-pixel-extraction"
+    }
+  },
+  "diagnostics": {
+    "sourceWidth": 340,
+    "sourceHeight": 240,
+    "mapSize": 1024,
+    "cropBBoxPixels": {
+      "x": 0,
+      "y": 0,
+      "width": 340,
+      "height": 240
+    },
+    "mask": {
+      "backgroundColor": "#3E6082",
+      "backgroundNoise": 8.602,
+      "transparentPixelFraction": 0.0,
+      "foregroundCoverage": 1.0
+    },
+    "mapStats": {
+      "valueRange": 0.08,
+      "heightP90Gradient": 0.0768,
+      "roughnessBase": 0.73,
+      "roughnessVariation": 0.14,
+      "normalStrength": 0.246,
+      "blurRadius": 21
+    },
+    "palette": [
+      "#3C5E83",
+      "#3F6185",
+      "#385B7F",
+      "#43668A",
+      "#2E5175"
+    ]
+  },
+  "warnings": [
+    "image is not clearly isolated from background; using most pixels as material evidence",
+    "object/background separation is weak",
+    "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+    "low value range weakens height/roughness inference"
+  ],
+  "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+}

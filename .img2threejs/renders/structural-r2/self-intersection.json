@@ -1,0 +1,1231 @@
+{
+  "selfIntersecting": true,
+  "meshCount": 30,
+  "insideVertexCount": 522,
+  "undecidedVertexCount": 77,
+  "sampledVertexCount": 5854,
+  "totalVertexCount": 5854,
+  "meshes": [
+    {
+      "name": "fly-membrane",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 93,
+      "undecidedVertexCount": 45,
+      "outsideVertexCount": 2527,
+      "sampledVertexCount": 2665,
+      "totalVertexCount": 2665,
+      "samplingStride": 1,
+      "triangleCount": 5120,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 940,
+          "position": [
+            -0.06562499701976776,
+            0.8515899181365967,
+            -0.19499999284744263
+          ]
+        },
+        {
+          "vertexIndex": 1254,
+          "position": [
+            -0.42656248807907104,
+            0.8580757975578308,
+            -0.032499998807907104
+          ]
+        },
+        {
+          "vertexIndex": 2171,
+          "position": [
+            -0.19687500596046448,
+            0.6060212850570679,
+            0.42250001430511475
+          ]
+        },
+        {
+          "vertexIndex": 2234,
+          "position": [
+            -0.26249998807907104,
+            0.5570034384727478,
+            0.45500001311302185
+          ]
+        },
+        {
+          "vertexIndex": 2295,
+          "position": [
+            -0.39375001192092896,
+            0.5038996338844299,
+            0.48750001192092896
+          ]
+        },
+        {
+          "vertexIndex": 2353,
+          "position": [
+            -0.6234375238418579,
+            0.4264081120491028,
+            0.5199999809265137
+          ]
+        },
+        {
+          "vertexIndex": 2364,
+          "position": [
+            -0.26249998807907104,
+            0.45279714465141296,
+            0.5199999809265137
+          ]
+        },
+        {
+          "vertexIndex": 2419,
+          "position": [
+            -0.590624988079071,
+            0.37506407499313354,
+            0.5525000095367432
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.002611372021228467,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "inner-floor",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 24,
+      "sampledVertexCount": 24,
+      "totalVertexCount": 24,
+      "samplingStride": 1,
+      "triangleCount": 8,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.002387823248920653,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "seam-ridge",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 35,
+      "undecidedVertexCount": 1,
+      "outsideVertexCount": 139,
+      "sampledVertexCount": 175,
+      "totalVertexCount": 175,
+      "samplingStride": 1,
+      "triangleCount": 288,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 8,
+          "position": [
+            -0.529046893119812,
+            0.8725761771202087,
+            0.0012490713270381093
+          ]
+        },
+        {
+          "vertexIndex": 36,
+          "position": [
+            -0.32318946719169617,
+            0.8854129910469055,
+            0.0012483061291277409
+          ]
+        },
+        {
+          "vertexIndex": 58,
+          "position": [
+            -0.16857603192329407,
+            0.8912125825881958,
+            -0.0012440886348485947
+          ]
+        },
+        {
+          "vertexIndex": 88,
+          "position": [
+            0.03764237090945244,
+            0.8886746168136597,
+            -0.0012526469072327018
+          ]
+        },
+        {
+          "vertexIndex": 102,
+          "position": [
+            0.14071336388587952,
+            0.8872538208961487,
+            -0.0012484564213082194
+          ]
+        },
+        {
+          "vertexIndex": 116,
+          "position": [
+            0.24374552071094513,
+            0.8846014738082886,
+            -0.0012506282655522227
+          ]
+        },
+        {
+          "vertexIndex": 130,
+          "position": [
+            0.3467071056365967,
+            0.8800272345542908,
+            -0.0012479423312470317
+          ]
+        },
+        {
+          "vertexIndex": 144,
+          "position": [
+            0.4495716094970703,
+            0.8734796643257141,
+            -0.0012508314102888107
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0011850103461715584,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "seam-end-l",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 34,
+      "undecidedVertexCount": 3,
+      "outsideVertexCount": 110,
+      "sampledVertexCount": 147,
+      "totalVertexCount": 147,
+      "samplingStride": 1,
+      "triangleCount": 240,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 7,
+          "position": [
+            -0.6016697287559509,
+            0.8211679458618164,
+            0.002498433692380786
+          ]
+        },
+        {
+          "vertexIndex": 19,
+          "position": [
+            -0.6253717541694641,
+            0.7771183848381042,
+            0.0012490818044170737
+          ]
+        },
+        {
+          "vertexIndex": 27,
+          "position": [
+            -0.6466018557548523,
+            0.7318323254585266,
+            0.0025006886571645737
+          ]
+        },
+        {
+          "vertexIndex": 35,
+          "position": [
+            -0.6986824870109558,
+            0.6465281248092651,
+            0.002507386729121208
+          ]
+        },
+        {
+          "vertexIndex": 47,
+          "position": [
+            -0.7296527624130249,
+            0.6072573065757751,
+            0.0012577478773891926
+          ]
+        },
+        {
+          "vertexIndex": 55,
+          "position": [
+            -0.7585079669952393,
+            0.5664048790931702,
+            0.0024987885262817144
+          ]
+        },
+        {
+          "vertexIndex": 86,
+          "position": [
+            -0.9100301861763,
+            0.3676111400127411,
+            -0.0012508506188169122
+          ]
+        },
+        {
+          "vertexIndex": 100,
+          "position": [
+            -0.9663895964622498,
+            0.2852814197540283,
+            -0.0012589762918651104
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0009448791828761599,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "seam-end-r",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 20,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 127,
+      "sampledVertexCount": 147,
+      "totalVertexCount": 147,
+      "samplingStride": 1,
+      "triangleCount": 240,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 9,
+          "position": [
+            0.603656530380249,
+            0.8221961855888367,
+            -0.001253694761544466
+          ]
+        },
+        {
+          "vertexIndex": 23,
+          "position": [
+            0.6484596729278564,
+            0.7329206466674805,
+            -0.0012515216367319226
+          ]
+        },
+        {
+          "vertexIndex": 37,
+          "position": [
+            0.700361430644989,
+            0.6478387117385864,
+            -0.0012430398492142558
+          ]
+        },
+        {
+          "vertexIndex": 51,
+          "position": [
+            0.7598865628242493,
+            0.5676178336143494,
+            -0.0012545904610306025
+          ]
+        },
+        {
+          "vertexIndex": 65,
+          "position": [
+            0.821929931640625,
+            0.4892460107803345,
+            -0.0012490474618971348
+          ]
+        },
+        {
+          "vertexIndex": 75,
+          "position": [
+            0.849969208240509,
+            0.447648286819458,
+            0.0012410751078277826
+          ]
+        },
+        {
+          "vertexIndex": 89,
+          "position": [
+            0.9096577763557434,
+            0.36752018332481384,
+            0.0012502109166234732
+          ]
+        },
+        {
+          "vertexIndex": 103,
+          "position": [
+            0.9656704068183899,
+            0.28491541743278503,
+            0.0012491950765252113
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0009449805010485695,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "awning-hood",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 6,
+      "sampledVertexCount": 6,
+      "totalVertexCount": 6,
+      "samplingStride": 1,
+      "triangleCount": 2,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0005097697395815858,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "awning-opening",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 18,
+      "sampledVertexCount": 18,
+      "totalVertexCount": 18,
+      "samplingStride": 1,
+      "triangleCount": 16,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.00042261978253982894,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "awning-kickstand",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 21,
+      "sampledVertexCount": 21,
+      "totalVertexCount": 21,
+      "samplingStride": 1,
+      "triangleCount": 24,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.00010638762498281304,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "awning-tab",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 24,
+      "sampledVertexCount": 24,
+      "totalVertexCount": 24,
+      "samplingStride": 1,
+      "triangleCount": 12,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 4.6213229297506424e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "vent-back-hood",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 6,
+      "sampledVertexCount": 6,
+      "totalVertexCount": 6,
+      "samplingStride": 1,
+      "triangleCount": 2,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0005097383015783929,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "vent-back-opening",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 18,
+      "sampledVertexCount": 18,
+      "totalVertexCount": 18,
+      "samplingStride": 1,
+      "triangleCount": 16,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.00042259856287992176,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "vent-back-kickstand",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 21,
+      "sampledVertexCount": 21,
+      "totalVertexCount": 21,
+      "samplingStride": 1,
+      "triangleCount": 24,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.00010638411138984814,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "vent-back-tab",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 24,
+      "sampledVertexCount": 24,
+      "totalVertexCount": 24,
+      "samplingStride": 1,
+      "triangleCount": 12,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 4.623632660866423e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "door-panel",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 221,
+      "sampledVertexCount": 221,
+      "totalVertexCount": 221,
+      "samplingStride": 1,
+      "triangleCount": 360,
+      "degenerateTriangleCount": 24,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0010808384463654062,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "door-zip",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 136,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 207,
+      "sampledVertexCount": 343,
+      "totalVertexCount": 343,
+      "samplingStride": 1,
+      "triangleCount": 576,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 7,
+          "position": [
+            -0.4178808946552236,
+            0.09864063361537108,
+            0.6464478323817884
+          ]
+        },
+        {
+          "vertexIndex": 48,
+          "position": [
+            -0.40766162429177355,
+            0.28117839420091756,
+            0.60485952362648
+          ]
+        },
+        {
+          "vertexIndex": 90,
+          "position": [
+            -0.3464963874238093,
+            0.47594640577089437,
+            0.5120788367115592
+          ]
+        },
+        {
+          "vertexIndex": 131,
+          "position": [
+            -0.2093101581948359,
+            0.6232111247802938,
+            0.41549728825918186
+          ]
+        },
+        {
+          "vertexIndex": 168,
+          "position": [
+            1.1191664401777324e-05,
+            0.6822868379379476,
+            0.375402197393093
+          ]
+        },
+        {
+          "vertexIndex": 209,
+          "position": [
+            0.17793358951634575,
+            0.6406437548423971,
+            0.40453256681791294
+          ]
+        },
+        {
+          "vertexIndex": 250,
+          "position": [
+            0.329993323383991,
+            0.5043362470890249,
+            0.4937212170683478
+          ]
+        },
+        {
+          "vertexIndex": 293,
+          "position": [
+            0.4018440404517095,
+            0.3160133751655782,
+            0.5919475854956244
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0010854952718259666,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "door-toggle",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 24,
+      "sampledVertexCount": 24,
+      "totalVertexCount": 24,
+      "samplingStride": 1,
+      "triangleCount": 12,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 4.0755367660901654e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "hub-front",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 76,
+      "sampledVertexCount": 76,
+      "totalVertexCount": 76,
+      "samplingStride": 1,
+      "triangleCount": 48,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 6.823488848409809e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "ridge-strut-front",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 21,
+      "sampledVertexCount": 21,
+      "totalVertexCount": 21,
+      "samplingStride": 1,
+      "triangleCount": 24,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0002300658621130886,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "hub-back",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 76,
+      "sampledVertexCount": 76,
+      "totalVertexCount": 76,
+      "samplingStride": 1,
+      "triangleCount": 48,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 6.823488848409809e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "ridge-strut-back",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 21,
+      "sampledVertexCount": 21,
+      "totalVertexCount": 21,
+      "samplingStride": 1,
+      "triangleCount": 24,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0002300658621130886,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "ridge-fitting",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 77,
+      "sampledVertexCount": 77,
+      "totalVertexCount": 77,
+      "samplingStride": 1,
+      "triangleCount": 100,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 4.0902285054818856e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "ridge-pole",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 65,
+      "undecidedVertexCount": 26,
+      "outsideVertexCount": 252,
+      "sampledVertexCount": 343,
+      "totalVertexCount": 343,
+      "samplingStride": 1,
+      "triangleCount": 576,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 10,
+          "position": [
+            -0.5647885203361511,
+            0.8851646184921265,
+            -0.0044999998062849045
+          ]
+        },
+        {
+          "vertexIndex": 71,
+          "position": [
+            -0.3516162931919098,
+            0.9628506302833557,
+            0.0022499999031424522
+          ]
+        },
+        {
+          "vertexIndex": 137,
+          "position": [
+            -0.12586580216884613,
+            0.9904189109802246,
+            -0.0022499999031424522
+          ]
+        },
+        {
+          "vertexIndex": 180,
+          "position": [
+            0.025195248425006866,
+            0.9958575963973999,
+            0.0022499999031424522
+          ]
+        },
+        {
+          "vertexIndex": 208,
+          "position": [
+            0.12586580216884613,
+            0.9904189109802246,
+            0.0022499999031424522
+          ]
+        },
+        {
+          "vertexIndex": 236,
+          "position": [
+            0.22602717578411102,
+            0.9786615371704102,
+            0.0022499999031424522
+          ]
+        },
+        {
+          "vertexIndex": 264,
+          "position": [
+            0.3252423107624054,
+            0.9608254432678223,
+            0.0022499999031424522
+          ]
+        },
+        {
+          "vertexIndex": 292,
+          "position": [
+            0.42304643988609314,
+            0.9362319707870483,
+            0.0022499999031424522
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0011823390842679933,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "leg-back-left",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 42,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 245,
+      "sampledVertexCount": 287,
+      "totalVertexCount": 287,
+      "samplingStride": 1,
+      "triangleCount": 480,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 7,
+          "position": [
+            -0.029643269255757332,
+            0.8791674375534058,
+            -0.20787017047405243
+          ]
+        },
+        {
+          "vertexIndex": 27,
+          "position": [
+            -0.0870271623134613,
+            0.8399527668952942,
+            -0.23233787715435028
+          ]
+        },
+        {
+          "vertexIndex": 42,
+          "position": [
+            -0.17720931768417358,
+            0.7890836000442505,
+            -0.27079030871391296
+          ]
+        },
+        {
+          "vertexIndex": 62,
+          "position": [
+            -0.23834769427776337,
+            0.7574060559272766,
+            -0.29685887694358826
+          ]
+        },
+        {
+          "vertexIndex": 77,
+          "position": [
+            -0.33001962304115295,
+            0.7098894119262695,
+            -0.33594653010368347
+          ]
+        },
+        {
+          "vertexIndex": 97,
+          "position": [
+            -0.39036405086517334,
+            0.6765547394752502,
+            -0.36167654395103455
+          ]
+        },
+        {
+          "vertexIndex": 112,
+          "position": [
+            -0.47867509722709656,
+            0.6221716403961182,
+            -0.39933115243911743
+          ]
+        },
+        {
+          "vertexIndex": 132,
+          "position": [
+            -0.535517156124115,
+            0.5822738409042358,
+            -0.42356783151626587
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0014613519900744081,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "tip-back-left",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 52,
+      "sampledVertexCount": 52,
+      "totalVertexCount": 52,
+      "samplingStride": 1,
+      "triangleCount": 32,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 3.4467375368218205e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "leg-back-right",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 45,
+      "undecidedVertexCount": 1,
+      "outsideVertexCount": 241,
+      "sampledVertexCount": 287,
+      "totalVertexCount": 287,
+      "samplingStride": 1,
+      "triangleCount": 480,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 9,
+          "position": [
+            0.030071118846535683,
+            0.8836047053337097,
+            -0.21426372230052948
+          ]
+        },
+        {
+          "vertexIndex": 46,
+          "position": [
+            0.17334997653961182,
+            0.7870252132415771,
+            -0.2772415280342102
+          ]
+        },
+        {
+          "vertexIndex": 81,
+          "position": [
+            0.3261699974536896,
+            0.707825779914856,
+            -0.3424018919467926
+          ]
+        },
+        {
+          "vertexIndex": 116,
+          "position": [
+            0.4746534824371338,
+            0.6202104687690735,
+            -0.40571320056915283
+          ]
+        },
+        {
+          "vertexIndex": 138,
+          "position": [
+            0.560248851776123,
+            0.5584812164306641,
+            -0.4374406039714813
+          ]
+        },
+        {
+          "vertexIndex": 158,
+          "position": [
+            0.6390467286109924,
+            0.491667777299881,
+            -0.4758082330226898
+          ]
+        },
+        {
+          "vertexIndex": 180,
+          "position": [
+            0.7156065702438354,
+            0.4173966646194458,
+            -0.5036829710006714
+          ]
+        },
+        {
+          "vertexIndex": 215,
+          "position": [
+            0.8323683142662048,
+            0.2847154438495636,
+            -0.5534685850143433
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0014613519900744081,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "tip-back-right",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 52,
+      "sampledVertexCount": 52,
+      "totalVertexCount": 52,
+      "samplingStride": 1,
+      "triangleCount": 32,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 3.4467375368218205e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "leg-front-left",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 10,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 277,
+      "sampledVertexCount": 287,
+      "totalVertexCount": 287,
+      "samplingStride": 1,
+      "triangleCount": 480,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 135,
+          "position": [
+            -0.560248851776123,
+            0.5584812164306641,
+            0.4374406039714813
+          ]
+        },
+        {
+          "vertexIndex": 136,
+          "position": [
+            -0.563221275806427,
+            0.561159074306488,
+            0.4353804886341095
+          ]
+        },
+        {
+          "vertexIndex": 141,
+          "position": [
+            -0.5862439274787903,
+            0.5374821424484253,
+            0.4532938599586487
+          ]
+        },
+        {
+          "vertexIndex": 142,
+          "position": [
+            -0.5874083042144775,
+            0.536683976650238,
+            0.44902101159095764
+          ]
+        },
+        {
+          "vertexIndex": 241,
+          "position": [
+            -0.9230360388755798,
+            0.17431668937206268,
+            0.5888005495071411
+          ]
+        },
+        {
+          "vertexIndex": 248,
+          "position": [
+            -0.9441483616828918,
+            0.14555060863494873,
+            0.5978025794029236
+          ]
+        },
+        {
+          "vertexIndex": 255,
+          "position": [
+            -0.9650892019271851,
+            0.11663889139890671,
+            0.6067314743995667
+          ]
+        },
+        {
+          "vertexIndex": 262,
+          "position": [
+            -0.9857508540153503,
+            0.0874921977519989,
+            0.6155412793159485
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0014613519900744081,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "tip-front-left",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 52,
+      "sampledVertexCount": 52,
+      "totalVertexCount": 52,
+      "samplingStride": 1,
+      "triangleCount": 32,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 3.4467375368218205e-05,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "leg-front-right",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": true,
+      "insideVertexCount": 42,
+      "undecidedVertexCount": 1,
+      "outsideVertexCount": 244,
+      "sampledVertexCount": 287,
+      "totalVertexCount": 287,
+      "samplingStride": 1,
+      "triangleCount": 480,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [
+        {
+          "vertexIndex": 9,
+          "position": [
+            0.03128771856427193,
+            0.8827665448188782,
+            0.21001315116882324
+          ]
+        },
+        {
+          "vertexIndex": 46,
+          "position": [
+            0.17466174066066742,
+            0.7861278653144836,
+            0.2730315625667572
+          ]
+        },
+        {
+          "vertexIndex": 81,
+          "position": [
+            0.3274860084056854,
+            0.706926167011261,
+            0.33819371461868286
+          ]
+        },
+        {
+          "vertexIndex": 116,
+          "position": [
+            0.4758945107460022,
+            0.6193554997444153,
+            0.4014730453491211
+          ]
+        },
+        {
+          "vertexIndex": 144,
+          "position": [
+            0.5874083042144775,
+            0.536683976650238,
+            0.44902101159095764
+          ]
+        },
+        {
+          "vertexIndex": 166,
+          "position": [
+            0.6646857261657715,
+            0.46774253249168396,
+            0.4867403507232666
+          ]
+        },
+        {
+          "vertexIndex": 201,
+          "position": [
+            0.7858384847640991,
+            0.3397512137889862,
+            0.5383982062339783
+          ]
+        },
+        {
+          "vertexIndex": 236,
+          "position": [
+            0.8971417546272278,
+            0.2014222890138626,
+            0.5858563780784607
+          ]
+        }
+      ],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 0.0014613519900744081,
+      "rayDirectionCount": 3
+    },
+    {
+      "name": "tip-front-right",
+      "analyzed": true,
+      "error": null,
+      "selfIntersecting": false,
+      "insideVertexCount": 0,
+      "undecidedVertexCount": 0,
+      "outsideVertexCount": 52,
+      "sampledVertexCount": 52,
+      "totalVertexCount": 52,
+      "samplingStride": 1,
+      "triangleCount": 32,
+      "degenerateTriangleCount": 0,
+      "worstRegions": [],
+      "normalSource": "centroid",
+      "normalFallbackCount": 0,
+      "epsilon": 3.4467375368218205e-05,
+      "rayDirectionCount": 3
+    }
+  ],
+  "errors": []
+}
