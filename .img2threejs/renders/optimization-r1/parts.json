@@ -1,0 +1,121 @@
+{
+ "model": "tent",
+ "parts": [
+  {
+   "name": "fly",
+   "kind": "assembly",
+   "module": "tent",
+   "triangles": 5804
+  },
+  {
+   "name": "fly-membrane",
+   "kind": "part",
+   "module": "fly",
+   "triangles": 5688
+  },
+  {
+   "name": "inner-floor",
+   "kind": "part",
+   "module": "fly",
+   "triangles": 8
+  },
+  {
+   "name": "awning",
+   "kind": "assembly",
+   "module": "fly",
+   "triangles": 54
+  },
+  {
+   "name": "awning-hood",
+   "kind": "part",
+   "module": "fly",
+   "triangles": 54
+  },
+  {
+   "name": "vent-back",
+   "kind": "assembly",
+   "module": "fly",
+   "triangles": 54
+  },
+  {
+   "name": "vent-back-hood",
+   "kind": "part",
+   "module": "fly",
+   "triangles": 54
+  },
+  {
+   "name": "door",
+   "kind": "assembly",
+   "module": "tent",
+   "triangles": 972
+  },
+  {
+   "name": "door-panel",
+   "kind": "part",
+   "module": "door",
+   "triangles": 972
+  },
+  {
+   "name": "poles",
+   "kind": "assembly",
+   "module": "tent",
+   "triangles": 3060
+  },
+  {
+   "name": "hub-front",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 48
+  },
+  {
+   "name": "hub-back",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 48
+  },
+  {
+   "name": "ridge-struts",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 48
+  },
+  {
+   "name": "ridge-pole",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 676
+  },
+  {
+   "name": "pole-legs",
+   "kind": "assembly",
+   "module": "frame",
+   "triangles": 2240
+  },
+  {
+   "name": "leg-back-left",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 480
+  },
+  {
+   "name": "leg-back-right",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 480
+  },
+  {
+   "name": "leg-front-left",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 480
+  },
+  {
+   "name": "leg-front-right",
+   "kind": "part",
+   "module": "frame",
+   "triangles": 480
+  }
+ ],
+ "unnamedMeshes": 0,
+ "integralMeshes": 9
+}

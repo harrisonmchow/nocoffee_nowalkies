@@ -1,0 +1,58 @@
+{
+  "model": "tent",
+  "specifiedComponents": 11,
+  "builtParts": 19,
+  "errors": 0,
+  "warnings": 0,
+  "result": "pass",
+  "findings": [
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "awning-hood",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "door-panel",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "fly-membrane",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "leg-back-left",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "leg-back-right",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "leg-front-left",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "leg-front-right",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    },
+    {
+      "check": "part-not-specified",
+      "severity": "info",
+      "subject": "vent-back-hood",
+      "detail": "built part has no matching component in the spec (fine for detail groups; a sign of spec drift for anything larger)"
+    }
+  ]
+}

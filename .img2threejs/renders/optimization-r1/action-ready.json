@@ -1,0 +1,17 @@
+{
+ "factory": "createTentModel(): THREE.Group  (src/scripts/camp/tent.ts)",
+ "root": "tent",
+ "namedNodes": {"fly": "Group (container)", "poles": "Group (container)", "door": "Group pivot at the door's bottom-left hinge", "awning": "Group (vent hood over the door)"},
+ "sculptRuntime": {
+   "door": "the door pivot Group",
+   "doorHinge": "{axis: unit Vector3 along the door's left zip edge (door-local), openAngle: -2.4}; open with door.rotateOnAxis(axis, openAngle * t)",
+   "nodes": "{fly, poles, door, awning}",
+   "destructionGroups": "{fly: [fly-membrane, inner-floor, awning, vent-back], door: [door-panel], frame: [hub-front, hub-back, ridge-struts, ridge-pole, pole-legs]}"
+ },
+ "verified": {
+   "interaction replay (scene.ts register/hover/fade)": "renders/optimization-r1 interact renders: 22 cloned MeshStandardMaterials, emissive + opacity drive all of them",
+   "door opens onto a real opening": "renders/interaction-r2/ref-neutral-interact1_door1.png",
+   "explodable/pickable": "parts.json: 19 parts, 0 unnamed meshes, detail flagged explodeWithParent; check_part_coverage 0 errors 0 warnings",
+   "no lights, no ground plane": "grep: 0 Light( in tent.ts; inner-floor is a 5 cm skirt band, no floor plane"
+ }
+}

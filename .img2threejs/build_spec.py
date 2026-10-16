@@ -67,16 +67,16 @@ membrane = {
                  "roof plateau |x|<=RIDGE_END, |z|<=HUB_Z at 0.86..0.89 (hung from both hubs, ridge-pole ears at the ends)", "end-wall seam lines ear->hem midpoint, straight (form-refinement: keeps end panels planar, IMG_4850)"],
         "heightRemap": "solve u, y = HEM + (1-HEM)*u^0.55 so walls leave the hem steeply",
         "sagLoad": -0.9, "iterations": 500,
-        "wrinkles": "seeded value noise, amplitude 4.5 mm, horizontal bias on lower faces"},
+        "wrinkles": "seeded value noise, amplitude 4 mm, wavelengths >= 3 grid cells (no aliasing); fine wrinkles in the normal map"},
     "uvStrategy": "accumulated surface arc length along grid rows/cols (cloth-style unwrap)",
-    "normalStrategy": "computeVertexNormals + generated canvas normal map (ripstop + soft wrinkles)",
+    "normalStrategy": "computeVertexNormals + generated canvas normal map (soft wrinkles)",
 }
 
 ct = [
     comp("root", "tent", "macro", "body", None, "box", "assembled-solid",
          "Assembly root only; carries no geometry.", "fly-nylon", [2.1, 1.0, 1.3], 0.85,
          descriptor={"topologyIntent": "empty group, base centred at y=0, door +Z"}, anim="root"),
-    comp("fly", "fly", "macro", "shell", "root", "extrude", "open-shell",
+    comp("fly", "fly-membrane", "macro", "shell", "root", "extrude", "open-shell",
          "Coated-nylon fly is a zero-thickness tensioned membrane seen from outside and (when faded) from inside.",
          "fly-nylon", [2.1, 0.92, 1.3], 0.8, descriptor=membrane,
          features=[
@@ -84,7 +84,7 @@ ct = [
              feat("panel-seams", "seam", "faint seam tubes along end-wall/face boundaries (hub->ridge-end, ridge-end->corner)", "panel-seams", geometryEffect="ridge"),
              feat("velcro-wraps", "fastener", "pale green webbing loops on the fly next to each leg at ~45% height", "velcro-wraps", geometryEffect="small box"),
              feat("hem-gap", "stain", "hem 4 cm above ground; dark inner floor band below", "hem-gap", geometryEffect="separate inner skirt"),
-         ], layers=["fly-nylon"]),
+         ], layers=["fly-nylon", "webbing"]),
     comp("inner-floor", "inner-floor", "meso", "base", "fly", "extrude", "open-shell",
          "Visible only as a dark band under the hem; a thin skirt inset 2 cm inside the hem.",
          "inner-floor", [2.04, 0.06, 1.26], 0.5, descriptor={"inferred": True},
@@ -113,7 +113,7 @@ ct = [
          [2.06, 0.92, 1.26], 0.75,
          descriptor={"curve": "catmull-rom per leg", "profile": "h(s) = 0.9*(1 - s) + 0.26*sin(pi*s)*sqrt(s), s = 0..1 hub->corner", "corners": [[sx * CORNER[0], 0, sz * CORNER[2]] for sx in (-1, 1) for sz in (-1, 1)]},
          features=[feat("leg-clips", "fastener", "4 black clips per leg at s = 0.2,0.4,0.6,0.8", "leg-clips", repetitionSystem="leg-clips")],
-         attachment=attach("frame-hub.legSockets", HUB, CORNER, "socket", 0.01)),
+         attachment=attach("frame-hub.legSockets", HUB, CORNER, "socket", 0.01), layers=["aluminium", "clip-black"]),
     comp("door", "door", "meso", "panel", "fly", "extrude", "open-shell",
          "Door panel conforms to the +Z face of the membrane, 3 mm proud, D-shaped (inferred outline).",
          "fly-nylon", [0.84, 0.66, 0.02], 0.35, pos=[-0.42, 0.05, 0.6],
@@ -121,7 +121,7 @@ ct = [
          features=[feat("door-zip", "linework", "dark coil-zip tube along the D outline", "door-zip"),
                    feat("door-toggle", "fastener", "small pale tab at door centre", "door-toggle")],
          attachment=attach("fly.doorHinge", [-0.42, 0.05, 0.6], [-0.42, 0.6, 0.35], "overlap", 0.003),
-         anim="hinge", pivot_mode="edge", layers=["fly-nylon", "zip"]),
+         anim="hinge", pivot_mode="edge", layers=["fly-nylon", "zip", "webbing"]),
     comp("awning", "awning", "meso", "panel", "fly", "extrude", "open-shell",
          "Peaked vent hood under the hub on the door face: two triangular flaps meeting at a ridge, propped by a kickstand.",
          "fly-nylon", [0.38, 0.18, 0.12], 0.8, pos=[0, 0.8, 0.14],
@@ -155,7 +155,7 @@ def mat(mid, name, color, rough, metal, notes, palette=None, double=False, overr
 fly_bands = [
     {"id": "macro", "frequency": 1.5, "amplitude": 0.03, "role": "membrane sag between pinned pole lines (geometry)"},
     {"id": "meso", "frequency": 14.0, "amplitude": 0.004, "role": "soft wrinkles, horizontal bias (geometry noise + normal map)"},
-    {"id": "micro", "frequency": 180.0, "amplitude": 0.002, "role": "ripstop grid ~5 mm (normal map only)"},
+    {"id": "micro", "frequency": 180.0, "amplitude": 0.002, "role": "fine grain in the roughness map; 5 mm ripstop grid omitted (moire at prop distance, form-refinement review)"},
 ]
 s["materials"] = [
     mat("fly-nylon", "fly ripstop nylon", "#9aa891", 0.62, 0.0,
@@ -164,8 +164,8 @@ s["materials"] = [
         overrides=[{"id": "crease-sheen", "detailRef": "crease-sheen", "channel": "roughness", "value": 0.5,
                     "region": "upper taut panels", "implementation": "roughnessMap from the same canvas as the normal map (independent channel)"}],
         bands=fly_bands),
-    mat("aluminium", "pole aluminium", "#b9bcbd", 0.45, 0.8, "Dull anodised aluminium tube, 9 mm."),
-    mat("hub-alloy", "hub", "#d6d8d6", 0.5, 0.3, "Pale grey hub/fitting."),
+    mat("aluminium", "pole aluminium", "#c3c7c9", 0.45, 0.35, "Dull anodised aluminium tube, 9 mm. Metalness 0.35: the scene has no env map, so 0.8 rendered near-black (material-pass)."),
+    mat("hub-alloy", "hub", "#d6d8d6", 0.5, 0.1, "Pale grey hub/fitting."),
     mat("clip-black", "pole clips", "#1d1f20", 0.7, 0.0, "Black moulded plastic clips."),
     mat("webbing", "green webbing loops", "#b8c7a8", 0.85, 0.0, "Pale sage webbing/velcro."),
     mat("inner-floor", "inner bathtub floor", "#2a3032", 0.8, 0.0, "Dark inner floor visible beneath hem (inferred colour).", double=True),
@@ -180,7 +180,7 @@ fly_m["albedo"]["dominant"] = ev["fly-nylon"]["baseColor"]
 fly_m["albedo"]["secondary"] = ["#8d9c8f", "#a3b1a3"]
 fly_m["colorVariation"]["palette"] = [ev["fly-nylon"]["baseColor"], "#8d9c8f", "#a3b1a3"]
 fly_m["roughness"].update(base=ev["fly-nylon"]["roughness"], variation=0.12)
-fly_m["normal"].update(strength=ev["fly-nylon"]["normalStrength"], pattern="generated canvas: ripstop grid + soft wrinkles (independent of albedo)")
+fly_m["normal"].update(strength=ev["fly-nylon"]["normalStrength"], pattern="generated canvas: tileable soft wrinkles (independent of albedo)")
 fly_m["localOverrides"][0]["roughness"] = ev["fly-nylon"]["creaseSheenRoughness"]
 fly_m["textureResolution"] = 1024
 fly_m["referencePbr"] = {
@@ -190,6 +190,8 @@ fly_m["referencePbr"] = {
     "use": "statistics only (roughness/normal strength); albedo palette rejected as blue-cast; runtime maps are generated in code"}
 for mid in ("aluminium", "hub-alloy", "clip-black", "webbing", "inner-floor", "zip"):
     m = mats[mid]
+    if mid in ev and "metalness" in ev[mid]:
+        m["metalness"]["base"] = ev[mid]["metalness"]
     if mid in ev:
         m.update(baseColor=ev[mid]["baseColor"], color=ev[mid]["baseColor"])
         m["albedo"]["dominant"] = ev[mid]["baseColor"]
@@ -206,6 +208,30 @@ for c in ct:
         "materialClass": {"fly-nylon": "fabric", "webbing": "fabric", "inner-floor": "fabric", "zip": "plastic",
                           "clip-black": "plastic", "hub-alloy": "plastic", "aluminium": "metal"}[c["material"]],
         "materialClassConfidence": 0.8, "evidenceRef": "material-evidence/summary.json"}
+# ---- surfaceDetail (surface-pass: generator requires normal/bump/displacement/AO locality) ----
+SD = {
+    "fly": dict(macroRoughness=0.66, microRoughness=0.03, bumpAmplitude=0.004,
+                normalPattern="150 seeded crease strokes (mostly horizontal, curved, tapered, wrapped) + broad periodic undulation, 0.6 m tile, normalScale 1.0; door-face luma variance matches IMG_4842 (0.00054/0.00053), gradients ~0.5x (deep folds are geometry the 3 cm grid cannot carry)",
+                displacementPattern="membrane sag (pinned Laplace solve) + 4 mm folds at >= 3 grid-cell wavelengths",
+                occlusionPattern="hood shadow band under each vent; dark inner floor band under the 4 cm hem",
+                edgeWearPattern="none: new, clean fly", notes="roughness map: 0.66 base, down to ~0.3 on taut crests, fine grain +-0.03"),
+    "door": dict(macroRoughness=0.66, microRoughness=0.03, bumpAmplitude=0.004, normalPattern="same cloth normal map as the fly, uv in metres/0.6",
+                 displacementPattern="conforms to the fly 3 mm proud", occlusionPattern="none", edgeWearPattern="none", notes="zip coil tube 1.5 mm, near fly colour"),
+    "awning": dict(macroRoughness=0.66, microRoughness=0.03, bumpAmplitude=0.002, normalPattern="cloth normal map", displacementPattern="flat flaps",
+                   occlusionPattern="dark vent opening/shadow band below the hood edge", edgeWearPattern="none", notes=""),
+    "vent-back": dict(macroRoughness=0.66, microRoughness=0.03, bumpAmplitude=0.002, normalPattern="cloth normal map", displacementPattern="flat flaps",
+                      occlusionPattern="dark vent opening/shadow band below the hood edge", edgeWearPattern="none", notes="mirror of awning"),
+    "inner-floor": dict(macroRoughness=0.8, microRoughness=0.0, bumpAmplitude=0.0, normalPattern="none", displacementPattern="none",
+                        occlusionPattern="reads as the contact-shadow band under the hem", edgeWearPattern="none", notes="inferred"),
+}
+for c in ct:
+    if c["id"] in SD:
+        c["surfaceDetail"] = SD[c["id"]]
+    elif c["material"] in ("aluminium", "hub-alloy"):
+        c["surfaceDetail"] = dict(macroRoughness=0.45 if c["material"] == "aluminium" else 0.5, microRoughness=0.0, bumpAmplitude=0.0,
+                                  normalPattern="smooth tube/moulding", displacementPattern="none", occlusionPattern="none",
+                                  edgeWearPattern="none", notes="dull anodised; metalness 0.35 (no env map in scene)")
+
 ct[0]["attachment"] = None
 ct[3]["attachment"] = attach("root.frame", HUB, CORNER, "socket", 0.01)  # poles group
 
@@ -222,10 +248,10 @@ s["lightingFromPhoto"] = [
 by_feat = {}
 for c in ct:
     for f in c["localFeatures"]:
-        by_feat.setdefault(f["detailRef"], f"{c['id']}/{f['id']}")
+        by_feat.setdefault(f["detailRef"], f["id"])  # bare feature id: both the validator and check_part_coverage resolve it
 for d in s["preSpecAssessment"]["detailInventory"]["details"]:
     if d["id"] == "crease-sheen":
-        d["mapsTo"]["ref"] = "fly-nylon/crease-sheen"
+        d["mapsTo"]["ref"] = "crease-sheen"
     elif d["id"] in by_feat:
         d["mapsTo"]["ref"] = by_feat[d["id"]]
 
@@ -281,7 +307,8 @@ s["assumptions"] = [
 ]
 s["risks"] = ["heightfield cannot overhang; walls near hem are steep but not vertical",
               "door outline inferred", "no visual hull: proportions are by-eye from non-orthographic photos"]
-s["performanceBudget"].update(targetTriangles=12000, maxDrawCalls=20, textureSize=512, fpsTarget=60)
+s["performanceBudget"].update(targetTriangles=12000, maxDrawCalls=24, textureSize=512, fpsTarget=60,
+                             drawCallRationale="optimization-pass: 22 measured; every remaining mesh is a named pickable part or a distinct material, so merging further would break the explode/pick contract")
 s["scores"] = {"object_isolation": 2, "silhouette_readability": 3, "depth_inference": 2, "primitive_decomposition": 3,
                "material_procedurality": 3, "occlusion_risk": 2, "interaction_fit": 3}
 s["actionReadiness"]["runtimeContract"] = {

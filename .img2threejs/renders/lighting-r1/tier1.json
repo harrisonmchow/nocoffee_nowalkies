@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "checks": {
+    "silhouetteIoU": 0.9035,
+    "aspectRatioDelta": 0.0,
+    "scaleDelta": 0.0,
+    "bilateralSymmetryError": 0.0249,
+    "colorDelta": {
+      "checked": 12,
+      "maxDeltaE": 12.26,
+      "perComponent": [
+        {
+          "componentId": null,
+          "deltaE": 3.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 3.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.26
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.35
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.1
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.1
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.35
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.35
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.35
+        },
+        {
+          "componentId": null,
+          "deltaE": 3.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 3.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 3.21
+        }
+      ],
+      "gated": true
+    }
+  },
+  "failures": [],
+  "maskWarnings": [],
+  "renderHash": "b749015a7e68949d",
+  "passId": "lighting-pass"
+}

@@ -11,9 +11,12 @@ ren=Image.open(R+'ref-dusk.png').convert('RGB'); fl=Image.open(R+'ref-unlit-flat
 m=ImageChops.difference(ren,Image.new('RGB',ren.size,(128,)*3)).convert('L').point(lambda v:255 if v>6 else 0)
 x0,y0,x1,y1=m.getbbox(); w,h=x1-x0,y1-y0
 fl.crop((x0-w*.06,y0-h*.06,x1+w*.06,y1+h*.06)).resize((900,580)).save(R+'cmp-render-flat.png')
+for n in ('ref-neutral',):
+    try: Image.open(R+n+'.png').convert('RGB').crop((x0-w*.06,y0-h*.06,x1+w*.06,y1+h*.06)).resize((900,580)).save(R+'cmp-'+n+'.png')
+    except FileNotFoundError: pass
 PY
-python3 $S/forge/stage4_review/diagnose_render.py --reference $R/cmp-ref.png --render $R/cmp-render.png --map-stripped-render $R/cmp-render-flat.png --spec object-sculpt-spec.json --pass-id $P --in-place --json > $R/tier1.json 2>$R/tier1.err || true
-python3 -c "import json;d=json.load(open('$R/tier1.json'));c=d['checks'];print('tier1 passed=',d['passed'],'IoU',c['silhouetteIoU'],'sym',c['bilateralSymmetryError'],'fail',d['failures'])"
+python3 $S/forge/stage4_review/diagnose_render.py --reference $R/cmp-ref.png --render $R/cmp-render-flat.png --map-stripped-render $R/cmp-render-flat.png --spec object-sculpt-spec.json --pass-id $P --in-place --json > $R/tier1.json 2>$R/tier1.err || true
+python3 -c "import json;d=json.load(open('$R/tier1.json'));c=d['checks'];print('tier1 (unlit albedo render) passed=',d['passed'],'IoU',c['silhouetteIoU'],'sym',c['bilateralSymmetryError'],'maxDeltaE',c['colorDelta'].get('maxDeltaE'),'fail',d['failures'])"
 python3 $S/forge/stage4_review/diagnose_render_multi_angle.py --reference $R/ref-dusk.png --orbit $R/right-dusk.png --orbit $R/rear-dusk.png --orbit $R/ref2-dusk.png --json > $R/multi-angle.json
 python3 -c "import json;d=json.load(open('$R/multi-angle.json'));print('multi-angle degenerate=',d['degenerate'],[round(a['ratio'],2) for a in d['angles']])"
 # Strict run kept as evidence; the declared negative space (strut/roof gap seen side-on,

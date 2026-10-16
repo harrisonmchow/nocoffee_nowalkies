@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "checks": {
+    "silhouetteIoU": 0.9066,
+    "aspectRatioDelta": 0.0,
+    "scaleDelta": 0.0,
+    "bilateralSymmetryError": 0.0222,
+    "colorDelta": {
+      "checked": 12,
+      "maxDeltaE": 54.56,
+      "perComponent": [
+        {
+          "componentId": null,
+          "deltaE": 39.08
+        },
+        {
+          "componentId": null,
+          "deltaE": 39.08
+        },
+        {
+          "componentId": null,
+          "deltaE": 13.18
+        },
+        {
+          "componentId": null,
+          "deltaE": 43.54
+        },
+        {
+          "componentId": null,
+          "deltaE": 54.56
+        },
+        {
+          "componentId": null,
+          "deltaE": 54.56
+        },
+        {
+          "componentId": null,
+          "deltaE": 43.54
+        },
+        {
+          "componentId": null,
+          "deltaE": 43.54
+        },
+        {
+          "componentId": null,
+          "deltaE": 43.54
+        },
+        {
+          "componentId": null,
+          "deltaE": 39.08
+        },
+        {
+          "componentId": null,
+          "deltaE": 39.08
+        },
+        {
+          "componentId": null,
+          "deltaE": 39.08
+        }
+      ],
+      "gated": false
+    }
+  },
+  "failures": [],
+  "maskWarnings": [],
+  "renderHash": "ac997fc874d743ce",
+  "passId": "form-refinement"
+}

@@ -1,0 +1,2 @@
+[{"id":"fly-material","score":0.76,"notes":"Unlit albedo is pale sage (#97a698); re-lit under a fitted blue dusk sky it reproduces the photo's door tone (render 60,98,125 vs ref 58,93,129); material_comparator overall 0.849 pass. Wrinkle contrast is lower than the photo (gradient 0.0023 vs 0.0115). Roof is ~15 levels darker: no sky reflection without an env map."},
+ {"id":"pole-system","score":0.82,"notes":"Poles now read pale dull aluminium (metalness 0.35) instead of near-black."}]

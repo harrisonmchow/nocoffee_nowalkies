@@ -5915,11 +5915,11 @@
       const radius2 = sphere.radius * sphere.radius;
       if (d2 > radius2) return null;
       const thc = Math.sqrt(radius2 - d2);
-      const t0 = tca - thc;
+      const t02 = tca - thc;
       const t1 = tca + thc;
       if (t1 < 0) return null;
-      if (t0 < 0) return this.at(t1, target2);
-      return this.at(t0, target2);
+      if (t02 < 0) return this.at(t1, target2);
+      return this.at(t02, target2);
     }
     /**
      * Returns `true` if this ray intersects with the given sphere.
@@ -11674,14 +11674,14 @@
     return dst;
   }
   function mergeUniforms(uniforms) {
-    const merged = {};
+    const merged2 = {};
     for (let u = 0; u < uniforms.length; u++) {
       const tmp2 = cloneUniforms(uniforms[u]);
       for (const p2 in tmp2) {
-        merged[p2] = tmp2[p2];
+        merged2[p2] = tmp2[p2];
       }
     }
-    return merged;
+    return merged2;
   }
   function cloneUniformsGroups(src) {
     const dst = [];
@@ -13982,11 +13982,11 @@
   };
   function CubicPoly() {
     let c0 = 0, c1 = 0, c2 = 0, c3 = 0;
-    function init(x0, x1, t0, t1) {
+    function init(x0, x1, t02, t1) {
       c0 = x0;
-      c1 = t0;
-      c2 = -3 * x0 + 3 * x1 - 2 * t0 - t1;
-      c3 = 2 * x0 - 2 * x1 + t0 + t1;
+      c1 = t02;
+      c2 = -3 * x0 + 3 * x1 - 2 * t02 - t1;
+      c3 = 2 * x0 - 2 * x1 + t02 + t1;
     }
     return {
       initCatmullRom: function(x0, x1, x2, x3, tension) {
@@ -15045,7 +15045,7 @@
      */
     evaluate(t) {
       const pp = this.parameterPositions;
-      let i1 = this._cachedIndex, t1 = pp[i1], t0 = pp[i1 - 1];
+      let i1 = this._cachedIndex, t1 = pp[i1], t02 = pp[i1 - 1];
       validate_interval: {
         seek: {
           let right;
@@ -15053,13 +15053,13 @@
             forward_scan: if (!(t < t1)) {
               for (let giveUpAt = i1 + 2; ; ) {
                 if (t1 === void 0) {
-                  if (t < t0) break forward_scan;
+                  if (t < t02) break forward_scan;
                   i1 = pp.length;
                   this._cachedIndex = i1;
                   return this.copySampleValue_(i1 - 1);
                 }
                 if (i1 === giveUpAt) break;
-                t0 = t1;
+                t02 = t1;
                 t1 = pp[++i1];
                 if (t < t1) {
                   break seek;
@@ -15068,21 +15068,21 @@
               right = pp.length;
               break linear_scan;
             }
-            if (!(t >= t0)) {
+            if (!(t >= t02)) {
               const t1global = pp[1];
               if (t < t1global) {
                 i1 = 2;
-                t0 = t1global;
+                t02 = t1global;
               }
               for (let giveUpAt = i1 - 2; ; ) {
-                if (t0 === void 0) {
+                if (t02 === void 0) {
                   this._cachedIndex = 0;
                   return this.copySampleValue_(0);
                 }
                 if (i1 === giveUpAt) break;
-                t1 = t0;
-                t0 = pp[--i1 - 1];
-                if (t >= t0) {
+                t1 = t02;
+                t02 = pp[--i1 - 1];
+                if (t >= t02) {
                   break seek;
                 }
               }
@@ -15101,8 +15101,8 @@
             }
           }
           t1 = pp[i1];
-          t0 = pp[i1 - 1];
-          if (t0 === void 0) {
+          t02 = pp[i1 - 1];
+          if (t02 === void 0) {
             this._cachedIndex = 0;
             return this.copySampleValue_(0);
           }
@@ -15113,9 +15113,9 @@
           }
         }
         this._cachedIndex = i1;
-        this.intervalChanged_(i1, t0, t1);
+        this.intervalChanged_(i1, t02, t1);
       }
-      return this.interpolate_(i1, t0, t, t1);
+      return this.interpolate_(i1, t02, t, t1);
     }
     /**
      * Returns the interpolation settings.
@@ -15181,18 +15181,18 @@
         endingEnd: ZeroCurvatureEnding
       };
     }
-    intervalChanged_(i1, t0, t1) {
+    intervalChanged_(i1, t02, t1) {
       const pp = this.parameterPositions;
       let iPrev = i1 - 2, iNext = i1 + 1, tPrev = pp[iPrev], tNext = pp[iNext];
       if (tPrev === void 0) {
         switch (this.getSettings_().endingStart) {
           case ZeroSlopeEnding:
             iPrev = i1;
-            tPrev = 2 * t0 - t1;
+            tPrev = 2 * t02 - t1;
             break;
           case WrapAroundEnding:
             iPrev = pp.length - 2;
-            tPrev = t0 + pp[iPrev] - pp[iPrev + 1];
+            tPrev = t02 + pp[iPrev] - pp[iPrev + 1];
             break;
           default:
             iPrev = i1;
@@ -15203,7 +15203,7 @@
         switch (this.getSettings_().endingEnd) {
           case ZeroSlopeEnding:
             iNext = i1;
-            tNext = 2 * t1 - t0;
+            tNext = 2 * t1 - t02;
             break;
           case WrapAroundEnding:
             iNext = 1;
@@ -15211,17 +15211,17 @@
             break;
           default:
             iNext = i1 - 1;
-            tNext = t0;
+            tNext = t02;
         }
       }
-      const halfDt = (t1 - t0) * 0.5, stride = this.valueSize;
-      this._weightPrev = halfDt / (t0 - tPrev);
+      const halfDt = (t1 - t02) * 0.5, stride = this.valueSize;
+      this._weightPrev = halfDt / (t02 - tPrev);
       this._weightNext = halfDt / (tNext - t1);
       this._offsetPrev = iPrev * stride;
       this._offsetNext = iNext * stride;
     }
-    interpolate_(i1, t0, t, t1) {
-      const result = this.resultBuffer, values = this.sampleValues, stride = this.valueSize, o1 = i1 * stride, o0 = o1 - stride, oP = this._offsetPrev, oN = this._offsetNext, wP = this._weightPrev, wN = this._weightNext, p2 = (t - t0) / (t1 - t0), pp = p2 * p2, ppp = pp * p2;
+    interpolate_(i1, t02, t, t1) {
+      const result = this.resultBuffer, values = this.sampleValues, stride = this.valueSize, o1 = i1 * stride, o0 = o1 - stride, oP = this._offsetPrev, oN = this._offsetNext, wP = this._weightPrev, wN = this._weightNext, p2 = (t - t02) / (t1 - t02), pp = p2 * p2, ppp = pp * p2;
       const sP = -wP * ppp + 2 * wP * pp - wP * p2;
       const s0 = (1 + wP) * ppp + (-1.5 - 2 * wP) * pp + (-0.5 + wP) * p2 + 1;
       const s1 = (-1 - wN) * ppp + (1.5 + wN) * pp + 0.5 * p2;
@@ -15244,8 +15244,8 @@
     constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
       super(parameterPositions, sampleValues, sampleSize, resultBuffer);
     }
-    interpolate_(i1, t0, t, t1) {
-      const result = this.resultBuffer, values = this.sampleValues, stride = this.valueSize, offset1 = i1 * stride, offset0 = offset1 - stride, weight1 = (t - t0) / (t1 - t0), weight0 = 1 - weight1;
+    interpolate_(i1, t02, t, t1) {
+      const result = this.resultBuffer, values = this.sampleValues, stride = this.valueSize, offset1 = i1 * stride, offset0 = offset1 - stride, weight1 = (t - t02) / (t1 - t02), weight0 = 1 - weight1;
       for (let i = 0; i !== stride; ++i) {
         result[i] = values[offset0 + i] * weight0 + values[offset1 + i] * weight1;
       }
@@ -15638,8 +15638,8 @@
     constructor(parameterPositions, sampleValues, sampleSize, resultBuffer) {
       super(parameterPositions, sampleValues, sampleSize, resultBuffer);
     }
-    interpolate_(i1, t0, t, t1) {
-      const result = this.resultBuffer, values = this.sampleValues, stride = this.valueSize, alpha = (t - t0) / (t1 - t0);
+    interpolate_(i1, t02, t, t1) {
+      const result = this.resultBuffer, values = this.sampleValues, stride = this.valueSize, alpha = (t - t02) / (t1 - t02);
       let offset = i1 * stride;
       for (let end = offset + stride; offset !== end; offset += 4) {
         Quaternion.slerpFlat(result, 0, values, offset - stride, values, offset, alpha);
@@ -26974,6 +26974,156 @@ void main() {
     }
   };
 
+  // node_modules/three/examples/jsm/utils/BufferGeometryUtils.js
+  function mergeGeometries(geometries, useGroups = false) {
+    const isIndexed = geometries[0].index !== null;
+    const attributesUsed = new Set(Object.keys(geometries[0].attributes));
+    const morphAttributesUsed = new Set(Object.keys(geometries[0].morphAttributes));
+    const attributes = {};
+    const morphAttributes = {};
+    const morphTargetsRelative = geometries[0].morphTargetsRelative;
+    const mergedGeometry = new BufferGeometry();
+    let offset = 0;
+    for (let i = 0; i < geometries.length; ++i) {
+      const geometry = geometries[i];
+      let attributesCount = 0;
+      if (isIndexed !== (geometry.index !== null)) {
+        console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index " + i + ". All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.");
+        return null;
+      }
+      for (const name in geometry.attributes) {
+        if (!attributesUsed.has(name)) {
+          console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index " + i + '. All geometries must have compatible attributes; make sure "' + name + '" attribute exists among all geometries, or in none of them.');
+          return null;
+        }
+        if (attributes[name] === void 0) attributes[name] = [];
+        attributes[name].push(geometry.attributes[name]);
+        attributesCount++;
+      }
+      if (attributesCount !== attributesUsed.size) {
+        console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index " + i + ". Make sure all geometries have the same number of attributes.");
+        return null;
+      }
+      if (morphTargetsRelative !== geometry.morphTargetsRelative) {
+        console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index " + i + ". .morphTargetsRelative must be consistent throughout all geometries.");
+        return null;
+      }
+      for (const name in geometry.morphAttributes) {
+        if (!morphAttributesUsed.has(name)) {
+          console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index " + i + ".  .morphAttributes must be consistent throughout all geometries.");
+          return null;
+        }
+        if (morphAttributes[name] === void 0) morphAttributes[name] = [];
+        morphAttributes[name].push(geometry.morphAttributes[name]);
+      }
+      if (useGroups) {
+        let count;
+        if (isIndexed) {
+          count = geometry.index.count;
+        } else if (geometry.attributes.position !== void 0) {
+          count = geometry.attributes.position.count;
+        } else {
+          console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index " + i + ". The geometry must have either an index or a position attribute");
+          return null;
+        }
+        mergedGeometry.addGroup(offset, count, i);
+        offset += count;
+      }
+    }
+    if (isIndexed) {
+      let indexOffset = 0;
+      const mergedIndex = [];
+      for (let i = 0; i < geometries.length; ++i) {
+        const index = geometries[i].index;
+        for (let j = 0; j < index.count; ++j) {
+          mergedIndex.push(index.getX(j) + indexOffset);
+        }
+        indexOffset += geometries[i].attributes.position.count;
+      }
+      mergedGeometry.setIndex(mergedIndex);
+    }
+    for (const name in attributes) {
+      const mergedAttribute = mergeAttributes(attributes[name]);
+      if (!mergedAttribute) {
+        console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed while trying to merge the " + name + " attribute.");
+        return null;
+      }
+      mergedGeometry.setAttribute(name, mergedAttribute);
+    }
+    for (const name in morphAttributes) {
+      const numMorphTargets = morphAttributes[name][0].length;
+      if (numMorphTargets === 0) break;
+      mergedGeometry.morphAttributes = mergedGeometry.morphAttributes || {};
+      mergedGeometry.morphAttributes[name] = [];
+      for (let i = 0; i < numMorphTargets; ++i) {
+        const morphAttributesToMerge = [];
+        for (let j = 0; j < morphAttributes[name].length; ++j) {
+          morphAttributesToMerge.push(morphAttributes[name][j][i]);
+        }
+        const mergedMorphAttribute = mergeAttributes(morphAttributesToMerge);
+        if (!mergedMorphAttribute) {
+          console.error("THREE.BufferGeometryUtils: .mergeGeometries() failed while trying to merge the " + name + " morphAttribute.");
+          return null;
+        }
+        mergedGeometry.morphAttributes[name].push(mergedMorphAttribute);
+      }
+    }
+    return mergedGeometry;
+  }
+  function mergeAttributes(attributes) {
+    let TypedArray;
+    let itemSize;
+    let normalized;
+    let gpuType = -1;
+    let arrayLength = 0;
+    for (let i = 0; i < attributes.length; ++i) {
+      const attribute = attributes[i];
+      if (TypedArray === void 0) TypedArray = attribute.array.constructor;
+      if (TypedArray !== attribute.array.constructor) {
+        console.error("THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.array must be of consistent array types across matching attributes.");
+        return null;
+      }
+      if (itemSize === void 0) itemSize = attribute.itemSize;
+      if (itemSize !== attribute.itemSize) {
+        console.error("THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.itemSize must be consistent across matching attributes.");
+        return null;
+      }
+      if (normalized === void 0) normalized = attribute.normalized;
+      if (normalized !== attribute.normalized) {
+        console.error("THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.normalized must be consistent across matching attributes.");
+        return null;
+      }
+      if (gpuType === -1) gpuType = attribute.gpuType;
+      if (gpuType !== attribute.gpuType) {
+        console.error("THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.gpuType must be consistent across matching attributes.");
+        return null;
+      }
+      arrayLength += attribute.count * itemSize;
+    }
+    const array = new TypedArray(arrayLength);
+    const result = new BufferAttribute(array, itemSize, normalized);
+    let offset = 0;
+    for (let i = 0; i < attributes.length; ++i) {
+      const attribute = attributes[i];
+      if (attribute.isInterleavedBufferAttribute) {
+        const tupleOffset = offset / itemSize;
+        for (let j = 0, l = attribute.count; j < l; j++) {
+          for (let c = 0; c < itemSize; c++) {
+            const value = attribute.getComponent(j, c);
+            result.setComponent(j + tupleOffset, c, value);
+          }
+        }
+      } else {
+        array.set(attribute.array, offset);
+      }
+      offset += attribute.count * itemSize;
+    }
+    if (gpuType !== void 0) {
+      result.gpuType = gpuType;
+    }
+    return result;
+  }
+
   // src/scripts/camp/tent.ts
   var L = 1.05;
   var D = 0.65;
@@ -26988,9 +27138,15 @@ void main() {
   var WALL = 0.55;
   var POLE_R = 45e-4;
   var CLEAR = 0.012;
+  var NORMAL_SCALE = 1;
+  var DOOR_OPEN = -2.4;
+  var DOOR_W = 0.42;
+  var DOOR_BASE = 0.06;
+  var DOOR_H = 0.62;
+  var doorTop = (x) => DOOR_BASE + DOOR_H * Math.pow(Math.sqrt(Math.max(0, 1 - (x / DOOR_W) ** 2)), 0.7);
   var COLORS = {
     fly: "#97a698",
-    pole: "#b4b8ba",
+    pole: "#c3c7c9",
     hub: "#d4d6d4",
     clip: "#1d1f20",
     webbing: "#b3c2a8",
@@ -27006,11 +27162,11 @@ void main() {
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-  function valueNoise(seed) {
+  function valueNoise(seed, px2 = 64, py2 = 64) {
     const r = rng(seed);
     const n = 64;
     const table = Array.from({ length: n * n }, () => r() * 2 - 1);
-    const at = (i, j) => table[(i % n + n) % n * n + (j % n + n) % n];
+    const at = (i, j) => table[(i % px2 + px2) % px2 * n + (j % py2 + py2) % py2];
     return (x, y) => {
       const i = Math.floor(x), j = Math.floor(y);
       const fx = x - i, fy = y - j;
@@ -27125,7 +27281,7 @@ void main() {
         const x = -L + i * dx, z = -D + j * dz;
         const y = h2[idx(i, j)];
         const fade = Math.min(1, (y - HEM) / 0.15) * (1 - y / 1.1);
-        h2[idx(i, j)] += 45e-4 * fade * wrinkle(x * 9, y * 22 + z * 3);
+        h2[idx(i, j)] += 4e-3 * fade * wrinkle(x * 5, y * 8 + z * 2);
       }
     }
     const height = (x, z) => {
@@ -27172,12 +27328,19 @@ void main() {
         uv.push(us[idx(i, j)] / 0.6, vs[idx(i, j)] / 0.6);
       }
     }
+    const inDoor = (k) => {
+      const x = pos[3 * k], y = pos[3 * k + 1], z = pos[3 * k + 2];
+      return z > HUB_Z && Math.abs(x) < DOOR_W && y > DOOR_BASE && y < doorTop(x);
+    };
     for (let j = 0; j < NZ; j++) {
       for (let i = 0; i < NX; i++) {
         const a = idx(i, j), b = idx(i + 1, j), c = idx(i, j + 1), d = idx(i + 1, j + 1);
         const x = -L + (i + 0.5) * dx, z = -D + (j + 0.5) * dz;
-        if (x * z > 0) index.push(a, c, d, a, d, b);
-        else index.push(a, c, b, b, c, d);
+        const tris2 = x * z > 0 ? [a, c, d, a, d, b] : [a, c, b, b, c, d];
+        for (let k = 0; k < 6; k += 3) {
+          if (inDoor(tris2[k]) && inDoor(tris2[k + 1]) && inDoor(tris2[k + 2])) continue;
+          index.push(tris2[k], tris2[k + 1], tris2[k + 2]);
+        }
       }
     }
     const g = new BufferGeometry();
@@ -27189,14 +27352,32 @@ void main() {
   }
   function clothMaps() {
     const S = 512;
-    const noise = valueNoise(5);
+    const r = rng(5);
+    const broad = valueNoise(13, 4, 8);
+    const grainN = valueNoise(17, 64, 64);
     const height = new Float32Array(S * S);
-    for (let y = 0; y < S; y++) {
-      for (let x = 0; x < S; x++) {
-        const gx = x % 8 === 0 ? 1 : 0, gy = y % 8 === 0 ? 1 : 0;
-        const w2 = noise(x / 40, y / 14) * 0.6 + noise(x / 90 + 7, y / 30) * 0.4;
-        height[y * S + x] = 0.35 * Math.max(gx, gy) + 1.4 * w2;
+    for (let k = 0; k < 150; k++) {
+      let x = r() * S, y = r() * S;
+      let a = (r() - 0.5) * 0.9;
+      const len = 30 + r() * r() * 220;
+      const width = 1.2 + r() * 2.2;
+      const amp = 0.5 + r() * 0.5;
+      const bend = (r() - 0.5) * 0.02;
+      for (let s = 0; s < len; s += 1) {
+        const taper = Math.sin(Math.PI * s / len);
+        const reach = Math.ceil(width * 2.5);
+        for (let o = -reach; o <= reach; o++) {
+          const px2 = Math.round(x - Math.sin(a) * o), py2 = Math.round(y + Math.cos(a) * o);
+          const i = (py2 % S + S) % S * S + (px2 % S + S) % S;
+          height[i] = Math.max(height[i], amp * taper * Math.exp(-((o / width) ** 2)));
+        }
+        x += Math.cos(a);
+        y += Math.sin(a);
+        a += bend;
       }
+    }
+    for (let y = 0; y < S; y++) {
+      for (let x = 0; x < S; x++) height[y * S + x] += 0.35 * broad(x / 128, y / 64);
     }
     const normal = document.createElement("canvas");
     const rough = document.createElement("canvas");
@@ -27214,9 +27395,10 @@ void main() {
         nimg.data[o + 1] = (n.y * 0.5 + 0.5) * 255;
         nimg.data[o + 2] = (n.z * 0.5 + 0.5) * 255;
         nimg.data[o + 3] = 255;
-        const crest = MathUtils.clamp(at(x, y) * 0.9, 0, 1);
-        const r = (0.66 - 0.36 * crest * crest) * 255;
-        rimg.data[o] = rimg.data[o + 1] = rimg.data[o + 2] = r;
+        const crest = MathUtils.clamp(at(x, y) * 0.6, 0, 1);
+        const grain = grainN(x / 8, y / 8) * 0.03;
+        const r2 = (0.66 - 0.36 * crest * crest + grain) * 255;
+        rimg.data[o] = rimg.data[o + 1] = rimg.data[o + 2] = r2;
         rimg.data[o + 3] = 255;
       }
     }
@@ -27229,6 +27411,23 @@ void main() {
       return t;
     };
     return { normalMap: wrap(normal), roughnessMap: wrap(rough) };
+  }
+  function merged(pieces, material, name) {
+    const geos = pieces.map((p2) => {
+      p2.updateMatrix();
+      const g = p2.geometry.clone().applyMatrix4(p2.matrix);
+      const out = g.index ? g.toNonIndexed() : g;
+      out.deleteAttribute("uv");
+      if (!out.attributes.normal) out.computeVertexNormals();
+      return out;
+    });
+    const mesh = new Mesh(mergeGeometries(geos), material);
+    mesh.name = name;
+    return mesh;
+  }
+  function detail(o) {
+    o.userData.explodeWithParent = true;
+    return o;
   }
   function tube(curve, radius, segments, material, name) {
     const mesh = new Mesh(new TubeGeometry(curve, segments, radius, 6, false), material);
@@ -27244,6 +27443,10 @@ void main() {
     const right = out(m.onFace(0.23, 0.75, side), 0.01, 0.04);
     const peak = out(m.onFace(0, 0.75, side), 0.015, 0.11);
     const hood = new BufferGeometry().setFromPoints([apex, left, peak, apex, peak, right]);
+    hood.setAttribute("uv", new Float32BufferAttribute(
+      [apex, left, peak, apex, peak, right].flatMap((p2) => [p2.x / 0.6, -p2.y / 0.6]),
+      2
+    ));
     hood.computeVertexNormals();
     const flaps = new Mesh(hood, cloth);
     flaps.name = `${name}-hood`;
@@ -27260,13 +27463,12 @@ void main() {
     gap.setIndex(idx);
     gap.computeVertexNormals();
     const opening = new Mesh(gap, dark);
-    opening.name = `${name}-opening`;
-    const stand = tube(new LineCurve3(m.onFace(0, 0.745, side, 4e-3), peak), 3e-3, 2, dark, `${name}-kickstand`);
+    const stand = tube(new LineCurve3(m.onFace(0, 0.745, side, 4e-3), peak), 3e-3, 2, dark, "");
     const tab = new Mesh(new BoxGeometry(0.025, 0.035, 4e-3), dark);
     tab.position.copy(m.onFace(0, 0.69, side, 5e-3));
     tab.lookAt(tab.position.clone().add(m.normalAt(tab.position.x, tab.position.z)));
-    tab.name = `${name}-tab`;
-    g.add(flaps, opening, stand, tab);
+    flaps.add(detail(merged([opening, stand, tab], dark, `${name}-vent`)));
+    g.add(flaps);
     return g;
   }
   function surfaceCurve(m, plan, lift) {
@@ -27293,11 +27495,11 @@ void main() {
       roughness: 1,
       roughnessMap,
       normalMap,
-      normalScale: new Vector2(0.25, 0.25),
+      normalScale: new Vector2(NORMAL_SCALE, NORMAL_SCALE),
       side: DoubleSide
     });
-    const alu = new MeshStandardMaterial({ name: "aluminium", color: COLORS.pole, metalness: 0.8, roughness: 0.45 });
-    const hubMat = new MeshStandardMaterial({ name: "hub", color: COLORS.hub, roughness: 0.5, metalness: 0.3 });
+    const alu = new MeshStandardMaterial({ name: "aluminium", color: COLORS.pole, metalness: 0.35, roughness: 0.45 });
+    const hubMat = new MeshStandardMaterial({ name: "hub", color: COLORS.hub, roughness: 0.5, metalness: 0.1 });
     const clipMat = new MeshStandardMaterial({ name: "clip", color: COLORS.clip, roughness: 0.7 });
     const webMat = new MeshStandardMaterial({ name: "webbing", color: COLORS.webbing, roughness: 0.85 });
     const innerMat = new MeshStandardMaterial({ name: "inner-floor", color: COLORS.inner, roughness: 0.8, side: DoubleSide });
@@ -27321,13 +27523,12 @@ void main() {
     const inner = new Mesh(skirtGeo, innerMat);
     inner.name = "inner-floor";
     fly.add(inner);
-    const seams = new Group();
-    seams.name = "fly-seams";
-    seams.add(tube(surfaceCurve(m, [[-RIDGE_END, 0], [RIDGE_END, 0]], 3e-3), 25e-4, 24, cloth, "seam-ridge"));
+    const seamTubes = [tube(surfaceCurve(m, [[-RIDGE_END, 0], [RIDGE_END, 0]], 3e-3), 25e-4, 24, cloth, "")];
     for (const sx of [-1, 1]) {
-      seams.add(tube(surfaceCurve(m, [[sx * RIDGE_END, 0], [sx * (L - 0.01), 0]], 3e-3), 25e-4, 20, cloth, `seam-end-${sx > 0 ? "r" : "l"}`));
+      seamTubes.push(tube(surfaceCurve(m, [[sx * RIDGE_END, 0], [sx * (L - 0.01), 0]], 3e-3), 25e-4, 20, cloth, ""));
     }
-    fly.add(seams);
+    const seams = merged(seamTubes, cloth, "fly-seams");
+    membrane.add(detail(seams));
     const loops = new InstancedMesh(new BoxGeometry(0.018, 0.05, 6e-3), webMat, 4);
     loops.name = "fly-loops";
     const tmp2 = new Object3D();
@@ -27340,28 +27541,29 @@ void main() {
       tmp2.updateMatrix();
       loops.setMatrixAt(n, tmp2.matrix);
     });
-    fly.add(loops);
+    membrane.add(detail(loops));
     const dark = clipMat;
     const awning = ventHood(m, 1, cloth, dark, "awning");
     const ventBack = ventHood(m, -1, cloth, dark, "vent-back");
     fly.add(awning, ventBack);
     root.add(fly);
-    const hinge = m.onFace(-0.42, 0.06, 1, 3e-3);
+    const hinge = m.onFace(-DOOR_W, DOOR_BASE, 1, 3e-3);
     const door = new Group();
     door.name = "door";
     door.position.copy(hinge);
     const outline = (t) => {
       const a = Math.PI * (1 - t);
-      return { x: 0.42 * Math.cos(a), y: 0.06 + 0.62 * Math.pow(Math.sin(a), 0.7) };
+      return { x: DOOR_W * Math.cos(a), y: DOOR_BASE + DOOR_H * Math.pow(Math.sin(a), 0.7) };
     };
-    const doorPos = [], doorIdx = [];
+    const doorPos = [], doorUv = [], doorIdx = [];
     const NU = 16, NV = 12;
     for (let iu = 0; iu <= NU; iu++) {
       const o = outline(iu / NU);
       for (let iv = 0; iv <= NV; iv++) {
-        const y = 0.06 + (o.y - 0.06) * (iv / NV);
+        const y = DOOR_BASE + (o.y - DOOR_BASE) * (iv / NV);
         const p2 = m.onFace(o.x, y, 1, 3e-3).sub(hinge);
         doorPos.push(p2.x, p2.y, p2.z);
+        doorUv.push(o.x / 0.6, -y / 0.6);
       }
     }
     for (let iu = 0; iu < NU; iu++) {
@@ -27372,6 +27574,7 @@ void main() {
     }
     const doorGeo = new BufferGeometry();
     doorGeo.setAttribute("position", new Float32BufferAttribute(doorPos, 3));
+    doorGeo.setAttribute("uv", new Float32BufferAttribute(doorUv, 2));
     doorGeo.setIndex(doorIdx);
     doorGeo.computeVertexNormals();
     const doorPanel = new Mesh(doorGeo, cloth);
@@ -27385,29 +27588,39 @@ void main() {
     const toggle = new Mesh(new BoxGeometry(0.02, 0.035, 6e-3), webMat);
     toggle.position.copy(m.onFace(0, 0.42, 1, 8e-3).sub(hinge));
     toggle.name = "door-toggle";
-    door.add(doorPanel, zip, toggle);
+    doorPanel.add(detail(zip), detail(toggle));
+    door.add(doorPanel);
+    const hingeTop = outline(0.3);
+    const hingeAxis = m.onFace(hingeTop.x, hingeTop.y, 1, 3e-3).sub(hinge).normalize();
     root.add(door);
     const poles = new Group();
     poles.name = "poles";
     const ridgeTop = ridgeCurve.getPointAt(0.5);
+    const strutTubes = [];
     for (const side of [1, -1]) {
-      const tag = side > 0 ? "front" : "back";
       const hub = new Mesh(new CylinderGeometry(0.022, 0.022, 0.028, 12), hubMat);
       hub.position.copy(hubAt(side));
-      hub.name = `hub-${tag}`;
-      poles.add(hub, tube(new LineCurve3(hubAt(side), ridgeTop), POLE_R, 2, alu, `ridge-strut-${tag}`));
+      hub.name = `hub-${side > 0 ? "front" : "back"}`;
+      poles.add(hub);
+      strutTubes.push(tube(new LineCurve3(hubAt(side), ridgeTop), POLE_R, 2, alu, ""));
     }
+    const struts = merged(strutTubes, alu, "ridge-struts");
+    const ridge = tube(ridgeCurve, POLE_R, 48, alu, "ridge-pole");
     const fitting = new Mesh(new SphereGeometry(0.012, 10, 6), hubMat);
     fitting.position.copy(ridgeTop);
     fitting.name = "ridge-fitting";
-    poles.add(fitting, tube(ridgeCurve, POLE_R, 48, alu, "ridge-pole"));
+    ridge.add(detail(fitting));
+    const legs = new Group();
+    legs.name = "pole-legs";
+    poles.add(struts, ridge, legs);
     const clips = new InstancedMesh(new BoxGeometry(0.022, 0.012, 0.016), clipMat, 16);
     clips.name = "pole-clips";
     let c = 0;
+    const tips = [];
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
       const curve = legCurve(sx, sz);
       const tag = `${sz > 0 ? "front" : "back"}-${sx > 0 ? "right" : "left"}`;
-      poles.add(tube(curve, POLE_R, 40, alu, `leg-${tag}`));
+      legs.add(tube(curve, POLE_R, 40, alu, `leg-${tag}`));
       for (const s of [0.2, 0.4, 0.6, 0.8]) {
         const p2 = curve.getPointAt(s);
         tmp2.position.copy(p2).y -= CLEAR * 0.5;
@@ -27417,17 +27630,20 @@ void main() {
       }
       const tip = new Mesh(new CylinderGeometry(6e-3, 6e-3, 0.03, 8), clipMat);
       tip.position.set(sx * CORNER.x, 0.015, sz * CORNER.z);
-      tip.name = `tip-${tag}`;
-      poles.add(tip);
+      tips.push(tip);
     }
-    poles.add(clips);
+    legs.add(detail(clips), detail(merged(tips, clipMat, "pole-tips")));
     root.add(poles);
     root.userData.sculptRuntime = {
       door,
-      // Open the door by turning the pivot about its hinge edge (local y).
-      doorHinge: { axis: new Vector3(0, 1, 0), openAngle: -1.9 },
+      // Open the door: door.rotateOnAxis(doorHinge.axis, doorHinge.openAngle * t), t = 0..1.
+      doorHinge: { axis: hingeAxis, openAngle: DOOR_OPEN },
       nodes: { fly, poles, door, awning },
-      parts: [fly, membrane, inner, seams, loops, awning, ventBack, door, poles, clips]
+      destructionGroups: {
+        fly: [membrane, inner, awning, ventBack],
+        door: [doorPanel],
+        frame: [poles.getObjectByName("hub-front"), poles.getObjectByName("hub-back"), struts, ridge, legs]
+      }
     };
     return root;
   }
@@ -27453,16 +27669,25 @@ void main() {
   } else if (light === "neutral") {
     scene.add(new HemisphereLight("#eeebe4", "#6f6a62", 1.5));
     const sun = new DirectionalLight("#ffeedd", 1.8);
-    sun.position.set(30, 38, 24);
+    sun.position.set(30, 38, 24).normalize().multiplyScalar(20);
     sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = sun.shadow.camera.bottom = -3;
+    sun.shadow.camera.right = sun.shadow.camera.top = 3;
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 40;
+    sun.shadow.bias = -5e-4;
+    sun.shadow.normalBias = 0.04;
     scene.add(sun);
   } else {
-    scene.add(new HemisphereLight("#8fb0e6", "#3d4a3c", 1.9));
-    const glow = new DirectionalLight("#c9d6f0", 0.35);
-    glow.position.set(-2, 6, 3);
-    scene.add(glow);
+    scene.add(new HemisphereLight(q.get("sky") ?? "#9cc0ff", q.get("gnd") ?? "#2a3a40", Number(q.get("hi") ?? 2.4)));
+    const zenith = new DirectionalLight(q.get("zc") ?? "#a8c6ff", Number(q.get("zi") ?? 1.2));
+    zenith.position.set(0, 10, 1.5);
+    scene.add(zenith);
   }
+  var t0 = performance.now();
   var tent = createTentModel();
+  var buildMs = performance.now() - t0;
   tent.traverse((o) => {
     if (o.isMesh) o.castShadow = o.receiveShadow = true;
     if (hide.includes(o.name)) o.visible = false;
@@ -27476,7 +27701,7 @@ void main() {
   });
   scene.add(tent);
   var cam = new PerspectiveCamera(Number(q.get("fov") ?? 30), w / h, 0.05, 50);
-  var targets = { ref: [-0.1, 0.33, 0] };
+  var targets = { ref: [-0.1, 0.33, 0], close: [0.1, 0.45, 0.5] };
   var tq = q.get("tgt")?.split(",").map(Number);
   var target = new Vector3(...tq ?? targets[view] ?? [0.05, 0.4, 0]);
   var views = {
@@ -27489,7 +27714,9 @@ void main() {
     right: [4.6, 1, 0],
     rear: [0, 1, -4.6],
     left: [-4.6, 1, 0],
-    top: [0.01, 5.2, 0.4]
+    top: [0.01, 5.2, 0.4],
+    close: [0.35, 0.75, 1.55]
+    // door-face close-up for the cloth surface
   };
   var p = q.get("pos")?.split(",").map(Number);
   cam.position.set(...p ?? views[view]);
@@ -27510,6 +27737,8 @@ void main() {
     if (m.isMesh) [m.material].flat().forEach((x) => mats.add(x.type));
   });
   window.__report = {
+    buildMs: Math.round(buildMs),
+    drawCalls: renderer.info.render.calls,
     triangles: tris,
     size: box.getSize(new Vector3()).toArray(),
     min: box.min.toArray(),
@@ -27537,6 +27766,78 @@ void main() {
       meshes.push({ name: m.name, vertices: v, indices: idx });
     });
     window.__export = { meshes, parts };
+  }
+  {
+    const parts = [];
+    let unnamed = 0, integral = 0;
+    const tris2 = (o) => {
+      let n = 0;
+      o.traverse((c) => {
+        const m = c;
+        if (!m.isMesh) return;
+        const g = m.geometry;
+        n += (g.index ? g.index.count : g.attributes.position.count) / 3 * (m.isInstancedMesh ? m.count : 1);
+      });
+      return n;
+    };
+    const groups = tent.userData.sculptRuntime.destructionGroups;
+    const moduleOf = (o) => {
+      for (const [k, list] of Object.entries(groups)) for (const g of list) {
+        let p2 = o;
+        while (p2) {
+          if (p2 === g) return k;
+          p2 = p2.parent;
+        }
+      }
+      return "tent";
+    };
+    const walk = (o) => {
+      for (const c of o.children) {
+        if (c.userData.explodeWithParent) {
+          c.traverse((x) => {
+            if (x.isMesh) integral++;
+          });
+          continue;
+        }
+        const isMesh = c.isMesh;
+        const named = c.children.filter((x) => x.name && !x.userData.explodeWithParent);
+        if (isMesh) {
+          if (!c.name) {
+            unnamed++;
+            continue;
+          }
+          parts.push({ name: c.name, kind: "part", module: moduleOf(c), triangles: tris2(c) });
+        } else if (c.name && named.length === 0) {
+          parts.push({ name: c.name, kind: "part", module: moduleOf(c), triangles: tris2(c) });
+          continue;
+        } else if (c.name) {
+          parts.push({ name: c.name, kind: "assembly", module: moduleOf(c), triangles: tris2(c) });
+        }
+        walk(c);
+      }
+    };
+    walk(tent);
+    window.__manifest = { model: "tent", parts, unnamedMeshes: unnamed, integralMeshes: integral };
+  }
+  if (q.get("interact")) {
+    const list = [];
+    tent.traverse((o) => {
+      const m = o;
+      if (!m.isMesh) return;
+      m.material = Array.isArray(m.material) ? m.material.map((x) => x.clone()) : m.material.clone();
+      for (const x of [m.material].flat()) if ("emissive" in x) list.push(x);
+    });
+    const k = Number(q.get("fade") ?? 0), hover = Number(q.get("hover") ?? 0);
+    for (const m of list) {
+      m.emissive.setRGB(hover, hover * 0.95, hover * 0.85);
+      m.transparent = k > 0;
+      m.opacity = 1 - k * 0.92;
+      m.depthWrite = k < 0.5;
+    }
+    const rt = tent.userData.sculptRuntime;
+    if (q.get("door")) rt.door.rotateOnAxis(rt.doorHinge.axis, rt.doorHinge.openAngle * Number(q.get("door")));
+    renderer.render(scene, cam);
+    window.__interact = { materials: list.length, allStandard: list.every((m) => m.type === "MeshStandardMaterial"), doorRotationY: rt.door.rotation.y };
   }
 })();
 /*! Bundled license information:

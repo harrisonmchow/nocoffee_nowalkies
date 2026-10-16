@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "kind": "img2threejs.material-comparison",
+  "materialId": "fly-nylon",
+  "reference": {
+    "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/renders/material-r1/fly-crop-ref.png",
+    "meanRgb": [
+      58,
+      92,
+      128
+    ],
+    "features": {
+      "meanLuma": 0.34328144709967323,
+      "lumaVariance": 0.0005294007533442488,
+      "horizontalGradient": 0.011504319287998879,
+      "verticalGradient": 0.018242799332499043,
+      "anisotropyProxy": 1.5857347901956822
+    },
+    "width": 198,
+    "height": 163,
+    "foregroundCoverage": 1.0,
+    "warnings": [
+      "image is not clearly isolated from background; using most pixels as material evidence"
+    ],
+    "readback": true,
+    "diagnostics": {
+      "backgroundColor": "#3B5D80",
+      "backgroundNoise": 9.487,
+      "transparentPixelFraction": 0.0,
+      "foregroundCoverage": 1.0
+    }
+  },
+  "render": {
+    "path": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/renders/material-r1/fly-crop-render.png",
+    "meanRgb": [
+      59,
+      96,
+      124
+    ],
+    "features": {
+      "meanLuma": 0.35413079316448803,
+      "lumaVariance": 0.0005043288736465425,
+      "horizontalGradient": 0.0023107234737866807,
+      "verticalGradient": 0.007298610763454324,
+      "anisotropyProxy": 3.15858251593116
+    },
+    "width": 198,
+    "height": 163,
+    "foregroundCoverage": 1.0,
+    "warnings": [
+      "image is not clearly isolated from background; using most pixels as material evidence"
+    ],
+    "readback": true,
+    "diagnostics": {
+      "backgroundColor": "#3F6581",
+      "backgroundNoise": 28.914,
+      "transparentPixelFraction": 0.0,
+      "foregroundCoverage": 1.0
+    }
+  },
+  "metrics": {
+    "deltaE00": 3.553,
+    "scores": {
+      "baseColor": 0.9289302013473949,
+      "meanLuma": 0.9758903420781894,
+      "microstructure": 0.9997910676691858,
+      "directionalResponse": 0.2135761371322611,
+      "overall": 0.8487
+    }
+  },
+  "mismatches": [],
+  "passed": true,
+  "nextAction": "continue",
+  "limitation": "Deterministic crop metrics are evidence; material identity still requires vision review for ambiguous cases."
+}

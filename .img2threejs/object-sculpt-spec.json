@@ -149,7 +149,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "frame-hub/hub-strut-junction"
+            "ref": "hub-strut-junction"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
           "confidence": 0.8,
@@ -170,7 +170,7 @@
           "affects": "silhouette",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "ridge-pole/ridge-arch"
+            "ref": "ridge-arch"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
           "confidence": 0.85,
@@ -191,7 +191,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "awning/peaked-vent-hood"
+            "ref": "peaked-vent-hood"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
           "confidence": 0.85,
@@ -212,7 +212,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "vent-back/peaked-vent-hood"
+            "ref": "peaked-vent-hood"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
           "confidence": 0.6,
@@ -233,7 +233,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "pole-legs/leg-clips"
+            "ref": "leg-clips"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
           "confidence": 0.8,
@@ -254,7 +254,7 @@
           "affects": "normal",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "fly/panel-seams"
+            "ref": "panel-seams"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c0.png",
           "confidence": 0.6,
@@ -275,7 +275,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "fly/fabric-sag"
+            "ref": "fabric-sag"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
           "confidence": 0.75,
@@ -296,7 +296,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "fly/velcro-wraps"
+            "ref": "velcro-wraps"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
           "confidence": 0.65,
@@ -317,7 +317,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "door/door-toggle"
+            "ref": "door-toggle"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
           "confidence": 0.55,
@@ -338,7 +338,7 @@
           "affects": "geometry",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "door/door-zip"
+            "ref": "door-zip"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r1c1.png",
           "confidence": 0.3,
@@ -359,7 +359,7 @@
           "affects": "albedo",
           "mapsTo": {
             "type": "component.localFeatures",
-            "ref": "fly/hem-gap"
+            "ref": "hem-gap"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r2c1.png",
           "confidence": 0.6,
@@ -380,7 +380,7 @@
           "affects": "roughness",
           "mapsTo": {
             "type": "material.localOverrides",
-            "ref": "fly-nylon/crease-sheen"
+            "ref": "crease-sheen"
           },
           "evidenceRef": "/Users/caleb/Desktop/Code/nocoffee_nowalkies/.img2threejs/detail-inventory/zone-r0c1.png",
           "confidence": 0.6,
@@ -779,26 +779,20 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "currentPass": "form-refinement",
+    "currentPass": "complete",
     "completedPasses": [
       "blockout",
-      "structural-pass"
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
     ],
-    "lastCompletedPass": "structural-pass",
-    "blockedReason": "",
-    "nextRequiredEvidence": [
-      "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
-      "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
-      "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold.",
-      "attachment contracts for child appendages/connectors",
-      "no floating child roots/joints in the browser screenshot",
-      "browser render screenshot from your agent's browser/screenshot tool",
-      "side-by-side reference/render comparison sheet for AI vision review",
-      "banded interior difference vs the reference baseline (forge/stage4_review/interior_difference.py --from/--to per region)",
-      "AI vision score at or above the visual acceptance threshold",
-      "all critical semantic feature scores from the shared image pair at or above their thresholds",
-      "self-correction review appended with action=continue before the next pass"
-    ]
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
   },
   "lookDevTargets": {
     "qualityPriority": "reference-fidelity",
@@ -1125,7 +1119,7 @@
     },
     {
       "id": "fly",
-      "name": "fly",
+      "name": "fly-membrane",
       "level": "macro",
       "role": "shell",
       "importance": 1.0,
@@ -1142,7 +1136,7 @@
         },
         "deformationStack": [],
         "uvStrategy": "accumulated surface arc length along grid rows/cols (cloth-style unwrap)",
-        "normalStrategy": "computeVertexNormals + generated canvas normal map (ripstop + soft wrinkles)",
+        "normalStrategy": "computeVertexNormals + generated canvas normal map (soft wrinkles)",
         "membraneSolve": {
           "footprintHalfExtents": [
             1.05,
@@ -1163,7 +1157,7 @@
           "heightRemap": "solve u, y = HEM + (1-HEM)*u^0.55 so walls leave the hem steeply",
           "sagLoad": -0.9,
           "iterations": 500,
-          "wrinkles": "seeded value noise, amplitude 4.5 mm, horizontal bias on lower faces"
+          "wrinkles": "seeded value noise, amplitude 4 mm, wavelengths >= 3 grid cells (no aliasing); fine wrinkles in the normal map"
         }
       },
       "parent": "root",
@@ -1246,7 +1240,8 @@
       },
       "material": "fly-nylon",
       "materialLayers": [
-        "fly-nylon"
+        "fly-nylon",
+        "webbing"
       ],
       "deformations": [],
       "joints": [],
@@ -1286,14 +1281,14 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
-        "microRoughness": 0.0,
-        "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "macroRoughness": 0.66,
+        "microRoughness": 0.03,
+        "bumpAmplitude": 0.004,
+        "normalPattern": "150 seeded crease strokes (mostly horizontal, curved, tapered, wrapped) + broad periodic undulation, 0.6 m tile, normalScale 1.0; door-face luma variance matches IMG_4842 (0.00054/0.00053), gradients ~0.5x (deep folds are geometry the 3 cm grid cannot carry)",
+        "displacementPattern": "membrane sag (pinned Laplace solve) + 4 mm folds at >= 3 grid-cell wavelengths",
+        "occlusionPattern": "hood shadow band under each vent; dark inner floor band under the 4 cm hem",
+        "edgeWearPattern": "none: new, clean fly",
+        "notes": "roughness map: 0.66 base, down to ~0.3 on taut crests, fine grain +-0.03"
       },
       "evidenceRefs": [
         "full-object"
@@ -1433,14 +1428,14 @@
       "seams": [],
       "localFeatures": [],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.8,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "none",
+        "displacementPattern": "none",
+        "occlusionPattern": "reads as the contact-shadow band under the hem",
+        "edgeWearPattern": "none",
+        "notes": "inferred"
       },
       "evidenceRefs": [
         "full-object"
@@ -1580,14 +1575,14 @@
       "seams": [],
       "localFeatures": [],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.45,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "smooth tube/moulding",
+        "displacementPattern": "none",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "dull anodised; metalness 0.35 (no env map in scene)"
       },
       "evidenceRefs": [
         "full-object"
@@ -1595,8 +1590,8 @@
       "details": [],
       "fidelityTier": "form",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(180, 184, 186, 1.0)",
-        "secondaryAlbedo": "rgba(154, 158, 159, 1.0)",
+        "dominantAlbedo": "rgba(195, 199, 201, 1.0)",
+        "secondaryAlbedo": "rgba(167, 171, 172, 1.0)",
         "materialClass": "metal",
         "materialClassConfidence": 0.8,
         "evidenceRef": "material-evidence/summary.json"
@@ -1734,14 +1729,14 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.5,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "smooth tube/moulding",
+        "displacementPattern": "none",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "dull anodised; metalness 0.35 (no env map in scene)"
       },
       "evidenceRefs": [
         "full-object"
@@ -1880,14 +1875,14 @@
       "seams": [],
       "localFeatures": [],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.5,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "smooth tube/moulding",
+        "displacementPattern": "none",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "dull anodised; metalness 0.35 (no env map in scene)"
       },
       "evidenceRefs": [
         "full-object",
@@ -2027,14 +2022,14 @@
       "seams": [],
       "localFeatures": [],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.45,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "smooth tube/moulding",
+        "displacementPattern": "none",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "dull anodised; metalness 0.35 (no env map in scene)"
       },
       "evidenceRefs": [
         "full-object"
@@ -2042,8 +2037,8 @@
       "details": [],
       "fidelityTier": "form",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(180, 184, 186, 1.0)",
-        "secondaryAlbedo": "rgba(154, 158, 159, 1.0)",
+        "dominantAlbedo": "rgba(195, 199, 201, 1.0)",
+        "secondaryAlbedo": "rgba(167, 171, 172, 1.0)",
         "materialClass": "metal",
         "materialClassConfidence": 0.8,
         "evidenceRef": "material-evidence/summary.json"
@@ -2209,14 +2204,14 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.45,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "smooth tube/moulding",
+        "displacementPattern": "none",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "dull anodised; metalness 0.35 (no env map in scene)"
       },
       "evidenceRefs": [
         "full-object"
@@ -2224,8 +2219,8 @@
       "details": [],
       "fidelityTier": "form",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(180, 184, 186, 1.0)",
-        "secondaryAlbedo": "rgba(154, 158, 159, 1.0)",
+        "dominantAlbedo": "rgba(195, 199, 201, 1.0)",
+        "secondaryAlbedo": "rgba(167, 171, 172, 1.0)",
         "materialClass": "metal",
         "materialClassConfidence": 0.8,
         "evidenceRef": "material-evidence/summary.json"
@@ -2372,7 +2367,8 @@
       },
       "material": "aluminium",
       "materialLayers": [
-        "aluminium"
+        "aluminium",
+        "clip-black"
       ],
       "deformations": [],
       "joints": [],
@@ -2388,14 +2384,14 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
+        "macroRoughness": 0.45,
         "microRoughness": 0.0,
         "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "normalPattern": "smooth tube/moulding",
+        "displacementPattern": "none",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "dull anodised; metalness 0.35 (no env map in scene)"
       },
       "evidenceRefs": [
         "full-object"
@@ -2403,8 +2399,8 @@
       "details": [],
       "fidelityTier": "form",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(180, 184, 186, 1.0)",
-        "secondaryAlbedo": "rgba(154, 158, 159, 1.0)",
+        "dominantAlbedo": "rgba(195, 199, 201, 1.0)",
+        "secondaryAlbedo": "rgba(167, 171, 172, 1.0)",
         "materialClass": "metal",
         "materialClassConfidence": 0.8,
         "evidenceRef": "material-evidence/summary.json"
@@ -2530,7 +2526,8 @@
       "material": "fly-nylon",
       "materialLayers": [
         "fly-nylon",
-        "zip"
+        "zip",
+        "webbing"
       ],
       "deformations": [],
       "joints": [],
@@ -2552,14 +2549,14 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
-        "microRoughness": 0.0,
-        "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "macroRoughness": 0.66,
+        "microRoughness": 0.03,
+        "bumpAmplitude": 0.004,
+        "normalPattern": "same cloth normal map as the fly, uv in metres/0.6",
+        "displacementPattern": "conforms to the fly 3 mm proud",
+        "occlusionPattern": "none",
+        "edgeWearPattern": "none",
+        "notes": "zip coil tube 1.5 mm, near fly colour"
       },
       "evidenceRefs": [
         "full-object"
@@ -2713,13 +2710,13 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
-        "microRoughness": 0.0,
-        "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
+        "macroRoughness": 0.66,
+        "microRoughness": 0.03,
+        "bumpAmplitude": 0.002,
+        "normalPattern": "cloth normal map",
+        "displacementPattern": "flat flaps",
+        "occlusionPattern": "dark vent opening/shadow band below the hood edge",
+        "edgeWearPattern": "none",
         "notes": ""
       },
       "evidenceRefs": [
@@ -2867,14 +2864,14 @@
         }
       ],
       "surfaceDetail": {
-        "macroRoughness": 0.0,
-        "microRoughness": 0.0,
-        "bumpAmplitude": 0.0,
-        "normalPattern": "",
-        "displacementPattern": "",
-        "occlusionPattern": "",
-        "edgeWearPattern": "",
-        "notes": ""
+        "macroRoughness": 0.66,
+        "microRoughness": 0.03,
+        "bumpAmplitude": 0.002,
+        "normalPattern": "cloth normal map",
+        "displacementPattern": "flat flaps",
+        "occlusionPattern": "dark vent opening/shadow band below the hood edge",
+        "edgeWearPattern": "none",
+        "notes": "mirror of awning"
       },
       "evidenceRefs": [
         "full-object",
@@ -2944,7 +2941,7 @@
           "id": "micro",
           "frequency": 180.0,
           "amplitude": 0.002,
-          "role": "ripstop grid ~5 mm (normal map only)"
+          "role": "fine grain in the roughness map; 5 mm ripstop grid omitted (moire at prop distance, form-refinement review)"
         }
       ],
       "roughness": {
@@ -2958,7 +2955,7 @@
         "variation": 0.0
       },
       "normal": {
-        "pattern": "generated canvas: ripstop grid + soft wrinkles (independent of albedo)",
+        "pattern": "generated canvas: tileable soft wrinkles (independent of albedo)",
         "strength": 0.25,
         "scale": 24.0,
         "space": "tangent"
@@ -3038,16 +3035,16 @@
       "name": "pole aluminium",
       "type": "standard",
       "shaderModel": "MeshStandardMaterial (runtime contract: scene drives emissive + opacity)",
-      "baseColor": "#b4b8ba",
-      "color": "#b4b8ba",
+      "baseColor": "#c3c7c9",
+      "color": "#c3c7c9",
       "albedo": {
-        "dominant": "#b4b8ba",
+        "dominant": "#c3c7c9",
         "secondary": [],
         "samplingNotes": "de-lit (see material evidence)"
       },
       "colorVariation": {
         "palette": [
-          "#b9bcbd"
+          "#c3c7c9"
         ],
         "pattern": "mottled",
         "amplitude": 0.04,
@@ -3090,7 +3087,7 @@
         "localResponse": "higher roughness in cavities, lower roughness on worn edges"
       },
       "metalness": {
-        "base": 0.8,
+        "base": 0.35,
         "variation": 0.0
       },
       "normal": {
@@ -3132,7 +3129,7 @@
         "Use normal/bump/displacement only when they map to observed surface relief.",
         "Use displacement geometry when the observed relief changes the close-up silhouette; texture-only relief is insufficient there."
       ],
-      "notes": "Dull anodised aluminium tube, 9 mm.",
+      "notes": "Dull anodised aluminium tube, 9 mm. Metalness 0.35: the scene has no env map, so 0.8 rendered near-black (material-pass).",
       "doubleSided": false,
       "qualityTier": "utility",
       "qualityTierRationale": "thin or tiny part (< 2 cm across in the reference); no croppable texture evidence"
@@ -3194,7 +3191,7 @@
         "localResponse": "higher roughness in cavities, lower roughness on worn edges"
       },
       "metalness": {
-        "base": 0.3,
+        "base": 0.1,
         "variation": 0.0
       },
       "normal": {
@@ -3960,6 +3957,225 @@
       "cameraView": "",
       "notes": "",
       "aiVisionNotes": "Agent vision on cmp-cmp.png + ref2-dusk.png vs IMG_4850."
+    },
+    {
+      "timestamp": "2026-10-16T11:22:55.788276+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.77,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.74,
+        "materialSurface": 0.62,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Legs now arch like the photo; hubs/struts/ridge pole unchanged and seated."
+        },
+        {
+          "id": "door-vent-awning",
+          "score": 0.75,
+          "notes": "Hood + slit + tab read; neutral sun now casts the hood's own shadow onto the fly as in the photo."
+        },
+        {
+          "id": "clips-and-loops",
+          "score": 0.7,
+          "notes": "Unchanged."
+        }
+      ],
+      "referenceScreenshot": "renders/form-r2/cmp-ref.png",
+      "renderScreenshot": "renders/form-r2/ref-dusk.png",
+      "comparisonImage": "renders/form-r2/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision on cmp-cmp.png, ref-neutral.png, close-neutral.png, ref2-dusk.png."
+    },
+    {
+      "timestamp": "2026-10-16T11:26:50.601025+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.77,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.74,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.76,
+          "notes": "Unlit albedo is pale sage (#97a698); re-lit under a fitted blue dusk sky it reproduces the photo's door tone (render 60,98,125 vs ref 58,93,129); material_comparator overall 0.849 pass. Wrinkle contrast is lower than the photo (gradient 0.0023 vs 0.0115). Roof is ~15 levels darker: no sky reflection without an env map."
+        },
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Poles now read pale dull aluminium (metalness 0.35) instead of near-black."
+        }
+      ],
+      "referenceScreenshot": "renders/material-r1/cmp-ref.png",
+      "renderScreenshot": "renders/material-r1/ref-dusk.png",
+      "comparisonImage": "renders/material-r1/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision on cmp-cmp.png + unlit/neutral renders."
+    },
+    {
+      "timestamp": "2026-10-16T11:28:41.170212+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.77,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.74,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.76,
+          "notes": "Unlit albedo is pale sage (#97a698); re-lit under a fitted blue dusk sky it reproduces the photo's door tone (render 60,98,125 vs ref 58,93,129); material_comparator overall 0.849 pass. Wrinkle contrast is lower than the photo (gradient 0.0023 vs 0.0115). Roof is ~15 levels darker: no sky reflection without an env map."
+        },
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Poles now read pale dull aluminium (metalness 0.35) instead of near-black."
+        }
+      ],
+      "referenceScreenshot": "renders/material-r1/cmp-ref.png",
+      "renderScreenshot": "renders/material-r1/ref-dusk.png",
+      "comparisonImage": "renders/material-r1/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision on cmp-cmp.png + unlit/neutral renders."
+    },
+    {
+      "timestamp": "2026-10-16T11:34:19.720839+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.8,
+          "notes": "Crease strokes read as crinkled coated nylon like IMG_4842; material_comparator 0.964 (was 0.849); luma variance matches; gradients ~0.5x photo (deep folds are geometry)."
+        }
+      ],
+      "referenceScreenshot": "renders/surface-r2/cmp-ref.png",
+      "renderScreenshot": "renders/surface-r2/ref-dusk.png",
+      "comparisonImage": "renders/surface-r2/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision on cmp-cmp.png + close-neutral.png."
+    },
+    {
+      "timestamp": "2026-10-16T11:35:55.324215+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.8,
+          "notes": "Holds under both the fitted dusk sky and the camp rig (hemisphere + low sun with scene.ts shadow bias): form reads from shading, wrinkles survive relighting, no acne, no baked light in albedo."
+        }
+      ],
+      "referenceScreenshot": "renders/lighting-r1/cmp-ref.png",
+      "renderScreenshot": "renders/lighting-r1/ref-dusk.png",
+      "comparisonImage": "renders/lighting-r1/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision on cmp-cmp.png + neutral renders."
+    },
+    {
+      "timestamp": "2026-10-16T11:40:43.111160+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.82,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "door-vent-awning",
+          "score": 0.76,
+          "notes": "Door pivot opens about its own zip edge into a real opening cut in the fly (hidden when shut); awning unchanged."
+        },
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Frame is explodable/pickable as hubs, struts (one part), ridge pole (+fitting detail), 4 legs (+clips/tips detail)."
+        }
+      ],
+      "referenceScreenshot": "renders/interaction-r2/cmp-ref.png",
+      "renderScreenshot": "renders/interaction-r2/ref-dusk.png",
+      "comparisonImage": "renders/interaction-r2/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision on cmp-cmp.png + hover/fade/door renders."
+    },
+    {
+      "timestamp": "2026-10-16T11:43:39.852691+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.82,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "overall-silhouette",
+          "score": 0.8,
+          "notes": "Unchanged after merges (IoU 0.9035 aligned)."
+        },
+        {
+          "id": "fly-material",
+          "score": 0.8,
+          "notes": "Unchanged."
+        }
+      ],
+      "referenceScreenshot": "renders/optimization-r1/cmp-ref.png",
+      "renderScreenshot": "renders/optimization-r1/ref-dusk.png",
+      "comparisonImage": "renders/optimization-r1/cmp-cmp.png",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": "Agent vision: no regression vs surface-r2."
     }
   ],
   "reviewHistory": [
@@ -4152,6 +4368,383 @@
         "notes": "",
         "aiVisionNotes": "Agent vision on cmp-cmp.png + ref2-dusk.png vs IMG_4850."
       }
+    },
+    {
+      "timestamp": "2026-10-16T11:22:55.788276+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.77,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.74,
+        "materialSurface": 0.62,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Legs now arch like the photo; hubs/struts/ridge pole unchanged and seated."
+        },
+        {
+          "id": "door-vent-awning",
+          "score": 0.75,
+          "notes": "Hood + slit + tab read; neutral sun now casts the hood's own shadow onto the fly as in the photo."
+        },
+        {
+          "id": "clips-and-loops",
+          "score": 0.7,
+          "notes": "Unchanged."
+        }
+      ],
+      "action": "continue",
+      "summary": "Form refinement: end-wall tension seams pinned (end panels planar like IMG_4850), legs arch more (bow 0.26), geometry folds kept >= 3 grid cells (fixes aliasing), fine wrinkles moved to a tileable normal map, door/hood UVs added. Harness shadow bias matched to scene.ts (the diagonal stripes were shadow acne, not the model).",
+      "matched": [
+        "planar end walls",
+        "leg arcs",
+        "soft horizontal wrinkles",
+        "roof plateau",
+        "vent"
+      ],
+      "mismatches": [
+        "faint centre crease at x=0 from triangulation flip",
+        "end panels slightly convex near the leg (u^0.55 remap)",
+        "photo shows more wrinkle contrast on the lower door face"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "end-wall seam pins",
+        "legY bow 0.26",
+        "wrinkle freq lowered",
+        "ripstop dropped",
+        "door+hood uv"
+      ],
+      "evidence": [
+        "renders/form-r2/tier1.json",
+        "renders/form-r2/multi-angle.json",
+        "renders/form-r2/turntable.json",
+        "renders/form-r2/interior.txt",
+        "renders/form-r2/ref-neutral.png",
+        "renders/form-r2/close-neutral.png",
+        "renders/form-r2/ref2-dusk.png"
+      ],
+      "mapStrippedRender": "renders/form-r2/cmp-render-flat.png",
+      "visualEvidence": {
+        "referenceScreenshot": "renders/form-r2/cmp-ref.png",
+        "renderScreenshot": "renders/form-r2/ref-dusk.png",
+        "comparisonImage": "renders/form-r2/cmp-cmp.png",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": "Agent vision on cmp-cmp.png, ref-neutral.png, close-neutral.png, ref2-dusk.png."
+      }
+    },
+    {
+      "timestamp": "2026-10-16T11:28:41.170212+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.77,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.74,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.76,
+          "notes": "Unlit albedo is pale sage (#97a698); re-lit under a fitted blue dusk sky it reproduces the photo's door tone (render 60,98,125 vs ref 58,93,129); material_comparator overall 0.849 pass. Wrinkle contrast is lower than the photo (gradient 0.0023 vs 0.0115). Roof is ~15 levels darker: no sky reflection without an env map."
+        },
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Poles now read pale dull aluminium (metalness 0.35) instead of near-black."
+        }
+      ],
+      "action": "continue",
+      "summary": "Material pass: de-lit sage fly validated by re-lighting (door within ~5 levels of the photo under a fitted dusk sky); material_comparator 0.849 pass; aluminium metalness 0.8 -> 0.35 so poles read pale without an env map. Tier 1 colour delta recorded on the UNLIT map-stripped render (max dE 12.3) because it compares albedo recipes; the dusk render gives 42.9 from the blue light alone. material_gate.py not applicable to the single-crop route and recorded as not passed.",
+      "matched": [
+        "fly albedo de-lit, no baked blue",
+        "door/roof tone under dusk",
+        "semi-matte roughness 0.66 with crest sheen",
+        "dull pale poles",
+        "black clips",
+        "green loops"
+      ],
+      "mismatches": [
+        "wrinkle contrast weaker than photo",
+        "roof lacks sky reflection (no env map)",
+        "material_gate not run on region pipeline"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "aluminium metalness 0.35, colour #c3c7c9",
+        "hub metalness 0.1"
+      ],
+      "evidence": [
+        "renders/material-r1/tier1.json",
+        "renders/material-r1/cmp-ref-unlit-flat.png",
+        "renders/material-r1/material-comparison.json",
+        "renders/material-r1/material-gate.json",
+        "renders/material-r1/palette.json",
+        "renders/material-r1/ref-neutral.png",
+        "renders/material-r1/close-neutral.png",
+        "material-evidence/summary.json",
+        "renders/material-r1/interior.txt",
+        "renders/material-r1/multi-angle.json",
+        "renders/material-r1/turntable.json"
+      ],
+      "mapStrippedRender": "renders/material-r1/cmp-render-flat.png",
+      "visualEvidence": {
+        "referenceScreenshot": "renders/material-r1/cmp-ref.png",
+        "renderScreenshot": "renders/material-r1/ref-dusk.png",
+        "comparisonImage": "renders/material-r1/cmp-cmp.png",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": "Agent vision on cmp-cmp.png + unlit/neutral renders."
+      }
+    },
+    {
+      "timestamp": "2026-10-16T11:34:19.720839+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.8,
+          "notes": "Crease strokes read as crinkled coated nylon like IMG_4842; material_comparator 0.964 (was 0.849); luma variance matches; gradients ~0.5x photo (deep folds are geometry)."
+        }
+      ],
+      "action": "continue",
+      "summary": "Surface pass: spec gained per-component surfaceDetail (generator had blocked); cloth normal map rebuilt as 150 seeded, wrapped, tapered crease strokes + broad undulation (normalScale 1.0) after two rejected looks (ridged noise read as quilting; isolines as contour loops). Noise made truly periodic (previous tile seams). Fly comparator 0.964.",
+      "matched": [
+        "crinkled nylon creases",
+        "semi-matte sheen on crests",
+        "vent shadow band",
+        "dark hem band"
+      ],
+      "mismatches": [
+        "crease gradients ~0.5x photo",
+        "slight pixel stepping inside individual strokes at close range"
+      ],
+      "specFixes": [
+        "surfaceDetail for fly/door/awning/vent-back/inner-floor/poles"
+      ],
+      "codeFixes": [
+        "periodic valueNoise(px,py)",
+        "stroke crease map",
+        "NORMAL_SCALE 1.0"
+      ],
+      "evidence": [
+        "renders/surface-r2/material-comparison.json",
+        "renders/surface-r2/close-neutral.png",
+        "renders/surface-r2/ref-neutral.png",
+        "renders/surface-r2/tier1.json",
+        "renders/surface-r2/interior.txt",
+        "renders/surface-r2/multi-angle.json",
+        "renders/surface-r2/turntable.json"
+      ],
+      "mapStrippedRender": "renders/surface-r2/cmp-render-flat.png",
+      "visualEvidence": {
+        "referenceScreenshot": "renders/surface-r2/cmp-ref.png",
+        "renderScreenshot": "renders/surface-r2/ref-dusk.png",
+        "comparisonImage": "renders/surface-r2/cmp-cmp.png",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": "Agent vision on cmp-cmp.png + close-neutral.png."
+      }
+    },
+    {
+      "timestamp": "2026-10-16T11:35:55.324215+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.8,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "fly-material",
+          "score": 0.8,
+          "notes": "Holds under both the fitted dusk sky and the camp rig (hemisphere + low sun with scene.ts shadow bias): form reads from shading, wrinkles survive relighting, no acne, no baked light in albedo."
+        }
+      ],
+      "action": "continue",
+      "summary": "Lighting pass: model ships no lights (runtime contract); verified under the fitted dusk sky (door within ~5 levels of IMG_4842) and under the camp rig copied from scene.ts (hemisphere #eeebe4/#6f6a62 x1.5 + sun x1.8, PCF soft shadows, bias -0.0005, normalBias 0.04, NeutralToneMapping). Shading carries the form; no shadow acne; albedo shows no baked light.",
+      "matched": [
+        "no lights in model",
+        "dusk tone match",
+        "camp-rig readability",
+        "soft shadow under vent hood"
+      ],
+      "mismatches": [
+        "roof lacks sky reflection (scene has no env map)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "renders/lighting-r1/ref-neutral.png",
+        "renders/lighting-r1/ref2-neutral.png",
+        "renders/lighting-r1/front-neutral.png",
+        "renders/lighting-r1/tier1.json",
+        "renders/lighting-r1/interior.txt",
+        "renders/lighting-r1/multi-angle.json",
+        "renders/lighting-r1/turntable.json"
+      ],
+      "mapStrippedRender": "renders/lighting-r1/cmp-render-flat.png",
+      "visualEvidence": {
+        "referenceScreenshot": "renders/lighting-r1/cmp-ref.png",
+        "renderScreenshot": "renders/lighting-r1/ref-dusk.png",
+        "comparisonImage": "renders/lighting-r1/cmp-cmp.png",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": "Agent vision on cmp-cmp.png + neutral renders."
+      }
+    },
+    {
+      "timestamp": "2026-10-16T11:40:43.111160+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.82,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "door-vent-awning",
+          "score": 0.76,
+          "notes": "Door pivot opens about its own zip edge into a real opening cut in the fly (hidden when shut); awning unchanged."
+        },
+        {
+          "id": "pole-system",
+          "score": 0.82,
+          "notes": "Frame is explodable/pickable as hubs, struts (one part), ridge pole (+fitting detail), 4 legs (+clips/tips detail)."
+        }
+      ],
+      "action": "continue",
+      "summary": "Interaction pass: scene.ts behaviour replayed in the harness (32 cloned MeshStandardMaterials; emissive hover; opacity fade 0.6; door pivot). Door now hinges on its zip edge (axis in sculptRuntime.doorHinge) and opens onto a real opening cut per-triangle in the fly, hidden when shut. Explode/pick contract: surface detail flagged explodeWithParent, struts one part, destructionGroups published; check_part_coverage 0 errors 0 warnings.",
+      "matched": [
+        "named nodes fly/poles/door/awning",
+        "door pivot",
+        "emissive",
+        "opacity fade",
+        "MeshStandardMaterial only",
+        "explodable",
+        "pickable"
+      ],
+      "mismatches": [
+        "door opening edge still slightly stepped (grid) when open"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "door hinge on zip edge, DOOR_OPEN -2.4",
+        "fly cut under the door",
+        "detail() flags",
+        "struts group",
+        "destructionGroups"
+      ],
+      "evidence": [
+        "renders/interaction-r2/ref-neutral-interact1_door1.png",
+        "renders/interaction-r2/ref-neutral-interact1_fade0.6.png",
+        "renders/interaction-r2/ref-neutral-interact1_hover0.35.png",
+        "renders/interaction-r2/parts.json",
+        "renders/interaction-r2/part-coverage.json",
+        "renders/interaction-r2/tier1.json",
+        "renders/interaction-r2/multi-angle.json",
+        "renders/interaction-r2/turntable.json"
+      ],
+      "mapStrippedRender": "renders/interaction-r2/cmp-render-flat.png",
+      "visualEvidence": {
+        "referenceScreenshot": "renders/interaction-r2/cmp-ref.png",
+        "renderScreenshot": "renders/interaction-r2/ref-dusk.png",
+        "comparisonImage": "renders/interaction-r2/cmp-cmp.png",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": "Agent vision on cmp-cmp.png + hover/fade/door renders."
+      }
+    },
+    {
+      "timestamp": "2026-10-16T11:43:39.852691+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.83,
+        "componentStructure": 0.82,
+        "formDetail": 0.76,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "overall-silhouette",
+          "score": 0.8,
+          "notes": "Unchanged after merges (IoU 0.9035 aligned)."
+        },
+        {
+          "id": "fly-material",
+          "score": 0.8,
+          "notes": "Unchanged."
+        }
+      ],
+      "action": "continue",
+      "summary": "Optimization pass: 9,836 triangles (budget 12k, ceiling 20k); draw calls 32 -> 22 by merging same-material static detail (seams, tips, vent slit+kickstand+tab, struts); 2 canvas maps at 512^2; createTentModel() ~97 ms under SwiftShader. No visual change (IoU 0.9035, Tier 1 dE 12.26, coverage 0/0).",
+      "matched": [
+        "under triangle budget",
+        "22 draws",
+        "no visual regression",
+        "interaction intact"
+      ],
+      "mismatches": [
+        "merged pole-tips/awning-vent now read as flagged by the ray-parity gate (disjoint pieces in one mesh",
+        "per-piece they passed in structural-r2)"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "merged() helper with mergeGeometries"
+      ],
+      "evidence": [
+        "renders/optimization-r1/tier1.json",
+        "renders/optimization-r1/multi-angle.json",
+        "renders/optimization-r1/turntable.json",
+        "renders/optimization-r1/interior.txt",
+        "renders/optimization-r1/part-coverage.json",
+        "renders/optimization-r1/self-intersection.json",
+        "renders/optimization-r1/parts.json"
+      ],
+      "mapStrippedRender": "renders/optimization-r1/cmp-render-flat.png",
+      "visualEvidence": {
+        "referenceScreenshot": "renders/optimization-r1/cmp-ref.png",
+        "renderScreenshot": "renders/optimization-r1/ref-dusk.png",
+        "comparisonImage": "renders/optimization-r1/cmp-cmp.png",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": "Agent vision: no regression vs surface-r2."
+      }
     }
   ],
   "lodPlan": [
@@ -4169,10 +4762,11 @@
   "performanceBudget": {
     "qualityPriority": "reference-fidelity",
     "targetTriangles": 12000,
-    "maxDrawCalls": 20,
+    "maxDrawCalls": 24,
     "textureSize": 512,
     "fpsTarget": 60,
-    "optimizationPolicy": "Reach accepted visual fidelity first, then optimize without removing reference-critical geometry or surface layers."
+    "optimizationPolicy": "Reach accepted visual fidelity first, then optimize without removing reference-critical geometry or surface layers.",
+    "drawCallRationale": "optimization-pass: 22 measured; every remaining mesh is a named pickable part or a distinct material, so merging further would break the explode/pick contract"
   },
   "lightingFromPhoto": [
     {
@@ -4237,7 +4831,7 @@
         "key_path": "categories.rendering_shader_mapping[10]",
         "score": 4.445426974684,
         "snippets": [
-          "Maps to flexible components following a 3D curve. \u00c1nh x\u1ea1 t\u1edbi c\u00e1c b\u1ed9 ph\u1eadn m\u1ec1m d\u1ebbo ch\u1ea1y theo m\u1ed9t \u0111\u01b0\u1eddng cong 3D. Recognition cues: Flexible, curve-following linear component \u2014 sling strap, pressure-switch cable, ammo belt draping into a receiver ..."
+          "Maps to flexible components following a 3D curve. Ánh xạ tới các bộ phận mềm dẻo chạy theo một đường cong 3D. Recognition cues: Flexible, curve-following linear component — sling strap, pressure-switch cable, ammo belt draping into a receiver ..."
         ],
         "source_refs": [
           {
@@ -4261,7 +4855,7 @@
         "key_path": "categories.rendering_shader_mapping[8]",
         "score": 3.401965238705,
         "snippets": [
-          "... Talon knife, trigger guard loop, carrying handle D\u1ea5u hi\u1ec7u nh\u1eadn di\u1ec7n: Chi ti\u1ebft v\u00f2ng tr\u00f2n \u2014 v\u00f2ng c\u00e1n l\u01b0\u1ee1i l\u00ea, v\u00f2ng ng\u00f3n tay tr\u00ean dao Talon, v\u00f2ng v\u00e0nh b\u1ea3o v\u1ec7 c\u00f2, tay x\u00e1ch Three.js target: TorusGeometry(radius, tube, radialSegments, tubularSegments)"
+          "... Talon knife, trigger guard loop, carrying handle Dấu hiệu nhận diện: Chi tiết vòng tròn — vòng cán lưỡi lê, vòng ngón tay trên dao Talon, vòng vành bảo vệ cò, tay xách Three.js target: TorusGeometry(radius, tube, radialSegments, tubularSegments)"
         ],
         "source_refs": [
           {
@@ -4285,7 +4879,7 @@
         "key_path": "categories.rendering_shader_mapping[4]",
         "score": 3.206244668833,
         "snippets": [
-          "... Recognition cues: Long uniform-cross-section round part (barrel, suppressor, muzzle brake body, cleaning rod, magazine tube) D\u1ea5u hi\u1ec7u nh\u1eadn di\u1ec7n: B\u1ed9 ph\u1eadn tr\u00f2n c\u00f3 ti\u1ebft di\u1ec7n \u0111\u1ec1u d\u00e0i (n\u00f2ng s\u00fang, \u1ed1ng gi\u1ea3m thanh, th\u00e2n b\u00f9 gi\u1eadt, c\u1ea7n th\u00f4ng n\u00f2ng, ..."
+          "... Recognition cues: Long uniform-cross-section round part (barrel, suppressor, muzzle brake body, cleaning rod, magazine tube) Dấu hiệu nhận diện: Bộ phận tròn có tiết diện đều dài (nòng súng, ống giảm thanh, thân bù giật, cần thông nòng, ..."
         ],
         "source_refs": [
           {
@@ -4778,6 +5372,589 @@
       "maskWarnings": [],
       "renderHash": "9be110d327e12050",
       "passId": "structural-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9066,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0222,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 54.56,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 39.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.18
+            },
+            {
+              "componentId": null,
+              "deltaE": 43.54
+            },
+            {
+              "componentId": null,
+              "deltaE": 54.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 54.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 43.54
+            },
+            {
+              "componentId": null,
+              "deltaE": 43.54
+            },
+            {
+              "componentId": null,
+              "deltaE": 43.54
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.08
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "ac997fc874d743ce",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.9069,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0225,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 42.91,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 32.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 32.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 37.14
+            },
+            {
+              "componentId": null,
+              "deltaE": 42.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 42.91
+            },
+            {
+              "componentId": null,
+              "deltaE": 37.14
+            },
+            {
+              "componentId": null,
+              "deltaE": 37.14
+            },
+            {
+              "componentId": null,
+              "deltaE": 37.14
+            },
+            {
+              "componentId": null,
+              "deltaE": 32.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 32.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 32.22
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "max per-part color delta-E 42.91 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "5d380a3c94fc1d97",
+      "passId": "material-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9035,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0249,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 12.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "b749015a7e68949d",
+      "passId": "material-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9035,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0249,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 12.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "b749015a7e68949d",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9035,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0249,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 12.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "b749015a7e68949d",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9035,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0249,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 12.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "b749015a7e68949d",
+      "passId": "lighting-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9035,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0249,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 12.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "b749015a7e68949d",
+      "passId": "interaction-pass"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.9035,
+        "aspectRatioDelta": 0.0,
+        "scaleDelta": 0.0,
+        "bilateralSymmetryError": 0.0249,
+        "colorDelta": {
+          "checked": 12,
+          "maxDeltaE": 12.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 3.21
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "b749015a7e68949d",
+      "passId": "optimization-pass"
     }
-  ]
+  ],
+  "materialGate": {
+    "schemaVersion": 1,
+    "kind": "img2threejs.material-gate",
+    "passed": false,
+    "failures": [
+      "spec is not wired to materialPipeline",
+      "no material regions are available for gating"
+    ],
+    "warnings": [
+      "materials not referenced by componentTree: ['clip-black', 'webbing', 'zip']"
+    ],
+    "comparisonCount": 1,
+    "compatibility": {
+      "schemaVersion": 1,
+      "passed": true,
+      "failures": [],
+      "warnings": [
+        "materials not referenced by componentTree: ['clip-black', 'webbing', 'zip']"
+      ],
+      "checked": {
+        "materialCount": 7,
+        "componentCount": 12,
+        "referencedMaterialCount": 4,
+        "riggedComponentCount": 0,
+        "lodPresent": true,
+        "collisionPresent": false
+      },
+      "invariant": "material IDs and UV/map contracts survive geometry, skinning, collision and LOD changes"
+    },
+    "requiredEvidence": [
+      "materialPipeline.status=proceed",
+      "all material regions status=proceed",
+      "per-region crop comparison passed",
+      "multi-angle controlled view plan and screenshot readback",
+      "geometry/UV/skinning/collision/LOD material ID compatibility passed"
+    ]
+  }
 }

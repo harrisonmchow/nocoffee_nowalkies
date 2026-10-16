@@ -5,7 +5,8 @@
 //   tent      the tent fades away to show the sleeping gear
 // Zoom in far enough (or flick hard) on the mountain to dive to the camp;
 // zoom out far enough at camp to fly back. Everything that differs
-// between mountains comes from its config in data/mountains.ts.
+// between mountains comes from its config in data/mountains.ts, and the
+// sky and light from the weather in data/weather.ts.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -13,13 +14,13 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { camp, type GearItem } from '../../data/camp';
 import type { MountainConfig } from '../../data/mountains';
+import type { WeatherConfig } from '../../data/weather';
 import { installHeightFog, makeMist } from './mist';
 import { makeStandIn } from './props';
 import { makeRock, rng } from './rocks';
+import { makeSky } from './sky';
 
 export type Mode = 'mountain' | 'camp' | 'tent';
-
-const SKY = new THREE.Color('#dcd9d2');
 
 // Camp layout in metres around the shelf centre. Tent door faces +z.
 type Fit = { by: 'height' | 'width'; size: number };
@@ -68,7 +69,7 @@ export function supportsWebGL() {
 const dirFrom = (az: number, polar: number) =>
   new THREE.Vector3(Math.sin(polar) * Math.sin(az), Math.cos(polar), Math.sin(polar) * Math.cos(az));
 
-export function initCamp(ui: CampUI, cfg: MountainConfig) {
+export function initCamp(ui: CampUI, cfg: MountainConfig, weather: WeatherConfig) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Everything registered here is removed again by dispose().
   const life = new AbortController();
@@ -107,9 +108,16 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
   renderer.domElement.className = 'camp-canvas';
   ui.stage.prepend(renderer.domElement);
 
+  const SKY = new THREE.Color(weather.horizon);
+  ui.stage.style.backgroundColor = weather.horizon;
+  ui.stage.classList.toggle('is-dark', weather.dark);
+  ui.veil.style.backgroundColor = weather.horizon;
+
   const scene = new THREE.Scene();
   scene.background = SKY;
   scene.fog = new THREE.Fog(SKY, ...cfg.mist.distance);
+  const sky = makeSky(weather);
+  scene.add(sky.group);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 1, 9000);
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -117,9 +125,9 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
   controls.enablePan = false;
   controls.autoRotate = false;
 
-  // Overcast light, one low warm sun for the camp's shadows.
-  scene.add(new THREE.HemisphereLight('#eeebe4', '#6f6a62', 1.5));
-  const sun = new THREE.DirectionalLight('#ffeedd', 1.8);
+  // Soft sky light, and one low sun (or moon) for the camp's shadows.
+  scene.add(new THREE.HemisphereLight(...weather.ambient));
+  const sun = new THREE.DirectionalLight(...weather.key);
   sun.position.copy(shelf).add(new THREE.Vector3(30, 38, 24));
   sun.target.position.copy(shelf);
   sun.castShadow = true;
@@ -137,6 +145,7 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
     SKY,
     cfg.mist.bands.map((b) => ({
       ...b,
+      opacity: [b.opacity[0] * weather.mist, b.opacity[1] * weather.mist] as [number, number],
       x: [centre.x + b.x[0], centre.x + b.x[1]] as [number, number],
       z: [centre.z + b.z[0], centre.z + b.z[1]] as [number, number],
     })),
@@ -308,9 +317,11 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
 
   // Camera ----------------------------------------------------------
   let mode: Mode = 'mountain';
+  // While something is selected the camera orbits it instead of the camp.
+  let focusLimits: Limits | null = null;
 
   function applyLimits(m: Mode) {
-    const l = limits[m];
+    const l = focusLimits ?? limits[m];
     controls.minDistance = l.min;
     controls.maxDistance = l.max;
     controls.minAzimuthAngle = l.az[0];
@@ -412,6 +423,7 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
   function climbOut() {
     if (trip) return;
     if (mode === 'tent') leaveTent();
+    dropFocus();
     select(null);
     setMode('mountain');
     travel(views.mountain, reduce ? 0.01 : 2.8, true);
@@ -466,7 +478,9 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
 
   function glow() {
     for (const [id, list] of mats) {
-      const k = id === selected ? 0.07 : id === hovered ? 0.05 : 0;
+      // Hover only. Once clicked the camera's lock-on shows what's chosen,
+      // and a glow would wash out the close-up.
+      const k = id === hovered && id !== selected ? 0.05 : 0;
       for (const m of list) m.emissive.setRGB(k, k * 0.95, k * 0.85);
     }
   }
@@ -535,26 +549,63 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
     });
   }
 
-  function enterTent() {
+  function enterTent(done?: () => void) {
     const tent = roots.get('tent');
     if (!tent || mode !== 'camp' || trip) return;
-    campSaved = { pos: camera.position.clone(), target: controls.target.clone() };
+    // Coming back out returns to the camp view, not to a close-up.
+    campSaved = dropFocus() ?? { pos: camera.position.clone(), target: controls.target.clone() };
     setMode('tent');
     openGoal = 1;
     const centre = tent.getWorldPosition(new THREE.Vector3());
     const offset = new THREE.Vector3(0.7, 4.3, 3.9).applyAxisAngle(new THREE.Vector3(0, 1, 0), tent.rotation.y);
-    travel({ target: centre.clone().add(new THREE.Vector3(0, 0.1, 0)), pos: centre.clone().add(offset) }, 1.3);
+    travel({ target: centre.clone().add(new THREE.Vector3(0, 0.1, 0)), pos: centre.clone().add(offset) }, 1.3, false, done);
   }
 
-  function leaveTent() {
+  function leaveTent(done?: () => void) {
     if (mode !== 'tent') return;
     openGoal = 0;
+    dropFocus();
     selected = null;
     glow();
     ui.onSelect(null);
     setMode('camp');
     const back = campSaved ?? { pos: camera.position.clone(), target: views.camp.target.clone() };
-    travel({ target: back.target, pos: back.pos }, 1.2);
+    travel({ target: back.target, pos: back.pos }, 1.2, false, done);
+  }
+
+  // Focus -----------------------------------------------------------
+  // Selecting a thing flies the camera to it and orbits it; deselecting
+  // flies back to wherever you were looking from before.
+  let focusSaved: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
+
+  function focusOn(id: string) {
+    const root = roots.get(id);
+    if (!root || trip) return;
+    focusSaved ??= { pos: camera.position.clone(), target: controls.target.clone() };
+    const box = new THREE.Box3().setFromObject(root, true);
+    const target = box.getCenter(new THREE.Vector3());
+    const radius = Math.max(box.getSize(new THREE.Vector3()).length() / 2, 0.35);
+    // Far enough that the whole thing fits with room for the info card.
+    const dist = THREE.MathUtils.clamp((radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.25, 1.8, 12);
+    // Keep looking from the side you're already on, from a little above.
+    const flat = camera.position.clone().sub(target).setY(0);
+    const az = flat.lengthSq() > 1e-6 ? Math.atan2(flat.x, flat.z) : 0;
+    focusLimits = { min: dist * 0.45, max: dist * 2.2, az: [-Infinity, Infinity], polar: [0.25, 1.4] };
+    travel({ target, az, polar: 1.1, dist }, reduce ? 0.01 : 1.1);
+  }
+
+  /** Forget the close-up without moving. Returns the view it replaced. */
+  function dropFocus() {
+    const back = focusSaved;
+    focusSaved = null;
+    focusLimits = null;
+    return back;
+  }
+
+  function releaseFocus() {
+    const back = dropFocus();
+    if (back && !trip) travel(back, reduce ? 0.01 : 1.1);
+    else if (!trip) applyLimits(mode);
   }
 
   window.addEventListener('keydown', (e) => {
@@ -579,11 +630,20 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
       enterTent();
       return;
     }
-    if (item?.inside && mode === 'camp') enterTent();
-    if (item && !item.inside && mode === 'tent') leaveTent();
     selected = item ? item.id : null;
     glow();
     ui.onSelect(item ?? null);
+    if (!item) return releaseFocus();
+    // Change level first if needed, then lock on once the camera arrives.
+    const lockOn = () => {
+      selected = item.id;
+      glow();
+      ui.onSelect(item);
+      focusOn(item.id);
+    };
+    if (item.inside && mode === 'camp') enterTent(lockOn);
+    else if (!item.inside && mode === 'tent') leaveTent(lockOn);
+    else focusOn(item.id);
   }
 
   // Loop ------------------------------------------------------------
@@ -618,6 +678,7 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
     }
     if (!reduce) {
       mist.update(dt);
+      sky.update(t);
       if (fireLight) fireLight.intensity = 2.6 + Math.sin(t * 9) * 0.3 + Math.sin(t * 23) * 0.2;
       if (flame) flame.scale.y = 0.8 + Math.sin(t * 11) * 0.08;
       for (const m of mixers) m.update(dt);
@@ -629,6 +690,7 @@ export function initCamp(ui: CampUI, cfg: MountainConfig) {
     camera.near = THREE.MathUtils.clamp(d * 0.02, 0.05, 20);
     camera.far = d + 7000;
     camera.updateProjectionMatrix();
+    sky.follow(camera);
 
     renderer.render(scene, camera);
   });

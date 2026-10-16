@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { camp } from '../data/camp';
 import { mountains } from '../data/mountains';
+import { weathers } from '../data/weather';
 
 const outside = camp.filter((g) => !g.inside);
 const tent = camp.filter((g) => g.inside);
@@ -18,11 +19,19 @@ const tent = camp.filter((g) => g.inside);
   </header>
 
   <div class="cp-stage-wrap wrap">
-    <div class="cp-switch" role="group" aria-label="Choose a mountain">
-      <span class="label">Mountain</span>
-      {mountains.map((m, i) => (
-        <button type="button" data-mountain={m.id} aria-pressed={i === 0 ? 'true' : 'false'}>{m.name}</button>
-      ))}
+    <div class="cp-switches">
+      <div class="cp-switch" role="group" aria-label="Choose a mountain">
+        <span class="label">Mountain</span>
+        {mountains.map((m, i) => (
+          <button type="button" data-mountain={m.id} aria-pressed={i === 0 ? 'true' : 'false'}>{m.name}</button>
+        ))}
+      </div>
+      <div class="cp-switch" role="group" aria-label="Choose the weather">
+        <span class="label">Weather</span>
+        {weathers.map((w, i) => (
+          <button type="button" data-weather={w.id} aria-pressed={i === 0 ? 'true' : 'false'}>{w.name}</button>
+        ))}
+      </div>
     </div>
     <div class="cp-stage" id="camp-stage">
       <p class="cp-status mono" id="camp-status" role="status"></p>
@@ -94,6 +103,7 @@ const tent = camp.filter((g) => g.inside);
 <script>
   import type { GearItem } from '../data/camp';
   import { mountains } from '../data/mountains';
+  import { weathers } from '../data/weather';
   import { initCamp, supportsWebGL } from '../scripts/camp/scene';
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -141,41 +151,62 @@ const tent = camp.filter((g) => g.inside);
       },
     };
 
-    // Remember the last mountain on this device; any storage failure just
-    // means starting on the first one.
-    const KEY = 'camp-mountain';
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(KEY);
-    } catch {}
-    let current = mountains.find((m) => m.id === saved) ?? mountains[0];
-    let scene = initCamp(ui, current);
+    // Remember the last mountain and weather on this device; any storage
+    // failure just means starting on the first of each.
+    const load = (key: string) => {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    };
+    const save = (key: string, value: string) => {
+      try {
+        localStorage.setItem(key, value);
+      } catch {}
+    };
+    let mountain = mountains.find((m) => m.id === load('camp-mountain')) ?? mountains[0];
+    let weather = weathers.find((w) => w.id === load('camp-weather')) ?? weathers[0];
+    let scene = initCamp(ui, mountain, weather);
 
-    const switches = document.querySelectorAll<HTMLButtonElement>('[data-mountain]');
-    const press = () => switches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mountain === current.id)));
+    const mountainButtons = document.querySelectorAll<HTMLButtonElement>('[data-mountain]');
+    const weatherButtons = document.querySelectorAll<HTMLButtonElement>('[data-weather]');
+    const press = () => {
+      mountainButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mountain === mountain.id)));
+      weatherButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.weather === weather.id)));
+    };
     press();
 
+    // Fade out, rebuild with the new settings, fade back in.
     let swapping = false;
-    switches.forEach((b) => {
-      b.addEventListener('click', async () => {
+    async function rebuild(change: () => void) {
+      if (swapping) return;
+      swapping = true;
+      change();
+      press();
+      save('camp-mountain', mountain.id);
+      save('camp-weather', weather.id);
+      stage.classList.remove('is-ready');
+      await new Promise((r) => setTimeout(r, 450));
+      scene.dispose();
+      showCard(null);
+      ui.back.hidden = true;
+      ui.summit.hidden = false;
+      ui.onMode('mountain');
+      scene = initCamp(ui, mountain, weather);
+      swapping = false;
+    }
+
+    mountainButtons.forEach((b) => {
+      b.addEventListener('click', () => {
         const next = mountains.find((m) => m.id === b.dataset.mountain);
-        if (!next || next === current || swapping) return;
-        swapping = true;
-        current = next;
-        press();
-        try {
-          localStorage.setItem(KEY, next.id);
-        } catch {}
-        // Fade out, rebuild with the new mountain's settings, fade back in.
-        stage.classList.remove('is-ready');
-        await new Promise((r) => setTimeout(r, 450));
-        scene.dispose();
-        showCard(null);
-        ui.back.hidden = true;
-        ui.summit.hidden = false;
-        ui.onMode('mountain');
-        scene = initCamp(ui, next);
-        swapping = false;
+        if (next && next !== mountain) rebuild(() => (mountain = next));
+      });
+    });
+    weatherButtons.forEach((b) => {
+      b.addEventListener('click', () => {
+        const next = weathers.find((w) => w.id === b.dataset.weather);
+        if (next && next !== weather) rebuild(() => (weather = next));
       });
     });
 
@@ -206,12 +237,17 @@ const tent = camp.filter((g) => g.inside);
 
   .cp-stage-wrap { margin-top: clamp(32px, 5vw, 56px); }
 
+  .cp-switches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    margin-bottom: 14px;
+  }
   .cp-switch {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-bottom: 14px;
   }
   .cp-switch .label { margin-right: 6px; }
   .cp-switch button {
@@ -245,6 +281,9 @@ const tent = camp.filter((g) => g.inside);
     opacity: 0;
     transition: opacity 900ms var(--ease);
   }
+  .cp-stage { transition: background-color 450ms var(--ease); }
+  .cp-stage:global(.is-dark) .cp-hint,
+  .cp-stage:global(.is-dark) .cp-status { color: var(--mute-on-ink); }
   .cp-stage:global(.is-ready) :global(.camp-canvas) { opacity: 1; }
   .cp-stage :global(.camp-canvas:active) { cursor: grabbing; }
 

@@ -14,9 +14,14 @@ with sync_playwright() as p:
         view, _, light = spec.partition(':')
         pg.goto(f'{page_url}?view={view}&light={light or "dusk"}{"&" + extra if extra else ""}')
         pg.wait_for_function('window.__ready === true', timeout=30000)
-        name = f'{view}-{light or "dusk"}{"-flat" if "flat=1" in extra else ""}.png'
+        tag = '-flat' if 'flat=1' in extra else ''
+        tag += ('-' + extra.replace('&', '_').replace('=', '')) if 'interact' in extra else ''
+        name = f'{view}-{light or "dusk"}{tag}.png'
         pg.locator('canvas').screenshot(path=str(out / name))
         rep = pg.evaluate('window.__report')
+        rep['interact'] = pg.evaluate('window.__interact || null')
+        man = pg.evaluate('window.__manifest')
+        json.dump(man, open(out / 'parts.json', 'w'), indent=1)
         print(name, json.dumps(rep))
     if errs: print('PAGE ERRORS', errs)
     b.close()

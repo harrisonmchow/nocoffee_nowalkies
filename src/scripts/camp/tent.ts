@@ -12,6 +12,7 @@
 // Inferred (neither photo shows it): the back face below the vents, the
 // ground line, the door outline. Stakes and guy-lines are left out.
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 const L = 1.05; // half length, x
 const D = 0.65; // half depth, z
@@ -26,10 +27,15 @@ const TOP = 1.0; // height the membrane solve is normalised to
 const WALL = 0.55; // < 1 makes the walls rise steeply off the hem
 const POLE_R = 0.0045;
 const CLEAR = 0.012; // pole centre to fabric
+const NORMAL_SCALE = 1.0;
+const DOOR_OPEN = -2.4; // radians about the hinge edge; folds the door out to its left
+const DOOR_W = 0.42, DOOR_BASE = 0.06, DOOR_H = 0.62; // the D: half width, sill, height
+/** Top of the door's D outline at x (|x| <= DOOR_W). */
+const doorTop = (x: number) => DOOR_BASE + DOOR_H * Math.pow(Math.sqrt(Math.max(0, 1 - (x / DOOR_W) ** 2)), 0.7); // cloth wrinkle relief (tuned on the door face against IMG_4842)
 
 const COLORS = {
   fly: '#97a698',
-  pole: '#b4b8ba',
+  pole: '#c3c7c9',
   hub: '#d4d6d4',
   clip: '#1d1f20',
   webbing: '#b3c2a8',
@@ -46,12 +52,12 @@ function rng(seed: number) {
   };
 }
 
-/** Smooth value noise on a lattice, deterministic. */
-function valueNoise(seed: number) {
+/** Smooth value noise on a lattice, deterministic. Wraps every px by py cells. */
+function valueNoise(seed: number, px = 64, py = 64) {
   const r = rng(seed);
   const n = 64;
   const table = Array.from({ length: n * n }, () => r() * 2 - 1);
-  const at = (i: number, j: number) => table[(((i % n) + n) % n) * n + (((j % n) + n) % n)];
+  const at = (i: number, j: number) => table[(((i % px) + px) % px) * n + (((j % py) + py) % py)];
   return (x: number, y: number) => {
     const i = Math.floor(x), j = Math.floor(y);
     const fx = x - i, fy = y - j;
@@ -180,13 +186,14 @@ function makeMembrane(): { geometry: THREE.BufferGeometry; m: Membrane } {
   const wrinkle = valueNoise(11);
   const idx = (i: number, j: number) => j * (NX + 1) + i;
 
-  // Soft wrinkles, mostly running across the faces, fading out at the pins.
+  // Soft folds, mostly running across the faces, fading out at the pins. Kept to
+  // wavelengths of three grid cells or more; the fine wrinkles live in the normal map.
   for (let j = 1; j < NZ; j++) {
     for (let i = 1; i < NX; i++) {
       const x = -L + i * dx, z = -D + j * dz;
       const y = h[idx(i, j)];
       const fade = Math.min(1, (y - HEM) / 0.15) * (1 - y / 1.1);
-      h[idx(i, j)] += 0.0045 * fade * wrinkle(x * 9, y * 22 + z * 3);
+      h[idx(i, j)] += 0.004 * fade * wrinkle(x * 5, y * 8 + z * 2);
     }
   }
 
@@ -238,13 +245,22 @@ function makeMembrane(): { geometry: THREE.BufferGeometry; m: Membrane } {
       uv.push(us[idx(i, j)] / 0.6, vs[idx(i, j)] / 0.6);
     }
   }
+  // The fly is cut where the door is: only triangles wholly inside the D go, so the hole
+  // stays smaller than the door panel and never shows while the door is shut.
+  const inDoor = (k: number) => {
+    const x = pos[3 * k], y = pos[3 * k + 1], z = pos[3 * k + 2];
+    return z > HUB_Z && Math.abs(x) < DOOR_W && y > DOOR_BASE && y < doorTop(x);
+  };
   for (let j = 0; j < NZ; j++) {
     for (let i = 0; i < NX; i++) {
       const a = idx(i, j), b = idx(i + 1, j), c = idx(i, j + 1), d = idx(i + 1, j + 1);
       // Split along the diagonal that follows the nearer leg, so the creases stay clean.
       const x = -L + (i + 0.5) * dx, z = -D + (j + 0.5) * dz;
-      if (x * z > 0) index.push(a, c, d, a, d, b);
-      else index.push(a, c, b, b, c, d);
+      const tris = x * z > 0 ? [a, c, d, a, d, b] : [a, c, b, b, c, d];
+      for (let k = 0; k < 6; k += 3) {
+        if (inDoor(tris[k]) && inDoor(tris[k + 1]) && inDoor(tris[k + 2])) continue;
+        index.push(tris[k], tris[k + 1], tris[k + 2]);
+      }
     }
   }
   const g = new THREE.BufferGeometry();
@@ -256,19 +272,40 @@ function makeMembrane(): { geometry: THREE.BufferGeometry; m: Membrane } {
 }
 
 // Cloth texture -----------------------------------------------------------
-// Normal and roughness maps drawn into canvases: a ripstop grid plus soft
-// wrinkles, with taut crests a little glossier. Albedo stays a flat colour.
+// Normal and roughness maps drawn into canvases: soft wrinkles, with taut
+// crests a little glossier. Albedo stays a flat colour. (The 5 mm ripstop
+// grid is left out: at prop distance it only shows up as moire.)
 
 function clothMaps() {
   const S = 512;
-  const noise = valueNoise(5);
+  const r = rng(5);
+  const broad = valueNoise(13, 4, 8); // wraps every 4 x 8 cells: read at (x / 128, y / 64)
+  const grainN = valueNoise(17, 64, 64); //                          read at (x / 8, y / 8)
   const height = new Float32Array(S * S);
-  for (let y = 0; y < S; y++) {
-    for (let x = 0; x < S; x++) {
-      const gx = x % 8 === 0 ? 1 : 0, gy = y % 8 === 0 ? 1 : 0;
-      const w = noise(x / 40, y / 14) * 0.6 + noise(x / 90 + 7, y / 30) * 0.4;
-      height[y * S + x] = 0.35 * Math.max(gx, gy) + 1.4 * w;
+  // Creases as strokes: mostly across the panel, gently curved, tapering at both ends,
+  // drawn with wrap-around so the tile repeats without a seam.
+  for (let k = 0; k < 150; k++) {
+    let x = r() * S, y = r() * S;
+    let a = (r() - 0.5) * 0.9;
+    const len = 30 + r() * r() * 220;
+    const width = 1.2 + r() * 2.2;
+    const amp = 0.5 + r() * 0.5;
+    const bend = (r() - 0.5) * 0.02;
+    for (let s = 0; s < len; s += 1) {
+      const taper = Math.sin((Math.PI * s) / len);
+      const reach = Math.ceil(width * 2.5);
+      for (let o = -reach; o <= reach; o++) {
+        const px = Math.round(x - Math.sin(a) * o), py = Math.round(y + Math.cos(a) * o);
+        const i = ((py % S) + S) % S * S + ((px % S) + S) % S;
+        height[i] = Math.max(height[i], amp * taper * Math.exp(-((o / width) ** 2)));
+      }
+      x += Math.cos(a);
+      y += Math.sin(a);
+      a += bend;
     }
+  }
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) height[y * S + x] += 0.35 * broad(x / 128, y / 64);
   }
   const normal = document.createElement('canvas');
   const rough = document.createElement('canvas');
@@ -287,8 +324,9 @@ function clothMaps() {
       nimg.data[o + 2] = (n.z * 0.5 + 0.5) * 255;
       nimg.data[o + 3] = 255;
       // Roughness 0.66 on the flat cloth, down towards 0.3 on taut crests.
-      const crest = THREE.MathUtils.clamp(at(x, y) * 0.9, 0, 1);
-      const r = (0.66 - 0.36 * crest * crest) * 255;
+      const crest = THREE.MathUtils.clamp(at(x, y) * 0.6, 0, 1);
+      const grain = grainN(x / 8, y / 8) * 0.03;
+      const r = (0.66 - 0.36 * crest * crest + grain) * 255;
       rimg.data[o] = rimg.data[o + 1] = rimg.data[o + 2] = r;
       rimg.data[o + 3] = 255;
     }
@@ -305,6 +343,27 @@ function clothMaps() {
 }
 
 // Small parts -------------------------------------------------------------
+
+/** One mesh from several static pieces sharing a material: fewer draw calls. */
+function merged(pieces: THREE.Object3D[], material: THREE.Material, name: string) {
+  const geos = pieces.map((p) => {
+    p.updateMatrix();
+    const g = (p as THREE.Mesh).geometry.clone().applyMatrix4(p.matrix);
+    const out = g.index ? g.toNonIndexed() : g;
+    out.deleteAttribute('uv');
+    if (!out.attributes.normal) out.computeVertexNormals();
+    return out;
+  });
+  const mesh = new THREE.Mesh(mergeGeometries(geos), material);
+  mesh.name = name;
+  return mesh;
+}
+
+/** Surface detail: rides its parent when the model is exploded, and a click on it picks the parent. */
+function detail<T extends THREE.Object3D>(o: T) {
+  o.userData.explodeWithParent = true;
+  return o;
+}
 
 function tube(curve: THREE.Curve<THREE.Vector3>, radius: number, segments: number, material: THREE.Material, name: string) {
   const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, segments, radius, 6, false), material);
@@ -325,6 +384,8 @@ function ventHood(m: Membrane, side: 1 | -1, cloth: THREE.Material, dark: THREE.
   const peak = out(m.onFace(0, 0.75, side), 0.015, 0.11);
 
   const hood = new THREE.BufferGeometry().setFromPoints([apex, left, peak, apex, peak, right]);
+  hood.setAttribute('uv', new THREE.Float32BufferAttribute(
+    [apex, left, peak, apex, peak, right].flatMap((p) => [p.x / 0.6, -p.y / 0.6]), 2));
   hood.computeVertexNormals();
   const flaps = new THREE.Mesh(hood, cloth);
   flaps.name = `${name}-hood`;
@@ -343,14 +404,13 @@ function ventHood(m: Membrane, side: 1 | -1, cloth: THREE.Material, dark: THREE.
   gap.setIndex(idx);
   gap.computeVertexNormals();
   const opening = new THREE.Mesh(gap, dark);
-  opening.name = `${name}-opening`;
-
-  const stand = tube(new THREE.LineCurve3(m.onFace(0, 0.745, side, 0.004), peak), 0.003, 2, dark, `${name}-kickstand`);
+  const stand = tube(new THREE.LineCurve3(m.onFace(0, 0.745, side, 0.004), peak), 0.003, 2, dark, '');
   const tab = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.035, 0.004), dark);
   tab.position.copy(m.onFace(0, 0.69, side, 0.005));
   tab.lookAt(tab.position.clone().add(m.normalAt(tab.position.x, tab.position.z)));
-  tab.name = `${name}-tab`;
-  g.add(flaps, opening, stand, tab);
+  // The opening, kickstand and webbing tab share a material, so they draw as one mesh.
+  flaps.add(detail(merged([opening, stand, tab], dark, `${name}-vent`)));
+  g.add(flaps);
   return g;
 }
 
@@ -383,11 +443,13 @@ export function createTentModel(): THREE.Group {
     roughness: 1,
     roughnessMap,
     normalMap,
-    normalScale: new THREE.Vector2(0.25, 0.25),
+    normalScale: new THREE.Vector2(NORMAL_SCALE, NORMAL_SCALE),
     side: THREE.DoubleSide,
   });
-  const alu = new THREE.MeshStandardMaterial({ name: 'aluminium', color: COLORS.pole, metalness: 0.8, roughness: 0.45 });
-  const hubMat = new THREE.MeshStandardMaterial({ name: 'hub', color: COLORS.hub, roughness: 0.5, metalness: 0.3 });
+  // Dull aluminium. Kept mostly diffuse: the camp scene has no environment map,
+  // and a high metalness would render the poles near black instead of pale grey.
+  const alu = new THREE.MeshStandardMaterial({ name: 'aluminium', color: COLORS.pole, metalness: 0.35, roughness: 0.45 });
+  const hubMat = new THREE.MeshStandardMaterial({ name: 'hub', color: COLORS.hub, roughness: 0.5, metalness: 0.1 });
   const clipMat = new THREE.MeshStandardMaterial({ name: 'clip', color: COLORS.clip, roughness: 0.7 });
   const webMat = new THREE.MeshStandardMaterial({ name: 'webbing', color: COLORS.webbing, roughness: 0.85 });
   const innerMat = new THREE.MeshStandardMaterial({ name: 'inner-floor', color: COLORS.inner, roughness: 0.8, side: THREE.DoubleSide });
@@ -417,13 +479,12 @@ export function createTentModel(): THREE.Group {
   fly.add(inner);
 
   // Panel seams: along the roof ridge and down the middle of each end wall.
-  const seams = new THREE.Group();
-  seams.name = 'fly-seams';
-  seams.add(tube(surfaceCurve(m, [[-RIDGE_END, 0.0], [RIDGE_END, 0.0]], 0.003), 0.0025, 24, cloth, 'seam-ridge'));
+  const seamTubes = [tube(surfaceCurve(m, [[-RIDGE_END, 0.0], [RIDGE_END, 0.0]], 0.003), 0.0025, 24, cloth, '')];
   for (const sx of [-1, 1]) {
-    seams.add(tube(surfaceCurve(m, [[sx * RIDGE_END, 0], [sx * (L - 0.01), 0]], 0.003), 0.0025, 20, cloth, `seam-end-${sx > 0 ? 'r' : 'l'}`));
+    seamTubes.push(tube(surfaceCurve(m, [[sx * RIDGE_END, 0], [sx * (L - 0.01), 0]], 0.003), 0.0025, 20, cloth, ''));
   }
-  fly.add(seams);
+  const seams = merged(seamTubes, cloth, 'fly-seams');
+  membrane.add(detail(seams));
 
   // Webbing loops beside each leg, about halfway down.
   const loops = new THREE.InstancedMesh(new THREE.BoxGeometry(0.018, 0.05, 0.006), webMat, 4);
@@ -438,7 +499,7 @@ export function createTentModel(): THREE.Group {
     tmp.updateMatrix();
     loops.setMatrixAt(n, tmp.matrix);
   });
-  fly.add(loops);
+  membrane.add(detail(loops));
 
   // Vents: the door one is the peaked awning.
   const dark = clipMat;
@@ -449,23 +510,24 @@ export function createTentModel(): THREE.Group {
 
   // Door: a D-shaped panel on the +z face, a few mm proud of the fly, with its zip.
   // The outline is inferred; the photos are too dark to read the zip.
-  const hinge = m.onFace(-0.42, 0.06, 1, 0.003);
+  const hinge = m.onFace(-DOOR_W, DOOR_BASE, 1, 0.003);
   const door = new THREE.Group();
   door.name = 'door';
   door.position.copy(hinge);
   const outline = (t: number) => {
     // t 0..1 around the D from the bottom left, up and over, to the bottom right.
     const a = Math.PI * (1 - t);
-    return { x: 0.42 * Math.cos(a), y: 0.06 + 0.62 * Math.pow(Math.sin(a), 0.7) };
+    return { x: DOOR_W * Math.cos(a), y: DOOR_BASE + DOOR_H * Math.pow(Math.sin(a), 0.7) };
   };
-  const doorPos: number[] = [], doorIdx: number[] = [];
+  const doorPos: number[] = [], doorUv: number[] = [], doorIdx: number[] = [];
   const NU = 16, NV = 12;
   for (let iu = 0; iu <= NU; iu++) {
     const o = outline(iu / NU);
     for (let iv = 0; iv <= NV; iv++) {
-      const y = 0.06 + (o.y - 0.06) * (iv / NV);
+      const y = DOOR_BASE + (o.y - DOOR_BASE) * (iv / NV);
       const p = m.onFace(o.x, y, 1, 0.003).sub(hinge);
       doorPos.push(p.x, p.y, p.z);
+      doorUv.push(o.x / 0.6, -y / 0.6); // same cloth scale as the fly
     }
   }
   for (let iu = 0; iu < NU; iu++) {
@@ -476,6 +538,7 @@ export function createTentModel(): THREE.Group {
   }
   const doorGeo = new THREE.BufferGeometry();
   doorGeo.setAttribute('position', new THREE.Float32BufferAttribute(doorPos, 3));
+  doorGeo.setAttribute('uv', new THREE.Float32BufferAttribute(doorUv, 2));
   doorGeo.setIndex(doorIdx);
   doorGeo.computeVertexNormals();
   const doorPanel = new THREE.Mesh(doorGeo, cloth);
@@ -489,7 +552,11 @@ export function createTentModel(): THREE.Group {
   const toggle = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.035, 0.006), webMat);
   toggle.position.copy(m.onFace(0, 0.42, 1, 0.008).sub(hinge));
   toggle.name = 'door-toggle';
-  door.add(doorPanel, zip, toggle);
+  doorPanel.add(detail(zip), detail(toggle));
+  door.add(doorPanel);
+  // The door hinges along its own left zip edge, which leans back with the face.
+  const hingeTop = outline(0.3);
+  const hingeAxis = m.onFace(hingeTop.x, hingeTop.y, 1, 0.003).sub(hinge).normalize();
   root.add(door);
 
   // Poles
@@ -497,25 +564,32 @@ export function createTentModel(): THREE.Group {
   poles.name = 'poles';
   // Each hub carries its two legs and a strut leaning in to the ridge pole's centre fitting.
   const ridgeTop = ridgeCurve.getPointAt(0.5);
+  const strutTubes: THREE.Mesh[] = [];
   for (const side of [1, -1]) {
-    const tag = side > 0 ? 'front' : 'back';
     const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.028, 12), hubMat);
     hub.position.copy(hubAt(side));
-    hub.name = `hub-${tag}`;
-    poles.add(hub, tube(new THREE.LineCurve3(hubAt(side), ridgeTop), POLE_R, 2, alu, `ridge-strut-${tag}`));
+    hub.name = `hub-${side > 0 ? 'front' : 'back'}`;
+    poles.add(hub);
+    strutTubes.push(tube(new THREE.LineCurve3(hubAt(side), ridgeTop), POLE_R, 2, alu, ''));
   }
+  const struts = merged(strutTubes, alu, 'ridge-struts'); // one part: both struts
+  const ridge = tube(ridgeCurve, POLE_R, 48, alu, 'ridge-pole');
   const fitting = new THREE.Mesh(new THREE.SphereGeometry(0.012, 10, 6), hubMat);
   fitting.position.copy(ridgeTop);
   fitting.name = 'ridge-fitting';
-  poles.add(fitting, tube(ridgeCurve, POLE_R, 48, alu, 'ridge-pole'));
+  ridge.add(detail(fitting));
+  const legs = new THREE.Group();
+  legs.name = 'pole-legs';
+  poles.add(struts, ridge, legs);
 
   const clips = new THREE.InstancedMesh(new THREE.BoxGeometry(0.022, 0.012, 0.016), clipMat, 16);
   clips.name = 'pole-clips';
   let c = 0;
+  const tips: THREE.Mesh[] = [];
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
     const curve = legCurve(sx, sz);
     const tag = `${sz > 0 ? 'front' : 'back'}-${sx > 0 ? 'right' : 'left'}`;
-    poles.add(tube(curve, POLE_R, 40, alu, `leg-${tag}`));
+    legs.add(tube(curve, POLE_R, 40, alu, `leg-${tag}`));
     for (const s of [0.2, 0.4, 0.6, 0.8]) {
       const p = curve.getPointAt(s);
       tmp.position.copy(p).y -= CLEAR * 0.5;
@@ -525,18 +599,21 @@ export function createTentModel(): THREE.Group {
     }
     const tip = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.03, 8), clipMat);
     tip.position.set(sx * CORNER.x, 0.015, sz * CORNER.z);
-    tip.name = `tip-${tag}`;
-    poles.add(tip);
+    tips.push(tip);
   }
-  poles.add(clips);
+  legs.add(detail(clips), detail(merged(tips, clipMat, 'pole-tips')));
   root.add(poles);
 
   root.userData.sculptRuntime = {
     door,
-    // Open the door by turning the pivot about its hinge edge (local y).
-    doorHinge: { axis: new THREE.Vector3(0, 1, 0), openAngle: -1.9 },
+    // Open the door: door.rotateOnAxis(doorHinge.axis, doorHinge.openAngle * t), t = 0..1.
+    doorHinge: { axis: hingeAxis, openAngle: DOOR_OPEN },
     nodes: { fly, poles, door, awning },
-    parts: [fly, membrane, inner, seams, loops, awning, ventBack, door, poles, clips],
+    destructionGroups: {
+      fly: [membrane, inner, awning, ventBack],
+      door: [doorPanel],
+      frame: [poles.getObjectByName('hub-front')!, poles.getObjectByName('hub-back')!, struts, ridge, legs],
+    },
   };
   return root;
 }
