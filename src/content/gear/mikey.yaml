@@ -41,26 +41,44 @@ items:
     name: Pack
     category: gear
     type: bag
+    scene:
+      model: proc:pack
   - id: tent
     name: Tent
     category: gear
     type: tent
+    scene:
+      model: proc:tent/trekking-pole
   - id: sleeping-pad
     name: Sleeping pad
     category: gear
     type: sleeping-pad
+    scene:
+      model: proc:sleeping-pad
   - id: sleeping-bag
     name: Sleeping bag
     category: gear
     type: sleeping-bag
+    scene:
+      model: proc:sleeping-bag
+  - id: pillow
+    name: Pillow
+    category: gear
+    type: pillow
+    scene:
+      model: proc:pillow
   - id: stove
     name: Stove and pot
     category: gear
     type: cooking
+    scene:
+      model: proc:stove-pot
   - id: water
     name: Water bottles
     category: gear
     type: water
+    scene:
+      model: proc:bottle
   - id: power
     name: Power bank and cables
     category: gear
@@ -73,3 +91,5 @@ items:
     name: Headtorch
     category: gear
     type: accessories
+    scene:
+      model: proc:headtorch

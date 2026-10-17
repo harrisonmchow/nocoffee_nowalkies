@@ -279,7 +279,7 @@ Warm monochrome on a bone ground, with four washed-out pastels used as signage g
 
 The same four pairs carry two further mappings:
 - **Walk grades** follow the Australian Walking Track Grading System from 1 (easiest) to 5 (hardest): green, blue, yellow, red, then a charcoal pill with white text for grade 5. The grade tag sits beside the walk name and distance.
-- **Person tones**: Harry green, Kevin blue, Caleb yellow, Mikey red. A person's tone (the `-bg` value only) fills the circle behind their figure and the offset tile behind each of their item drawings.
+- **Person tones**: Harry green, Caleb yellow, Mikey red, Kevin blue. A person's tone (the `-bg` value only) fills the circle behind their figure and the offset tile behind each of their item drawings.
 
 Data figures use the `-bg` values as flat fills inside ink outlines: the elevation profile and the start-marker ring in green, and weight-bar segments in green (clothing) and blue (gear).
 

@@ -4,6 +4,7 @@ import { z } from 'astro/zod';
 import { regions } from './data/regions';
 import { crewIds } from './data/site';
 import { itemTypeKeys, categories } from './data/gear-types';
+import { biomeIds } from './data/biomes';
 
 const regionSlugs = regions.map((r) => r.slug) as [string, ...string[]];
 
@@ -76,9 +77,39 @@ const gear = defineCollection({
           image: image().optional(),
           notes: z.string().optional(),
           link: z.url().optional(),
+          /** A hex colour, e.g. '#6b7a5a'. Tints the item's 3D placeholder. */
+          colour: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+          /** Only for items that appear in the 3D camp. Clothing shows on the figure instead. */
+          scene: z
+            .object({
+              /** A placeholder preset such as proc:tent/trekking-pole, or a model id from the 3D asset manifest. */
+              model: z.string().regex(/^(proc:)?[a-z0-9][a-z0-9/-]*$/),
+              /** Where the item's hotspot sits in the camp layout. Defaults to the item id. */
+              anchor: z.string().regex(/^[a-z0-9-]+$/).optional(),
+            })
+            .optional(),
         }),
       ),
     }),
+});
+
+// One file per person: src/content/camps/<person>.yaml
+// Their camp in the 3D world on /gear. Camps are imagined moods, not real trips.
+const camps = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/content/camps' }),
+  schema: z.object({
+    person: z.enum(crewIds),
+    biome: z.enum(biomeIds),
+    title: z.string(),
+    pose: z.enum(['standing']).default('standing'),
+    /** Alt text for the camp's poster, the still shown when 3D can't run. */
+    posterAlt: z.string().optional(),
+    /** False until the 3D camp is worth showing; until then the page keeps the 2D figure. */
+    ready: z.boolean().default(false),
+    /** A dog at the campsite (a generic stand-in for now). */
+    dog: z.boolean().default(false),
+    sample: z.boolean().default(false),
+  }),
 });
 
 // One folder per review: src/content/reviews/<review-name>/index.md
@@ -131,4 +162,4 @@ const reviews = defineCollection({
     }),
 });
 
-export const collections = { walks, loadouts, gear, reviews };
+export const collections = { walks, loadouts, gear, reviews, camps };

@@ -1,0 +1,13 @@
+color-contrast .foot__cols > div:nth-child(1) > .label
+color-contrast .foot__small
+color-contrast div:nth-child(1) > .muted
+color-contrast div:nth-child(1) > dt
+color-contrast div:nth-child(2) > .label
+color-contrast div:nth-child(2) > .muted
+color-contrast div:nth-child(2) > dt
+color-contrast div:nth-child(3) > .label
+color-contrast div:nth-child(3) > .muted
+color-contrast div:nth-child(3) > dt
+color-contrast div:nth-child(4) > dt
+label-content-name-mismatch .hotspot--left
+label-content-name-mismatch a[aria-label="Gear: 10 items"]

@@ -7,7 +7,8 @@ import { getLoadouts, formatWeight, personTone, gearHref } from '../../lib/gear'
 const people = await getLoadouts();
 const anySample = people.some((p) => p.sample);
 ---
-<GearLayout title="Gear" description="What Harry, Kevin, Caleb and Mikey carry on the trail right now.">
+{/* Hidden for now: the site's Gear links open Harry's camp instead, and nothing links here. Kept, and still built, for when everyone's camps are ready. */}
+<GearLayout title="Gear" description="What Harry, Caleb, Mikey and Kevin carry on the trail right now." world={{ level: 'hub' }} noindex>
   <div class="g-page wrap" data-mode="lineup" data-up="/">
     <header class="lineup-head">
       <div>

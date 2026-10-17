@@ -1,0 +1,5 @@
+color-contrast .foot__cols > div:nth-child(1) > .label
+color-contrast .foot__small
+color-contrast .mono
+color-contrast div:nth-child(2) > .label
+color-contrast div:nth-child(3) > .label

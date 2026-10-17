@@ -1,0 +1,17 @@
+color-contrast .foot__cols > div:nth-child(1) > .label
+color-contrast .foot__small
+color-contrast .tag--retired
+color-contrast a[href$="sample-pack/"] > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__item[data-astro-cid-xkps4zyp=""]
+color-contrast a[href$="sample-pack/"] > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__meta[data-astro-cid-xkps4zyp=""] > .rvh-row__by[data-astro-cid-xkps4zyp=""]
+color-contrast div:nth-child(2) > .label
+color-contrast div:nth-child(3) > .label
+color-contrast li[data-cat="clothing"]:nth-child(2) > .rvh-row > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__item[data-astro-cid-xkps4zyp=""]
+color-contrast li[data-cat="clothing"]:nth-child(2) > .rvh-row > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__meta[data-astro-cid-xkps4zyp=""] > .rvh-row__by[data-astro-cid-xkps4zyp=""]
+color-contrast li[data-cat="clothing"]:nth-child(4) > .rvh-row > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__item[data-astro-cid-xkps4zyp=""]
+color-contrast li[data-cat="clothing"]:nth-child(4) > .rvh-row > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__meta[data-astro-cid-xkps4zyp=""] > .rvh-row__by[data-astro-cid-xkps4zyp=""]
+color-contrast li[data-cat="gear"]:nth-child(3) > .rvh-row > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__item[data-astro-cid-xkps4zyp=""]
+color-contrast li[data-cat="gear"]:nth-child(3) > .rvh-row > .rvh-row__body[data-astro-cid-xkps4zyp=""] > .rvh-row__meta[data-astro-cid-xkps4zyp=""] > .rvh-row__by[data-astro-cid-xkps4zyp=""]
+color-contrast span[aria-label="Rated 2.5 out of 5"] > .rating__num[data-astro-cid-4nmxmgk6=""] > .rating__of[data-astro-cid-4nmxmgk6=""]
+color-contrast span[aria-label="Rated 3.5 out of 5"] > .rating__num[data-astro-cid-4nmxmgk6=""] > .rating__of[data-astro-cid-4nmxmgk6=""]
+color-contrast span[aria-label="Rated 4 out of 5"] > .rating__num[data-astro-cid-4nmxmgk6=""] > .rating__of[data-astro-cid-4nmxmgk6=""]
+color-contrast span[aria-label="Rated 4.5 out of 5"] > .rating__num[data-astro-cid-4nmxmgk6=""] > .rating__of[data-astro-cid-4nmxmgk6=""]

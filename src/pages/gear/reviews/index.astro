@@ -15,10 +15,10 @@ import {
 const reviews = await getReviews();
 const anySample = reviews.some((r: Review) => r.data.sample);
 ---
-<GearLayout title="Gear reviews" description="Honest reviews of the gear Harry, Kevin, Caleb and Mikey carry. Every review says how we got the item.">
-  <div class="g-page wrap" data-up="/gear/">
+<GearLayout title="Gear reviews" description="Honest reviews of the gear Harry, Caleb, Mikey and Kevin carry. Every review says how we got the item.">
+  <div class="g-page wrap" data-up="/gear/harry/">
     <header class="rvh-head">
-      <a class="g-back" href="/gear/"><Icon name="arrow-left" /> Gear</a>
+      <a class="g-back" href="/gear/harry/"><Icon name="arrow-left" /> Gear</a>
       <h1 tabindex="-1">Reviews</h1>
       <p class="rvh-head__lede">Gear we’ve carried long enough to have an opinion on. Every review says how we got the item, and gifted or paid items name the brand.</p>
       {anySample && (

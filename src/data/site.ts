@@ -7,14 +7,15 @@ export const site = {
 
 // Bios are an open decision. Leave `line` empty until each person writes one.
 // `id` is how walks and gear refer to each person.
-export const crewIds = ['harry', 'kevin', 'caleb', 'mikey'] as const;
+// This order is the site order: the lineup, the gear tabs and prev/next all follow it.
+export const crewIds = ['harry', 'caleb', 'mikey', 'kevin'] as const;
 export type CrewId = (typeof crewIds)[number];
 
 export const crew: { id: CrewId; name: string; line: string }[] = [
   { id: 'harry', name: 'Harry', line: '' },
-  { id: 'kevin', name: 'Kevin', line: '' },
   { id: 'caleb', name: 'Caleb', line: '' },
   { id: 'mikey', name: 'Mikey', line: '' },
+  { id: 'kevin', name: 'Kevin', line: '' },
 ];
 
 export const crewName = (id: string) => crew.find((c) => c.id === id)?.name ?? id;

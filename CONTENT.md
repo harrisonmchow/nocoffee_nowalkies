@@ -28,7 +28,7 @@ coverAlt: Describe the cover photo for people who can't see it.
 
 date: 2026-01-18
 nights: 1               # 0 for a day walk
-walkers: [harry, kevin, caleb, mikey]
+walkers: [harry, caleb, mikey, kevin]
 author: harry           # who wrote it, shown as "Words by Harry"
 grade: 4                # Australian Walking Track Grading System, 1 to 5
 gpx: route.gpx          # distance and climbing are worked out from this
@@ -72,7 +72,7 @@ items:
 
 **Clothing types:** `hat`, `gloves`, `rain-jacket`, `down-jacket`, `fleece`, `shirt`, `pants`, `socks`, `shoes`.
 
-**Gear types:** `bag`, `tent`, `sleeping-pad`, `sleeping-bag`, `quilt`, `cooking`, `water`, `electronics`, `first-aid`, `accessories`.
+**Gear types:** `bag`, `tent`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `accessories`.
 
 The type decides where the item sits on the flat-lay. To add a new type, add one line to `src/data/gear-types.ts`.
 
@@ -83,6 +83,53 @@ Weights are added up automatically:
 - **Total:** base plus worn.
 
 Until any item has a weight, the pages show "weights to come".
+
+## 3D camps
+
+The gear pages have a 3D world under them; `GEAR-3D-PLAN.md` has the plan. It's on for everyone whose device can run it. Everyone else gets the 2D pages, as does anyone whose device asks for reduced motion or for saving data.
+
+- To turn the 3D world off in your own browser, add `?world=off` to any gear page's address.
+- Your browser remembers that until you add `?world=auto`.
+
+The site's **Gear** link opens Harry's camp, and the tabs over the camps switch between people. The everyone page at `/gear/` is hidden for now: nothing links to it and search engines are asked to skip it, but it's still built, so you can open it by its address.
+
+Each person's page opens on their camp's landscape:
+
+- The marker's **Go to <name>'s campsite**, or scrolling down, flies through the cloud to the campsite at `/gear/<person>/camp/`.
+- At the campsite you can drag to look around and scroll to zoom.
+- Pointing at the person shows their clothing; pointing at a piece of kit shows that item. Each numbered dot sits just above what it marks, on a short stem.
+- Clicking the tent goes inside, to the sleeping bag or quilt, the mat and the pillow.
+- The person's panel is a small card that starts minimized, to their name and a **Setup details** button. The button opens the rest: the weights, categories and write-up (and, on the landscape, **Go to campsite**).
+
+Each person has a camp file, `src/content/camps/<person>.yaml`. Camps are imagined moods, not real trips:
+
+```yaml
+person: harry
+biome: alpine-aurora    # alpine-aurora, maple-autumn, coast-sunset or rockies-night
+title: Snow-capped peak under the aurora
+pose: standing
+ready: true             # false keeps visitors on the 2D figure (with ?world=on you see the camp anyway)
+dog: true               # optional: a dog at the campsite (a generic stand-in for now)
+```
+
+Gear items get two optional fields for the camp:
+
+```yaml
+  - id: tent
+    # ...the usual fields
+    colour: '#6b7a5a'                 # tints the item's 3D stand-in
+    scene:
+      model: proc:tent/trekking-pole  # the 3D model that stands in for it
+```
+
+Only items with `scene` appear in the camp. Each model has its own place, and its hotspot sits just above it. The models so far are simple stand-ins until real ones replace them:
+
+| Where | Models |
+| --- | --- |
+| At the campsite | `proc:tent/trekking-pole`, `proc:pack`, `proc:stove-pot`, `proc:bottle` |
+| Inside the tent | `proc:sleeping-pad`, `proc:sleeping-bag` or `proc:quilt`, `proc:pillow`, `proc:headtorch` |
+
+Clothing shows on the person instead. They wear the colours of any clothing item that has a `colour`: a jacket (rain jacket, down jacket or fleece), the pants, the hat and the shoes.
 
 ## Gear reviews
 

@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Astro (static site). Deploy target: not yet decided.
+Astro (static site). Deploy target: not final; likely Vercel or similar.
 
 ## Users
 
@@ -39,12 +39,20 @@ The content is first-hand: four real friends documenting hikes they actually too
 ## Capabilities and Constraints
 
 - **Brand contact:** email only, a plain link to nocoffeenowalkies@gmail.com. No contact form.
-- **People:** the four members are Harry, Kevin, Caleb and Mikey. Each gets a short profile (name, photo, one line), and posts carry author bylines.
+- **People:** the four members are Harry, Caleb, Mikey and Kevin. Each gets a short profile (name, photo, one line), and posts carry author bylines.
 - **Hiking regions:** Blue Mountains, Warrumbungles, Kosciuszko National Park, Tasmania, and Ala Archa National Park (Kyrgyzstan).
 - **Walks:** each region holds many walks. A walk has a write-up, photos, trip stats, an optional GPX route (drawn as a route map with an elevation profile), and a grade on the Australian Walking Track Grading System. Walks live at `/places/<region>/<walk>/`.
 - **Gear:** each person has a current loadout of items. Item fields are name, brand, category (clothing or gear), type, weight in grams, worn or packed, a cut-out image, and notes. Base, worn and total weights are computed from the items.
-  - The section reads like inspecting a character in a video game: a lineup of all four people, then one person in full kit, then a bird's-eye flat-lay of a category, then a single item. Viewers can look but not change anything.
+  - The section reads like inspecting a character in a video game: one person in full kit, then a bird's-eye flat-lay of a category, then a single item. Viewers can look but not change anything.
+  - The site's Gear link opens Harry's camp; tabs switch between people. The lineup of all four (`/gear/`) is hidden for now: still built, but nothing links to it and it's kept out of search.
   - There is no shared gear: every item belongs to the person who carries it.
+  - **3D camps (see `GEAR-3D-PLAN.md`):** each person gets a 3D biome and campsite on `/gear/`. The camps are imagined moods, not real trips. By choice they carry no label, and they don't link to walks.
+    - The 3D world is on by default wherever the device can run it; `?world=off` turns it off in one browser. Everyone else gets the 2D pages.
+    - A person's page opens on their camp's landscape. Going to the campsite (`/gear/<person>/camp/`) flies down through the cloud.
+    - At the campsite you can look around and point at the person (their clothing) or their kit, each marked by a numbered dot just above it. The tent opens onto the sleep system. Harry's and Caleb's camps have a dog.
+    - On Harry's landscape, cloud close in front of the view parts as the cursor moves through it; the cloud sea beyond stays still.
+    - Caleb camps under Japanese maples in autumn, with leaves falling; Mikey camps on a beach at sunset, the tent beside his car; Kevin under the stars by a frozen lake.
+    - Over the 3D camp, the person's panel is a small card that starts minimized, to their name and a Setup details button that opens the rest (weights, categories, write-up).
 - **Gear reviews:** reviews live at `/gear/reviews/`, and each one can be linked from the matching item in someone's loadout.
   - Each review has a score out of 5 (half steps) and a trail verdict: Still carrying, Would buy again, or Retired.
   - It can also carry pros and cons, how long the item was tested, and the walks it was used on.
@@ -60,6 +68,7 @@ The content is first-hand: four real friends documenting hikes they actually too
 
 - **Name:** No Coffee No Walkies. **Instagram handle:** @nocoffee_nowalkies.
 - **Binding visual style guide:** [SKILL.md](SKILL.md) ("minimalist-ui": warm monochrome, editorial serif headings, flat bento grids, muted pastel accents, no gradients or heavy shadows, no emojis, no AI-cliché copy). The user confirmed that all future design work must follow it.
+  - **Exception for the 3D scenes on `/gear` (confirmed 17 October 2026):** the rendered scenes may use full colour, sky gradients and glow, in the manner of mont-fort.com. The UI around them (type, panels, buttons, tags) still follows the guide.
 - **No logo or wordmark exists yet.** Don't present an invented mark as an established one.
 
 ## Evidence on Hand

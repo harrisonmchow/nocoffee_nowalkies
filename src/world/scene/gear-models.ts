@@ -1,0 +1,308 @@
+// Stand-ins for a person and their kit at camp: simple stylised shapes from
+// the geometry kit, until scans and real models replace them
+// (GEAR-3D-PLAN.md §6). Each comes with its own materials, so hovering one
+// lights only that thing, and an anchor (local) for its hotspot.
+import {
+  BoxGeometry,
+  CapsuleGeometry,
+  CylinderGeometry,
+  Mesh,
+  MeshStandardMaterial,
+  Object3D,
+  SphereGeometry,
+  TorusGeometry,
+  Vector3,
+  type BufferGeometry,
+} from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { createPropMaterial } from './props-material';
+import type { WorldUniforms } from '../systems/uniforms';
+
+export type GearModel = {
+  object: Object3D;
+  materials: MeshStandardMaterial[];
+  /** Where its hotspot sits, in the model's own space. */
+  anchor: Vector3;
+  /** Which side of it the hotspot's dot sits: above it (the default), or below, for something others lie on. */
+  pin?: 'above' | 'below';
+};
+
+type Kit = { uniforms: WorldUniforms; starLayers: number };
+
+function build(kit: Kit) {
+  const object = new Object3D();
+  const materials: MeshStandardMaterial[] = [];
+  const material = (color: string, options: { roughness?: number; metalness?: number; emissive?: string } = {}) => {
+    const m = createPropMaterial(kit.uniforms, kit.starLayers, { color, roughness: options.roughness ?? 0.85, metalness: options.metalness, emissive: options.emissive });
+    materials.push(m);
+    return m;
+  };
+  const add = (geometry: BufferGeometry, m: MeshStandardMaterial, x = 0, y = 0, z = 0) => {
+    const mesh = new Mesh(geometry, m);
+    mesh.position.set(x, y, z);
+    object.add(mesh);
+    return mesh;
+  };
+  /** Bake each part into one mesh per material: a dozen parts, a handful of draw calls. */
+  const finish = (anchor: Vector3): GearModel => {
+    const parts = object.children.filter((c): c is Mesh => (c as Mesh).isMesh);
+    for (const m of materials) {
+      const mine = parts.filter((p) => p.material === m);
+      if (mine.length < 2) continue;
+      // Non-indexed throughout: some primitives come indexed and some don't.
+      const merged = mergeGeometries(mine.map((p) => {
+        p.updateMatrix();
+        const g = p.geometry.index ? p.geometry.toNonIndexed() : p.geometry.clone();
+        return g.applyMatrix4(p.matrix);
+      }));
+      if (!merged) continue;
+      mine.forEach((p) => {
+        object.remove(p);
+        p.geometry.dispose();
+      });
+      object.add(new Mesh(merged, m));
+    }
+    return { object, materials, anchor };
+  };
+  return { object, materials, material, add, finish };
+}
+
+/** Clothing colours for the figure, from the items' own colours where they have them. */
+export type FigureColours = { jacket: string; pants: string; hat: string; shoes: string };
+
+/**
+ * A person standing still, about 1.75 m, facing +z. Stylised on purpose:
+ * rounded shapes in their clothes' colours, and a neutral clay where skin
+ * would be, until each person is scanned.
+ */
+export function createFigure(kit: Kit, colours: FigureColours): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'figure';
+  const clay = material('#b8ad9e', { roughness: 0.9 });
+  const jacket = material(colours.jacket, { roughness: 0.7 });
+  const pants = material(colours.pants, { roughness: 0.85 });
+  const hat = material(colours.hat, { roughness: 0.95 });
+  const shoes = material(colours.shoes, { roughness: 0.8 });
+  for (const side of [-1, 1]) {
+    add(new RoundedBoxGeometry(0.11, 0.08, 0.27, 2, 0.03), shoes, side * 0.1, 0.04, 0.03);
+    add(new CapsuleGeometry(0.075, 0.66, 4, 10), pants, side * 0.1, 0.46, 0);
+    const arm = add(new CapsuleGeometry(0.056, 0.5, 4, 10), jacket, side * 0.245, 1.12, 0.01);
+    arm.rotation.z = side * 0.09;
+    add(new SphereGeometry(0.05, 12, 8), clay, side * 0.27, 0.83, 0.02);
+  }
+  add(new RoundedBoxGeometry(0.36, 0.2, 0.22, 2, 0.06), pants, 0, 0.88, 0);
+  const torso = add(new CapsuleGeometry(0.17, 0.36, 4, 14), jacket, 0, 1.2, 0);
+  torso.scale.set(1.12, 1, 0.74);
+  add(new CylinderGeometry(0.05, 0.055, 0.08, 10), clay, 0, 1.46, 0);
+  add(new SphereGeometry(0.105, 18, 14), clay, 0, 1.6, 0.005);
+  // A beanie: a cap and a folded band.
+  const cap = add(new SphereGeometry(0.112, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), hat, 0, 1.625, 0.005);
+  cap.scale.set(1, 1.08, 1);
+  const band = add(new TorusGeometry(0.106, 0.022, 8, 24), hat, 0, 1.63, 0.005);
+  band.rotation.x = Math.PI / 2;
+  return finish(new Vector3(0, 1.25, 0.12));
+}
+
+/** A pack standing on its base, about 60 cm tall, back panel toward -z. */
+export function createPack(kit: Kit, color = '#55594d'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'pack';
+  const body = material(color, { roughness: 0.82 });
+  const trim = material('#2c2d2b', { roughness: 0.7 });
+  add(new RoundedBoxGeometry(0.32, 0.56, 0.22, 3, 0.07), body, 0, 0.28, 0);
+  add(new RoundedBoxGeometry(0.3, 0.1, 0.22, 2, 0.04), body, 0, 0.6, 0.005);
+  add(new RoundedBoxGeometry(0.2, 0.24, 0.05, 2, 0.02), body, 0, 0.26, 0.125);
+  for (const side of [-1, 1]) add(new BoxGeometry(0.03, 0.5, 0.012), trim, side * 0.09, 0.3, -0.115);
+  return finish(new Vector3(0, 0.62, 0));
+}
+
+/** A canister stove with a pot on it. */
+export function createStove(kit: Kit): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'stove';
+  const steel = material('#9a9c9e', { roughness: 0.35, metalness: 0.8 });
+  const canister = material('#2f5f8f', { roughness: 0.5, metalness: 0.4 });
+  const black = material('#1f1f20', { roughness: 0.6 });
+  add(new CylinderGeometry(0.05, 0.055, 0.09, 20), canister, 0, 0.045, 0);
+  add(new CylinderGeometry(0.018, 0.022, 0.04, 12), black, 0, 0.11, 0);
+  add(new CylinderGeometry(0.068, 0.064, 0.1, 24), steel, 0, 0.18, 0);
+  add(new CylinderGeometry(0.07, 0.07, 0.01, 24), steel, 0, 0.235, 0);
+  add(new RoundedBoxGeometry(0.11, 0.015, 0.02, 1, 0.006), black, 0.12, 0.2, 0);
+  return finish(new Vector3(0, 0.3, 0));
+}
+
+/** A water bottle with its cap. */
+export function createBottle(kit: Kit, color = '#6f9cb8'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'bottle';
+  const plastic = material(color, { roughness: 0.3 });
+  const cap = material('#2b2b2e', { roughness: 0.6 });
+  add(new CylinderGeometry(0.04, 0.04, 0.22, 18), plastic, 0, 0.11, 0);
+  add(new CylinderGeometry(0.018, 0.026, 0.03, 14), plastic, 0, 0.235, 0);
+  add(new CylinderGeometry(0.02, 0.02, 0.025, 14), cap, 0, 0.26, 0);
+  return finish(new Vector3(0, 0.28, 0));
+}
+
+/** An inflatable sleeping mat, 183 × 51 cm, lying along x, with lengthwise baffles. */
+export function createPad(kit: Kit, color = '#d38a2e'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'pad';
+  const shell = material(color, { roughness: 0.55 });
+  add(new RoundedBoxGeometry(1.83, 0.055, 0.51, 3, 0.025), shell, 0, 0.0275, 0);
+  for (let i = -2; i <= 2; i++) {
+    const tube = add(new CapsuleGeometry(0.035, 1.7, 3, 8), shell, 0, 0.05, i * 0.095);
+    tube.rotation.z = Math.PI / 2;
+    tube.scale.set(1, 1, 0.55);
+  }
+  // The bag lies on it, so its dot hangs below its front edge rather than above.
+  return { ...finish(new Vector3(0.62, 0.08, 0.18)), pin: 'below' };
+}
+
+/** A mummy sleeping bag lying along x, hood toward -x. */
+export function createSleepingBag(kit: Kit, color = '#3b4c6e'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'sleeping-bag';
+  const shell = material(color, { roughness: 0.6 });
+  const lining = material('#262a33', { roughness: 0.9 });
+  const body = add(new CapsuleGeometry(0.21, 1.0, 6, 16), shell, 0.2, 0.11, 0);
+  body.rotation.z = Math.PI / 2;
+  body.scale.set(0.55, 1, 1);
+  const hood = add(new SphereGeometry(0.2, 16, 12), shell, -0.42, 0.12, 0);
+  hood.scale.set(1, 0.62, 1.05);
+  const opening = add(new SphereGeometry(0.1, 14, 10), lining, -0.5, 0.15, 0);
+  opening.scale.set(0.6, 0.45, 0.9);
+  return finish(new Vector3(0.35, 0.24, 0.05));
+}
+
+/** A quilt laid over the mat: a soft slab with baffle lines, foot box toward +x. */
+export function createQuilt(kit: Kit, color = '#5d4a6e'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'quilt';
+  const shell = material(color, { roughness: 0.62 });
+  add(new RoundedBoxGeometry(1.75, 0.09, 0.62, 3, 0.04), shell, 0.04, 0.1, 0);
+  for (let i = -3; i <= 3; i++) add(new BoxGeometry(0.012, 0.012, 0.6), shell, 0.04 + i * 0.22, 0.146, 0);
+  return finish(new Vector3(0.25, 0.2, 0.05));
+}
+
+/** An inflatable camp pillow. */
+export function createPillow(kit: Kit, color = '#8b9097'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'pillow';
+  const shell = material(color, { roughness: 0.45 });
+  const pillow = add(new SphereGeometry(0.2, 18, 12), shell, 0, 0.06, 0);
+  pillow.scale.set(0.8, 0.28, 1.15);
+  return finish(new Vector3(0, 0.14, 0));
+}
+
+/** A headtorch, hung from the tent's apex: the light inside comes from it. */
+export function createHeadtorch(kit: Kit): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'headtorch';
+  const strap = material('#3b3d40', { roughness: 0.8 });
+  const lamp = material('#202124', { roughness: 0.4, emissive: '#ffcf8a' });
+  lamp.emissiveIntensity = 1.4;
+  const loop = add(new TorusGeometry(0.06, 0.008, 6, 20), strap, 0, 0, 0);
+  loop.rotation.x = Math.PI / 2;
+  add(new RoundedBoxGeometry(0.05, 0.03, 0.03, 1, 0.008), lamp, 0, -0.01, 0.06);
+  return finish(new Vector3(0, -0.02, 0.06));
+}
+
+/**
+ * A dog standing side-on, about 55 cm at the shoulder, facing +z: a generic
+ * stand-in, in the same rounded style as the person, until a real one
+ * replaces it. Its tail is its own part, so it can wag.
+ */
+export function createDog(kit: Kit, coat = '#b07a45'): GearModel & { update(time: number): void } {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'dog';
+  const fur = material(coat, { roughness: 0.95 });
+  const pale = material('#d9b98f', { roughness: 0.95 });
+  const ears = material('#865631', { roughness: 0.95 });
+  const dark = material('#231e1b', { roughness: 0.5 });
+  const body = add(new CapsuleGeometry(0.125, 0.4, 4, 14), fur, 0, 0.46, -0.02);
+  body.rotation.x = Math.PI / 2;
+  body.scale.set(0.88, 1, 1);
+  const chest = add(new SphereGeometry(0.135, 16, 12), pale, 0, 0.45, 0.19);
+  chest.scale.set(0.86, 1.05, 0.9);
+  const haunch = add(new SphereGeometry(0.13, 16, 12), fur, 0, 0.47, -0.22);
+  haunch.scale.set(0.9, 1, 1);
+  const neck = add(new CapsuleGeometry(0.07, 0.14, 4, 10), fur, 0, 0.58, 0.27);
+  neck.rotation.x = -0.7;
+  const head = add(new SphereGeometry(0.1, 16, 12), fur, 0, 0.69, 0.35);
+  head.scale.set(0.95, 0.9, 1.05);
+  add(new RoundedBoxGeometry(0.085, 0.075, 0.14, 2, 0.03), pale, 0, 0.655, 0.46);
+  add(new SphereGeometry(0.022, 10, 8), dark, 0, 0.678, 0.535);
+  for (const side of [-1, 1]) {
+    add(new SphereGeometry(0.012, 8, 6), dark, side * 0.045, 0.715, 0.43);
+    // Floppy ears, hanging off the sides of the head.
+    const ear = add(new RoundedBoxGeometry(0.055, 0.11, 0.03, 2, 0.012), ears, side * 0.088, 0.67, 0.335);
+    ear.rotation.z = side * 0.35;
+    for (const end of [-1, 1]) {
+      const z = end * 0.2 + (end > 0 ? 0.01 : -0.01);
+      add(new CapsuleGeometry(0.034, 0.3, 4, 8), end > 0 ? pale : fur, side * 0.07, 0.2, z);
+      const paw = add(new SphereGeometry(0.04, 10, 8), pale, side * 0.07, 0.035, z + 0.02);
+      paw.scale.set(1, 0.6, 1.25);
+    }
+  }
+  const model = finish(new Vector3(0, 0.82, 0.3));
+  // The tail on its own pivot at its root, raised and swept back.
+  const pivot = new Object3D();
+  pivot.position.set(0, 0.53, -0.33);
+  const raise = new Object3D();
+  raise.rotation.x = -0.85;
+  const tail = new Mesh(new CapsuleGeometry(0.027, 0.24, 4, 8), fur);
+  tail.position.set(0, 0.14, 0);
+  raise.add(tail);
+  pivot.add(raise);
+  object.add(pivot);
+  return {
+    ...model,
+    update(time: number) {
+      pivot.rotation.y = Math.sin(time * 8.5) * 0.45;
+    },
+  };
+}
+
+/**
+ * A generic dual-cab ute, about 5.2 m long, front toward +z: a stand-in for
+ * Mikey's car until a model replaces it. Glossy paint, dark glass, an open
+ * tray, and four wheels.
+ */
+export function createCar(kit: Kit, paintColour = '#dcd9d2'): GearModel {
+  const { object, material, add, finish } = build(kit);
+  object.name = 'car';
+  const paint = material(paintColour, { roughness: 0.28, metalness: 0.15 });
+  const glass = material('#141a20', { roughness: 0.06, metalness: 0.7 });
+  const trim = material('#1e1f21', { roughness: 0.7 });
+  const tyre = material('#151515', { roughness: 0.92 });
+  const hub = material('#b9bab8', { roughness: 0.3, metalness: 0.8 });
+  const lamp = material('#f4e2c0', { roughness: 0.3, emissive: '#ffd9a0' });
+  lamp.emissiveIntensity = 0.6;
+  const tail = material('#5a0d0d', { roughness: 0.4, emissive: '#c01818' });
+  tail.emissiveIntensity = 0.4;
+  // The body: a lower shell the length of the car, the bonnet, and the cab with its glasshouse and roof.
+  add(new RoundedBoxGeometry(1.84, 0.62, 5.2, 3, 0.12), paint, 0, 0.66, 0);
+  add(new RoundedBoxGeometry(1.8, 0.24, 1.45, 3, 0.1), paint, 0, 1.05, 1.85);
+  add(new RoundedBoxGeometry(1.76, 0.42, 2.45, 3, 0.1), paint, 0, 1.14, 0.25);
+  add(new RoundedBoxGeometry(1.66, 0.5, 2.25, 3, 0.12), glass, 0, 1.56, 0.2);
+  add(new RoundedBoxGeometry(1.7, 0.08, 2.15, 2, 0.04), paint, 0, 1.84, 0.15);
+  // The tray: open, its sides and tailgate standing up from the shell.
+  for (const side of [-1, 1]) add(new RoundedBoxGeometry(0.07, 0.42, 1.75, 2, 0.03), paint, side * 0.885, 1.15, -1.62);
+  add(new RoundedBoxGeometry(1.84, 0.42, 0.07, 2, 0.03), paint, 0, 1.15, -2.5);
+  add(new RoundedBoxGeometry(1.7, 0.04, 1.7, 1, 0.02), trim, 0, 0.98, -1.62);
+  // Bumpers, lights and wheels.
+  add(new RoundedBoxGeometry(1.9, 0.2, 0.22, 2, 0.06), trim, 0, 0.5, 2.6);
+  add(new RoundedBoxGeometry(1.9, 0.2, 0.22, 2, 0.06), trim, 0, 0.5, -2.58);
+  for (const side of [-1, 1]) {
+    add(new RoundedBoxGeometry(0.34, 0.14, 0.06, 1, 0.03), lamp, side * 0.66, 0.9, 2.6);
+    add(new RoundedBoxGeometry(0.12, 0.26, 0.06, 1, 0.03), tail, side * 0.85, 1.05, -2.56);
+    for (const end of [-1, 1]) {
+      const wheel = add(new CylinderGeometry(0.39, 0.39, 0.28, 20), tyre, side * 0.82, 0.39, end * 1.62);
+      wheel.rotation.z = Math.PI / 2;
+      const cap = add(new CylinderGeometry(0.22, 0.22, 0.3, 16), hub, side * 0.82, 0.39, end * 1.62);
+      cap.rotation.z = Math.PI / 2;
+    }
+  }
+  return finish(new Vector3(0, 2.0, 0));
+}

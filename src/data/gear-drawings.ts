@@ -73,6 +73,10 @@ export const drawings: Record<ItemType, string> = {
     <path class="f" d="M56 22 L144 22 L136 148 Q100 184 64 148 Z"/>
     <path d="M60 52 L140 52 M62 82 L138 82 M64 112 L136 112 M66 140 L134 140"/>
     <path d="M56 22 L60 34 M144 22 L140 34"/>`,
+  pillow: `
+    <path class="f" d="M50 66 Q50 52 66 52 L134 52 Q150 52 150 66 L150 134 Q150 148 134 148 L66 148 Q50 148 50 134 Z"/>
+    <path d="M62 80 Q100 72 138 80 M62 100 Q100 94 138 100 M62 120 Q100 114 138 120"/>
+    <circle cx="138" cy="64" r="4"/>`,
   cooking: `
     <circle class="f" cx="88" cy="100" r="52"/>
     <circle cx="88" cy="100" r="42"/>

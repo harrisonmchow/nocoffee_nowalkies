@@ -1,0 +1,8 @@
+# Caleb's camp in the 3D world on /gear. Camps are imagined moods, not real trips.
+person: caleb
+biome: maple-autumn
+title: Autumn under the Japanese maples
+pose: standing
+ready: true
+dog: true          # a dog at the campsite (a generic stand-in for now)
+sample: true

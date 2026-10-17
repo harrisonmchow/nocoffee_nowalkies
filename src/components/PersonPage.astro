@@ -1,0 +1,141 @@
+---
+// A person's gear page. Two views share it: their landscape (/gear/<person>/)
+// and their campsite close up (/gear/<person>/camp/). With the 3D world on,
+// the panel is a small card that starts minimized, to the way back, the name
+// and the Setup details button, so the camp shows; in 2D it's all open, as
+// before.
+import GearLayout from '../layouts/GearLayout.astro';
+import GearFigure from './GearFigure.astro';
+import Sign from './Sign.astro';
+import Icon from './Icon.astro';
+import WeightBar from './WeightBar.astro';
+import { formatWeight, personTone, gearHref, type getLoadout } from '../lib/gear';
+import { campRoute, campsiteRoute } from '../lib/camps';
+import { categories, categoryLabel } from '../data/gear-types';
+
+type Loadout = Awaited<ReturnType<typeof getLoadout>>;
+interface Props {
+  person: Loadout;
+  prev: Loadout;
+  next: Loadout;
+  view: 'landscape' | 'camp';
+}
+
+const { person: p, prev, next, view } = Astro.props;
+const { Content } = await p.render();
+const t = p.totals;
+const focus = p.loadout.data.focus;
+const updated = p.loadout.data.updated?.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+const weight = (g: number) => (t.hasWeights ? formatWeight(g) : undefined);
+const world = view === 'camp' ? await campsiteRoute(p.id) : await campRoute(p.id);
+const detailsId = `setup-${p.id}`;
+---
+<GearLayout title={view === 'camp' ? `${p.name}’s camp` : `${p.name}’s gear`} description={`${p.name}’s current hiking kit: clothing, pack, sleep system and kitchen.`} world={world}>
+  <div class="g-page wrap" data-up={view === 'camp' ? gearHref(p.id) : undefined} data-prev={gearHref(prev.id)} data-next={gearHref(next.id)}>
+    <div class="person">
+      <div class="stage" data-stage>
+        <div class="stage__fig">
+          <GearFigure
+            name={p.name}
+            tone={personTone[p.id]}
+            figure={p.loadout.data.figure}
+            figureAlt={p.loadout.data.figureAlt}
+            transitionName={`figure-${p.id}`}
+            sizes="(min-width: 860px) 36vw, 70vw"
+            eager
+          />
+          {categories.map((c, i) => (
+            <a
+              class:list={['hotspot', { 'hotspot--left': focus[c].x < 55 }]}
+              href={gearHref(p.id, c)}
+              style={`left:${focus[c].x}%;top:${focus[c].y}%`}
+              data-peek={c}
+              data-fx={focus[c].x}
+              data-fy={focus[c].y}
+              aria-label={`${categoryLabel[c]}: ${t.byCategory[c].count} items`}
+            >
+              <span class="hotspot__dot">{i + 1}</span>
+              <span class="hotspot__label">{categoryLabel[c]}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="panel" data-collapsed>
+        <div class="panel__head">
+          {/* The landscape is the top of a person's gear (the everyone page is hidden for now), so only the campsite has a way back. */}
+          {view === 'camp' && (
+            <a class="g-back" href={gearHref(p.id)}><Icon name="arrow-left" /> <span class="w3d">Landscape</span><span class="w2d">{p.name}</span></a>
+          )}
+          <div class="panel__title">
+            <h1 tabindex="-1"><span transition:name={`name-${p.id}`}>{p.name}</span></h1>
+            <button type="button" class="panel__toggle" aria-expanded="false" aria-controls={detailsId} data-panel-toggle>
+              <span>Setup details</span>
+              <Icon name="caret-down" />
+            </button>
+          </div>
+          <p class="panel__meta">
+            {p.sample && <span class="tag tag--draft">Sample kit</span>}
+            {updated && <span>Kit as of {updated}</span>}
+            <span class="g-keys">{view === 'camp' && <><kbd>Esc</kbd> back </>}<kbd>←</kbd><kbd>→</kbd> next person</span>
+          </p>
+          {view === 'landscape' && (
+            <div class="panel__world">
+              <Sign size="sm" name="Go to campsite" href={`${gearHref(p.id)}camp/`} data-to-camp />
+            </div>
+          )}
+        </div>
+
+        <div class="panel__details" id={detailsId}>
+          <dl class="g-spec">
+            <div><dt>Base weight</dt>{weight(t.baseG) ? <dd class="num">{weight(t.baseG)}</dd> : <dd class="muted">Not weighed yet</dd>}</div>
+            <div><dt>Worn</dt>{weight(t.wornG) ? <dd class="num">{weight(t.wornG)}</dd> : <dd class="muted">Not weighed yet</dd>}</div>
+            <div><dt>Total</dt>{weight(t.totalG) ? <dd class="num">{weight(t.totalG)}</dd> : <dd class="muted">Not weighed yet</dd>}</div>
+            <div><dt>Items</dt><dd class="num">{t.count}{t.hasWeights && t.weighedCount < t.count ? ` (${t.count - t.weighedCount} not weighed yet)` : ''}</dd></div>
+          </dl>
+
+          <ul class="panel__cats" role="list">
+            {categories.map((c, i) => (
+              <li data-peek={c} data-fx={focus[c].x} data-fy={focus[c].y}>
+                <Sign
+                  name={categoryLabel[c]}
+                  href={gearHref(p.id, c)}
+                  tag={String(i + 1)}
+                  tagLabel={String(i + 1)}
+                  meta={`${t.byCategory[c].count} items · ${t.hasWeights ? formatWeight(t.byCategory[c].weightG) : 'weights to come'}`}
+                />
+              </li>
+            ))}
+          </ul>
+
+          <WeightBar items={p.items} />
+
+          <section aria-labelledby="setup-h">
+            <h2 id="setup-h">The setup</h2>
+            <div class="panel__prose"><Content /></div>
+          </section>
+
+          <nav class="panel__switch" aria-label="Other people">
+            <a class="g-back" href={gearHref(prev.id)}><Icon name="arrow-left" /> {prev.name}</a>
+            <a class="g-back" href={gearHref(next.id)}>{next.name} <Icon name="arrow-right" /></a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</GearLayout>
+
+<script>
+  // The Setup details button opens and minimizes the panel (3D only; in 2D
+  // it's always open). Delegated, so it works on every page the router swaps in.
+  document.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-panel-toggle]');
+    if (!button) return;
+    const panel = button.closest<HTMLElement>('.panel');
+    if (!panel) return;
+    const open = panel.hasAttribute('data-collapsed');
+    panel.toggleAttribute('data-collapsed', !open);
+    button.setAttribute('aria-expanded', String(open));
+    document.dispatchEvent(new CustomEvent('gear:panel', { detail: { open } }));
+  });
+</script>

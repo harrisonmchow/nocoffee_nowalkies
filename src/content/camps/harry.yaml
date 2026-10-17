@@ -1,0 +1,8 @@
+# Harry's camp in the 3D world on /gear. Camps are imagined moods, not real trips.
+person: harry
+biome: alpine-aurora
+title: Snow-capped peak under the aurora
+pose: standing
+ready: true
+dog: true          # a dog at the campsite (a generic stand-in for now)
+sample: true

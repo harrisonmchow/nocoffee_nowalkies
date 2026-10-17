@@ -1,0 +1,21 @@
+---
+// A person's campsite, close up, in the 3D world. Without it (world off), the
+// page is the same as their person page.
+import PersonPage from '../../../components/PersonPage.astro';
+import { getLoadouts } from '../../../lib/gear';
+
+export async function getStaticPaths() {
+  const people = await getLoadouts();
+  return people.map((p, i) => ({
+    params: { person: p.id },
+    props: {
+      person: p,
+      prev: people[(i - 1 + people.length) % people.length],
+      next: people[(i + 1) % people.length],
+    },
+  }));
+}
+
+const { person, prev, next } = Astro.props;
+---
+<PersonPage person={person} prev={prev} next={next} view="camp" />

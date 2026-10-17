@@ -39,6 +39,7 @@ export const itemTypes = {
   'sleeping-pad': { category: 'gear', label: 'Sleeping pad', zone: 'sleep', size: 'md' },
   'sleeping-bag': { category: 'gear', label: 'Sleeping bag', zone: 'sleep', size: 'md' },
   quilt: { category: 'gear', label: 'Quilt', zone: 'sleep', size: 'md' },
+  pillow: { category: 'gear', label: 'Pillow', zone: 'sleep', size: 'sm' },
   bag: { category: 'gear', label: 'Pack', zone: 'pack', size: 'lg' },
   tent: { category: 'gear', label: 'Tent', zone: 'shelter', size: 'lg' },
   cooking: { category: 'gear', label: 'Cooking', zone: 'kit', size: 'sm' },

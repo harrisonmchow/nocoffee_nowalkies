@@ -37,7 +37,7 @@ const up = gearHref(p.id, category);
 const focus = p.loadout.data.focus[category];
 const review = await reviewFor(p.id, item.id);
 ---
-<GearLayout title={`${item.name} | ${p.name}’s ${label.toLowerCase()}`} description={`${p.name}’s ${item.name.toLowerCase()}${item.brand ? ` from ${item.brand}` : ''}.`}>
+<GearLayout title={`${item.name} | ${p.name}’s ${label.toLowerCase()}`} description={`${p.name}’s ${item.name.toLowerCase()}${item.brand ? ` from ${item.brand}` : ''}.`} world={{ level: 'detail', person: p.id }}>
   {/* Same settled backdrop as the flat-lay, so stepping in and out only moves the item. */}
   <div class="dive" aria-hidden="true">
     <div class="dive__fig" style={`--fx:${focus.x}%;--fy:${focus.y}%`}>

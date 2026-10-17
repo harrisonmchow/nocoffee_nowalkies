@@ -3,19 +3,45 @@
 // figure, names and items morph from one view to the next. The router is
 // only on these pages; links out to the rest of the site load normally.
 import { ClientRouter } from 'astro:transitions';
+import { getCollection } from 'astro:content';
 import Base from './Base.astro';
+import CrewTabs from '../components/CrewTabs.astro';
+import { CAMPS_ELEMENT_ID, ROUTE_ELEMENT_ID, serialiseRoute, type WorldRoute } from '../world/route';
 import '../styles/gear.css';
+import '../styles/world.css';
 
 interface Props {
   title: string;
   description?: string;
+  /** What the 3D world shows under this page (GEAR-3D-PLAN.md). Defaults to a 2D detail page. */
+  world?: WorldRoute;
+  /** Keep the page out of search results (for a page that's hidden, with nothing linking to it). */
+  noindex?: boolean;
 }
-const { title, description } = Astro.props;
+const { title, description, world = { level: 'detail' }, noindex = false } = Astro.props;
+// Every person's biome, so the world can start a transition before the next page arrives.
+const camps = Object.fromEntries((await getCollection('camps')).map((c) => [c.data.person, { biome: c.data.biome, ready: c.data.ready }]));
 ---
 <Base title={title} description={description} current="gear">
   <ClientRouter slot="head" fallback="animate" />
+  {noindex && <meta slot="head" name="robots" content="noindex" />}
+  {/*
+    The 3D world. Persisted, so the canvas starts once per visit; boot.ts decides
+    whether it runs at all. It has no transition name on purpose: named elements
+    are drawn above the page during a view transition, and this must stay behind it.
+  */}
+  <div id="world" aria-hidden="true" transition:persist="world"></div>
+  {/* What sits over the world: the camp marker, hotspots and cards (src/world/ui.ts). */}
+  <div id="world-ui" transition:persist="world-ui"></div>
+  <script is:inline type="application/json" id={ROUTE_ELEMENT_ID} set:html={serialiseRoute(world)} />
+  <script is:inline type="application/json" id={CAMPS_ELEMENT_ID} set:html={JSON.stringify(camps).replace(/</g, '\\u003c')} />
+  <CrewTabs />
   <slot />
 </Base>
+
+<script>
+  import '../world/boot';
+</script>
 
 <script>
   import { navigate } from 'astro:transitions/client';

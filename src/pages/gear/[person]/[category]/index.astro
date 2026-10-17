@@ -25,7 +25,7 @@ const packed = items.filter((i) => !isWorn(i));
 const tone = personTone[p.id];
 let n = 0;
 ---
-<GearLayout title={`${p.name}’s ${categoryLabel[category].toLowerCase()}`} description={`${p.name}’s ${categoryLabel[category].toLowerCase()}, laid out piece by piece.`}>
+<GearLayout title={`${p.name}’s ${categoryLabel[category].toLowerCase()}`} description={`${p.name}’s ${categoryLabel[category].toLowerCase()}, laid out piece by piece.`} world={{ level: 'detail', person: p.id }}>
   <div class="dive" aria-hidden="true">
     <div class="dive__fig" style={`--fx:${focus.x}%;--fy:${focus.y}%`}>
       <GearFigure name={p.name} tone={tone} figure={p.loadout.data.figure} transitionName={`figure-${p.id}`} sizes="100vw" ghost />

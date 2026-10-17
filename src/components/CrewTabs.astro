@@ -1,0 +1,15 @@
+---
+// The crew tabs over the 3D camps, in the site order: names in capitals over
+// the scene, the current one bright and underlined. Persisted across gear
+// pages, so the current tab is marked by script (src/world/boot.ts) rather
+// than re-rendered. Hidden unless the 3D world is running on a person's page.
+import { crew } from '../data/site';
+import { gearHref } from '../lib/gear';
+---
+<nav class="crew-tabs wrap" aria-label="Crew camps" transition:persist="crew-tabs" data-crew-tabs>
+  <ul class="crew-tabs__list" role="list">
+    {crew.map((c) => (
+      <li><a class="crew-tab" href={gearHref(c.id)} data-tab={c.id}>{c.name}</a></li>
+    ))}
+  </ul>
+</nav>
