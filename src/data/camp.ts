@@ -26,17 +26,11 @@ export type GearItem = {
 
 export const camp: GearItem[] = [
   {
+    // Drawn in code from photos of our own tent (scripts/camp/tent.ts), so no model or credit.
     id: 'tent',
     name: 'Tent',
-    note: 'Generic two-person tent. Fly, inner and a vestibule for wet boots.',
+    note: 'Our two-person tent. Fly, inner and a vestibule for wet boots.',
     kind: 'shelter',
-    model: '/models/tent.glb',
-    credit: {
-      title: 'Modern Camping Tent',
-      author: 'Guy in a Poncho',
-      license: 'CC BY 4.0',
-      source: 'https://sketchfab.com/3d-models/modern-camping-tent-3f624d58d582430595179bdf9a156be3',
-    },
   },
   {
     id: 'chair',

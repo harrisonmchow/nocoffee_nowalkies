@@ -1,10 +1,12 @@
 // Things drawn in code: the clothes, the sleeping gear inside the tent,
 // and simple stand-ins for any .glb model that hasn't been added yet.
+// The tent itself lives in tent.ts.
 // Every prop sits on y = 0 and faces +z.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import type { GearItem } from '../../data/camp';
 import { makeRock } from './rocks';
+import { createTentModel } from './tent';
 
 const mat = (color: string, extra: THREE.MeshStandardMaterialParameters = {}) =>
   new THREE.MeshStandardMaterial({ color, roughness: 0.9, ...extra });
@@ -33,19 +35,6 @@ function stripes(base: string, line: string, count: number) {
 }
 
 // Stand-ins -----------------------------------------------------------
-
-function standInTent() {
-  const g = new THREE.Group();
-  const fly = mat('#7f8a6a', { flatShading: true, side: THREE.DoubleSide });
-  const dome = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 8, 0, Math.PI * 2, 0, Math.PI / 2), fly);
-  dome.scale.set(0.85, 1.15, 1.2);
-  g.add(dome);
-  const door = new THREE.Mesh(new THREE.CircleGeometry(0.42, 20, 0, Math.PI), mat('#4f5745'));
-  door.position.set(0, 0.01, 1.19);
-  door.scale.y = 1.6;
-  g.add(door);
-  return shadows(g);
-}
 
 function standInChair() {
   const g = new THREE.Group();
@@ -230,7 +219,7 @@ export function makeSleepGear(id: string) {
 
 export function makeStandIn(item: GearItem): THREE.Object3D {
   switch (item.kind) {
-    case 'shelter': return standInTent();
+    case 'shelter': return createTentModel();
     case 'sit': return standInChair();
     case 'fire': return standInFire();
     case 'person': return standInPerson();

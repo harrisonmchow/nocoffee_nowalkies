@@ -18,6 +18,7 @@ import type { WeatherConfig } from '../../data/weather';
 import { installHeightFog, makeMist } from './mist';
 import { makeStandIn } from './props';
 import { makeRock, rng } from './rocks';
+import { createTentModel } from './tent';
 import { makeSky } from './sky';
 
 export type Mode = 'mountain' | 'camp' | 'tent';
@@ -259,7 +260,8 @@ export function initCamp(ui: CampUI, cfg: MountainConfig, weather: WeatherConfig
       } catch {
         obj = makeStandIn(item);
       }
-    } else obj = makeStandIn(item);
+    } else if (item.id === 'tent') obj = createTentModel();
+    else obj = makeStandIn(item);
 
     const root = new THREE.Group();
     const holder = new THREE.Group();
