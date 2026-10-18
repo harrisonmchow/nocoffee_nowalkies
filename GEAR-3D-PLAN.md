@@ -192,6 +192,27 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
 
 **Every landscape keeps its camp on screen (17 October 2026).** The camps sat about 78% of the way down the frame, off the bottom of a short window. Now each landscape camera, and its zoom target and portrait variant, is lowered or raised, keeping the way it looks, until its camp is at the middle of the unshifted frame (`seat` in `biome-set.ts`). The page's frame shift then puts it 60% of the way down. Moving the camera rather than tipping it keeps each horizon and sky where it was composed. A camera never comes within 25 m of the ground, which is why Kevin's camp sits a little lower, at 68%. The sea's diagnostics are now taken from a fixed view on the beach, since from the lower landscape camera the waves are finer than a pixel and filtered away, as designed.
 
+**Harry's tent is his real one (18 October 2026): the Zorali SummitSeeker 2P.** Rebuilt in code from the product page's four photos and its listed size, through the img2threejs skill's pipeline, and pitched in Harry's camp in place of the stand-in.
+
+- **How it's built** (`scene/summitseeker-geometry.ts`), the way the tent is pitched:
+  - Two main poles run corner to corner on the floor's diagonals, crossing at the hub. Their arch, y = 1.075 (1 - |u|^2.3), is fitted to the side and end photos: flatter on top than a parabola.
+  - The brow pole arches across the crown at the crossing, its tips at the two door tops.
+  - The inner hangs inside the poles from its clips. Each ring is a quadrilateral through the four pole arms, bowed a little, with its door tops pulled out toward the brow pole's tips. A tan bathtub runs 8.5 cm up, a teal band to 24 cm, then grey mesh with seams along the corners, and a yellow-zipped D door on each side.
+  - The fly is the tightest skin over its supports: the convex hull of the poles and brow pole (lifted 2 cm), the corner tabs, the two vestibules' stakes (1.32 m out) and the vents' props, with the bottom left open. That's what gives the photos' flat, taut panels and straight vestibule edges. It's 146 triangles, with normals smoothed across the folds along the poles and kept sharp at the creases.
+  - The trim follows the fly: each vestibule's door is its head-side face, piped from the stake up the ridge, under the crown and down the head arm, with rounded corners like the photo's D. Also the hem binding, toggles on cords, a light ridge-and-sun mark (no lettering), the vents' mouths, clips, pole feet, and straps and stakes at the corners and vestibules.
+  - Colours are sampled from the photos. Every material is flat colour: the ripstop is below a pixel at every distance the camp shows it.
+- **In the camp** (`scene/summitseeker.ts`): 64 parts merged by material into four meshes, in the world's own materials, plus a door panel that glows softly at night with the headtorch inside. About 14.5k triangles and 5 draw calls.
+  - It keeps the stand-in's contract: you can point at it (the fly, its door and the floor under the hem), the fly fades to a ghost and the mesh thins to look inside, and the headtorch lights the inside.
+  - `camp.ts` now pitches a real tent when a camp's tent item names one (`proc:tent/zorali-summitseeker-2p`); every other camp keeps the stand-in. The camp map in `GearLayout.astro` carries each person's tent, so the real one is pitched as soon as the camp is built: it's there from the landscape, and compiled with the rest of the camp.
+  - Decision: no snow on the fly in Harry's snowy camp. Its teal is what makes it this tent, and snow on its sloping panels washed it to beige.
+- **Content:** Harry's tent item has the brand line "Zorali SummitSeeker 2P" and a link to the product page. No weight yet, so his totals don't change until it's weighed.
+- **Measured** (desktop, high tier): Harry's campsite went from 42 to 44 calls, 110k to 128k triangles, and 17 to 18 programs.
+- **Validated:** a new test checks that Harry's camp pitches the SummitSeeker (from the landscape and at the campsite) and that Kevin's keeps the stand-in, and the tent's card names it. The full suite passes apart from the WebKit frame-time check, which is flaky on this machine with or without the tent: over its limits in 3 of 13 runs with it and 1 of 5 without, with typical worst frames of 25–50 ms either way. The tent's geometry takes about 16 ms to build on desktop (48 ms cold), when its camp is built rather than during travel. Harry's budget test now covers the tent. The fallback screenshot of the tent's 2D page is re-recorded with its brand and link; its count was also stale ("4 of 9" before the headtorch, power bank and first aid kit were added).
+- **The pipeline's record** (outside the repo, in the session's workspace):
+  - The intake, a spec of 64 components generated from the same part list, strict validation, and the blockout, structural and form passes, each rendered from the generated factory and reviewed against the photos. Tier 1 silhouette overlap with the primary photo is 0.95.
+  - It stopped at the material pass, where its target was already reached: 0.80 against 0.70, with every critical feature at or above its bar. That pass's per-part colour check matches all 16 colours against a render's five dominant ones, so it can't pass for a tent whose inner, poles and zips hide under the fly. Measured per material instead: the fly, band and mesh are within delta-E 10 of the photos.
+- **Not yet:** the vents' visors are subtler than the photos'; the inner door's exact cut and the far side are inferred; the other three camps still have the stand-in.
+
 ---
 
 ## 0. Decisions at a glance
@@ -685,7 +706,7 @@ If scanning disappoints, the other routes still stand: an AI image-to-3D draft (
 
 ### 6.2 Gear
 
-**Now: generic placeholders**, built with the geometry kit so they're properly sized and lit, and need no licences.
+**Now: generic placeholders**, built with the geometry kit so they're properly sized and lit, and need no licences. The first real model is Harry's tent, the Zorali SummitSeeker 2P (Progress, 18 October 2026): parametric, as planned below, from its photos and spec sheet.
 
 | Item | Placeholder now | Later | Triangles |
 | --- | --- | --- | --- |

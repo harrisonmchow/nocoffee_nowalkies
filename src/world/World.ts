@@ -581,6 +581,8 @@ export class World {
         this.built.set(biome, built);
         this.scene.add(built.group);
         this.renderer.initTexture(built.heightTexture);
+        // A real tent in the person's gear is pitched now, so it's seen from the landscape and compiled with the rest.
+        built.camp.pitchTent(Object.values(this.camps).find((c) => c?.biome === biome)?.tent);
         if (this.kit?.biome === biome) this.dressKit();
         // Compile while hidden, so the first frame of the reveal doesn't stall.
         // Hide the camp on show for the call: programs are keyed on the light

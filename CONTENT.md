@@ -122,12 +122,20 @@ Gear items get two optional fields for the camp:
       model: proc:tent/trekking-pole  # the 3D model that stands in for it
 ```
 
-Only items with `scene` appear in the camp. Each model has its own place, and its hotspot sits just above it. The models so far are simple stand-ins until real ones replace them:
+Only items with `scene` appear in the camp. Each model has its own place, and its hotspot sits just above it. Most models are simple stand-ins until real ones replace them:
 
 | Where | Models |
 | --- | --- |
-| At the campsite | `proc:tent/trekking-pole`, `proc:pack`, `proc:stove-pot`, `proc:bottle` |
+| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack`, `proc:stove-pot`, `proc:bottle` |
 | Inside the tent | `proc:sleeping-pad`, `proc:sleeping-bag` or `proc:quilt`, `proc:pillow`, `proc:headtorch` |
+
+Real tents, by model id:
+
+| Model | Tent | Where it's used |
+| --- | --- | --- |
+| `proc:tent/zorali-summitseeker-2p` | Zorali SummitSeeker 2P, rebuilt from its four product photos and its listed size (220 cm long, 130 cm wide at the head, 105 cm at the foot, 110 cm high) | Harry's camp |
+
+A camp whose tent item names a real tent pitches it in place of the stand-in, and the sleeping kit goes inside it. Any other `proc:tent/...` keeps the stand-in. The tent's card shows the item's `brand` line, so Harry's says "Zorali SummitSeeker 2P". Its weight isn't filled in yet: add `weightG` once it's weighed (the listing gives 1620 g trail weight).
 
 Clothing shows on the person instead. They wear the colours of any clothing item that has a `colour`: a jacket (rain jacket, down jacket or fleece), the pants, the hat and the shoes.
 

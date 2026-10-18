@@ -542,6 +542,7 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     // The tent itself: what it is, and that a click goes inside.
     await page.mouse.move(on.tent.x, on.tent.y);
     await expect(card(page)).toContainText('Harry’s shelter');
+    await expect(card(page)).toContainText('Zorali SummitSeeker 2P');
     await expect(card(page)).toContainText('Click to look inside');
     await page.screenshot({ path: `${OUT}/m4-camp-tent-${testInfo.project.name}.png` });
     // A piece of kit by its hotspot, pinned by a click, with a link to its page; Esc puts it away.
@@ -564,11 +565,25 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     await dot(page, 'Tent').click();
     await page.waitForFunction(() => window.__world!.level() === 'tent');
     expect((await shown()).cloud).toBe(false);
-    // Kevin's camp has neither.
+  });
+
+  test('Kevin’s camp has neither a dog nor the cloud in front', async ({ page }) => {
+    const shown = () => page.evaluate(() => ({ dog: window.__world!.shows('dog'), cloud: window.__world!.shows('foreground-clouds') }));
     await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
     expect(await shown()).toEqual({ dog: false, cloud: false });
     await openCamp(page, 'kevin', 'rockies-night');
     expect((await shown()).cloud).toBe(false);
+  });
+
+  test('Harry’s tent is his Zorali SummitSeeker; a camp without a real tent keeps the stand-in', async ({ page }) => {
+    const parts = () => page.evaluate(() => ['summitseeker', 'summitseeker-fly', 'summitseeker-inner', 'summitseeker-canopy', 'summitseeker-frame'].map((name) => window.__world!.shows(name)));
+    // Pitched as soon as the camp is built, so it's there from the landscape, before the kit arrives.
+    await openCamp(page, 'harry', 'alpine-aurora');
+    expect(await parts()).toEqual([true, true, true, true, true]);
+    await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
+    expect(await parts()).toEqual([true, true, true, true, true]);
+    await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
+    expect(await parts()).toEqual([false, false, false, false, false]);
   });
 
   test('clicking the tent goes inside, to the sleeping bag, the mat and the pillow', async ({ page }, testInfo) => {

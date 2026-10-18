@@ -45,10 +45,12 @@ items:
       model: proc:pack
   - id: tent
     name: Tent
+    brand: Zorali SummitSeeker 2P
     category: gear
     type: tent
+    link: https://www.zorali.com/products/summitseeker-2p-ultralight-backpacking-tent
     scene:
-      model: proc:tent/trekking-pole
+      model: proc:tent/zorali-summitseeker-2p
   - id: sleeping-pad
     name: Sleeping pad
     category: gear

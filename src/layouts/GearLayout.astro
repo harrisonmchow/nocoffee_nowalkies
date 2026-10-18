@@ -19,8 +19,10 @@ interface Props {
   noindex?: boolean;
 }
 const { title, description, world = { level: 'detail' }, noindex = false } = Astro.props;
-// Every person's biome, so the world can start a transition before the next page arrives.
-const camps = Object.fromEntries((await getCollection('camps')).map((c) => [c.data.person, { biome: c.data.biome, ready: c.data.ready }]));
+// Every person's biome, so the world can start a transition before the next page arrives,
+// and their tent, so a real one is pitched as soon as their camp is built.
+const tents = new Map((await getCollection('gear')).map((g) => [g.id, g.data.items.find((i) => i.type === 'tent')?.scene?.model]));
+const camps = Object.fromEntries((await getCollection('camps')).map((c) => [c.data.person, { biome: c.data.biome, ready: c.data.ready, tent: tents.get(c.data.person) }]));
 ---
 <Base title={title} description={description} current="gear">
   <ClientRouter slot="head" fallback="animate" />

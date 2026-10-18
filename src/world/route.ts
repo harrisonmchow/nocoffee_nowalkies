@@ -47,8 +47,8 @@ export type WorldRoute =
 export const ROUTE_ELEMENT_ID = 'world-route';
 export const CAMPS_ELEMENT_ID = 'world-camps';
 
-/** Each person's camp, from src/content/camps/: its biome, and whether it's ready for visitors. */
-export type CampMap = Partial<Record<string, { biome: BiomeId; ready: boolean }>>;
+/** Each person's camp, from src/content/camps/: its biome, whether it's ready for visitors, and the tent their gear names (its `scene.model`). */
+export type CampMap = Partial<Record<string, { biome: BiomeId; ready: boolean; tent?: string }>>;
 
 export function readCamps(doc: Document = document): CampMap {
   try {

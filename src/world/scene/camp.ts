@@ -1,5 +1,6 @@
-// The camp's placeholders: a generic dome tent and a campfire. Real gear
-// models replace the tent later (GEAR-3D-PLAN.md §6.2); the fire stays.
+// The camp: a tent and a campfire, the person and their kit. The tent is a
+// generic dome stand-in until a camp's gear names a real one (Harry's
+// SummitSeeker: summitseeker.ts); the fire stays.
 import {
   type MeshStandardMaterial,
   AdditiveBlending,
@@ -43,8 +44,17 @@ import {
   createStove,
   type GearModel,
 } from './gear-models';
+import { createSummitSeeker } from './summitseeker';
 
 // ---------------------------------------------------------------- tent
+
+// Inside the tent, in its own space (floor at y 0, long axis x, door toward +z).
+const INSIDE = {
+  pad: new Vector3(0, 0, -0.06),
+  bed: new Vector3(0.02, 0.055, -0.06),
+  pillow: new Vector3(-0.74, 0.1, -0.06),
+  headtorch: new Vector3(0.1, 0.9, 0),
+};
 
 const TENT = { halfLength: 1.05, halfWidth: 0.68, height: 1.0 };
 
@@ -126,6 +136,10 @@ function createTent(uniforms: WorldUniforms, starLayers: number, colour: string)
     group,
     shell,
     fabric,
+    /** What lights up when it's pointed at. */
+    materials: [fabric],
+    inside: INSIDE,
+    anchor: new Vector3(0, 1.05, 0.2),
     update(tentGlow: number) {
       // Warm light from a headtorch inside, seen through the door.
       doorMaterial.emissive.copy(glow.setRGB(1.0, 0.55, 0.22).multiplyScalar(0.32 * tentGlow));
@@ -355,6 +369,25 @@ function createFire(uniforms: WorldUniforms, starLayers: number, seed: number) {
 
 // ---------------------------------------------------------------- camp
 
+type Tent = {
+  group: Object3D;
+  /** What you point at to pick the tent. */
+  shell: Object3D;
+  materials: MeshStandardMaterial[];
+  /** Where the sleeping kit and the headtorch go, in the tent's own frame. */
+  inside: typeof INSIDE;
+  /** Its hotspot, in its own frame. */
+  anchor: Vector3;
+  update(tentGlow: number): void;
+  setInside(k: number): void;
+  dispose(): void;
+};
+
+/** Real tents, by the variant in a kit's `proc:tent/<variant>` model. */
+const REAL_TENTS: Record<string, (uniforms: WorldUniforms, starLayers: number) => Tent> = {
+  'zorali-summitseeker-2p': createSummitSeeker,
+};
+
 export type CampLayout = {
   tent: { x: number; z: number; rotation: number; colour: string };
   fire: { x: number; z: number };
@@ -396,14 +429,6 @@ function highlighter(materials: MeshStandardMaterial[]) {
   return (on: boolean) => materials.forEach((m, i) => m.emissive.copy(on ? lit[i] : originals[i]));
 }
 
-// Inside the tent, in its own space (floor at y 0, long axis x, door toward +z).
-const INSIDE = {
-  pad: new Vector3(0, 0, -0.06),
-  bed: new Vector3(0.02, 0.055, -0.06),
-  pillow: new Vector3(-0.74, 0.1, -0.06),
-  headtorch: new Vector3(0.1, 0.9, 0),
-};
-
 /** Build the camp on the ground given by `groundAt`. */
 export function createCamp(
   uniforms: WorldUniforms,
@@ -414,10 +439,15 @@ export function createCamp(
 ) {
   const group = new Object3D();
   group.name = 'camp';
-  const tent = createTent(uniforms, starLayers, layout.tent.colour);
-  tent.group.position.set(layout.tent.x, groundAt(layout.tent.x, layout.tent.z) - 0.02, layout.tent.z);
-  tent.group.rotation.y = layout.tent.rotation;
-  group.add(tent.group);
+  // The stand-in until the kit arrives; a real tent in the kit replaces it (setKit).
+  let tent: Tent = createTent(uniforms, starLayers, layout.tent.colour);
+  const pitch = (next: Tent) => {
+    next.group.position.set(layout.tent.x, groundAt(layout.tent.x, layout.tent.z) - 0.02, layout.tent.z);
+    next.group.rotation.y = layout.tent.rotation;
+    group.add(next.group);
+    return next;
+  };
+  pitch(tent);
 
   const fire = createFire(uniforms, starLayers, seed);
   fire.group.position.set(layout.fire.x, groundAt(layout.fire.x, layout.fire.z), layout.fire.z);
@@ -487,13 +517,28 @@ export function createCamp(
     highlights.set(id, highlighter(materials));
   };
   const kitArgs = { uniforms, starLayers };
+  /** Pitch the tent a model names, if it's a real one: the stand-in stays otherwise. Anything already inside moves across. */
+  let pitched = '';
+  const pitchTent = (model?: string) => {
+    const [kind, variant] = model?.replace(/^proc:/, '').split('/') ?? [];
+    const real = kind === 'tent' && variant ? REAL_TENTS[variant] : undefined;
+    if (!real || pitched === variant) return;
+    const next = real(uniforms, starLayers);
+    for (const child of [...tent.group.children]) if (models.some((m) => m.object === child)) next.group.add(child);
+    group.remove(tent.group);
+    tent.dispose();
+    tent = pitch(next);
+    pitched = variant;
+  };
   // The car, for a setting that has one: parked on the sand beside the tent.
   if (layout.car) place(createCar(kitArgs, layout.car.colour), layout.car.x, layout.car.z, layout.car.rotation, group);
 
   return {
     group,
     fireAt: fire.group.position,
-    tentGroup: tent.group,
+    get tentGroup() {
+      return tent.group;
+    },
     /** The pickables at camp; the inside ones only count once you've gone into the tent. */
     pickables,
     update(time: number, fireGain: number, tentGlow: number) {
@@ -521,30 +566,33 @@ export function createCamp(
         place(figure, layout.person.x, layout.person.z, layout.person.rotation);
         register('clothing', 'clothing', false, figure.object, figure.materials, figure.object.localToWorld(figure.anchor.clone()));
       }
+      // A real tent in the kit takes the stand-in's place (if the camp's build hasn't pitched it already), before anything goes inside it.
+      pitchTent(items.find((i) => i.model?.replace(/^proc:/, '').startsWith('tent/'))?.model);
       tent.group.updateMatrixWorld(true);
       const inTent = (local: Vector3) => local.clone();
+      const spots = tent.inside;
       for (const item of items) {
         const model = item.model?.replace(/^proc:/, '').split('/')[0];
         let built: GearModel | null = null;
         if (model === 'tent') {
-          register(item.id, 'tent', false, tent.shell, [tent.fabric], tent.group.localToWorld(new Vector3(0, 1.05, 0.2)));
+          register(item.id, 'tent', false, tent.shell, tent.materials, tent.group.localToWorld(tent.anchor.clone()));
           continue;
         }
         if (model === 'pack') built = place(createPack(kitArgs, item.colour), layout.pack.x, layout.pack.z, layout.pack.rotation);
         else if (model === 'stove-pot') built = place(createStove(kitArgs), layout.stove.x, layout.stove.z, 0);
         else if (model === 'bottle') built = place(createBottle(kitArgs, item.colour), layout.water.x, layout.water.z, 0);
         else if (model === 'sleeping-pad') {
-          const at = inTent(INSIDE.pad);
+          const at = inTent(spots.pad);
           built = place(createPad(kitArgs, item.colour), at.x, at.z, 0, tent.group, at.y);
         } else if (model === 'sleeping-bag' || model === 'quilt') {
-          const at = inTent(INSIDE.bed);
+          const at = inTent(spots.bed);
           const make = model === 'quilt' ? createQuilt : createSleepingBag;
           built = place(make(kitArgs, item.colour), at.x, at.z, 0, tent.group, at.y);
         } else if (model === 'pillow') {
-          const at = inTent(INSIDE.pillow);
+          const at = inTent(spots.pillow);
           built = place(createPillow(kitArgs, item.colour), at.x, at.z, 0, tent.group, at.y);
         } else if (model === 'headtorch') {
-          const at = inTent(INSIDE.headtorch);
+          const at = inTent(spots.headtorch);
           built = place(createHeadtorch(kitArgs), at.x, at.z, 0, tent.group, at.y);
         }
         if (!built) continue;
@@ -560,7 +608,10 @@ export function createCamp(
       lit = id;
       if (id) highlights.get(id)?.(true);
     },
-    setInside: tent.setInside,
+    pitchTent,
+    setInside(k: number) {
+      tent.setInside(k);
+    },
     /** Looking into the tent through its ghosted fly, from above the door. */
     insidePose() {
       tent.group.updateMatrixWorld(true);
