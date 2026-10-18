@@ -1,4 +1,4 @@
-import { REVISION, Vector2 } from 'three';
+import { Matrix4, Raycaster, REVISION, Vector2, Vector3, type InstancedMesh, type Mesh } from 'three';
 import type { BiomeId } from '../data/biomes';
 import type { WorldRoute } from './route';
 import type { StationSpec } from './scene/biome-set';
@@ -88,6 +88,15 @@ export type WorldHook = {
   holdLook(on: boolean): void;
   /** Whether something in the scene, by name (the 'dog', the 'foreground-clouds'), is being drawn. */
   shows(name: string): boolean;
+  /**
+   * The shown camp's maples against the terrain as drawn (raycast onto its
+   * mesh, not the height field): each tree's base, its height, and how far
+   * the base stands above the lowest ground around its trunk's flare. The
+   * stems start 0.15 m (scaled) below the base, so more than that floats.
+   */
+  roots(): { x: number; z: number; height: number; gap: number }[];
+  /** How high above the ground at (x, z) the maple's leaves first cover it (raycast straight up), or null if open sky. */
+  cover(x: number, z: number): number | null;
   director: {
     phase(): string;
     /** Stop the timeline moving on its own (tests seek it instead). */
@@ -218,6 +227,60 @@ export function exposeWorld(world: World): WorldHook {
       if (!object) return false;
       for (; object; object = object.parent ?? undefined) if (!object.visible) return false;
       return true;
+    },
+    roots: () => {
+      const biome = world.scene.getObjectByName(`biome-${world.shownBiome}`);
+      const terrain = biome?.getObjectByName('terrain');
+      if (!biome || !terrain) return [];
+      biome.updateMatrixWorld(true);
+      const ray = new Raycaster();
+      const down = new Vector3(0, -1, 0);
+      const m = new Matrix4();
+      const base = new Vector3();
+      const scale = new Vector3();
+      const roots: { x: number; z: number; height: number; gap: number }[] = [];
+      biome.traverse((object) => {
+        if (object.name !== 'maple-bark') return;
+        const mesh = object as Mesh | InstancedMesh;
+        const instanced = (mesh as InstancedMesh).isInstancedMesh;
+        mesh.geometry.computeBoundingBox();
+        // The trunk's footprint: how far its bark spreads at the ground (its flare), in its own space; not a bough sweeping low further out.
+        const position = mesh.geometry.getAttribute('position');
+        let foot = 0;
+        for (let k = 0; k < position.count; k++) {
+          const out = Math.hypot(position.getX(k), position.getZ(k));
+          if (position.getY(k) < 0.2 && out < 4) foot = Math.max(foot, out);
+        }
+        for (let i = 0; i < (instanced ? (mesh as InstancedMesh).count : 1); i++) {
+          if (instanced) {
+            (mesh as InstancedMesh).getMatrixAt(i, m);
+            m.premultiply(mesh.matrixWorld);
+          } else m.copy(mesh.matrixWorld);
+          base.setFromMatrixPosition(m);
+          scale.setFromMatrixScale(m);
+          let lowest = Infinity;
+          for (let k = 0; k <= 8; k++) {
+            const r = k === 8 ? 0 : foot * scale.x;
+            ray.set(new Vector3(base.x + Math.cos(k * 0.785) * r, base.y + 500, base.z + Math.sin(k * 0.785) * r), down);
+            const hit = ray.intersectObject(terrain, false)[0];
+            if (hit) lowest = Math.min(lowest, hit.point.y);
+          }
+          roots.push({ x: base.x, z: base.z, height: mesh.geometry.boundingBox!.max.y * scale.y, gap: base.y - 0.15 * scale.y - lowest });
+        }
+      });
+      return roots;
+    },
+    cover: (x, z) => {
+      const biome = world.scene.getObjectByName(`biome-${world.shownBiome}`);
+      if (!biome) return null;
+      biome.updateMatrixWorld(true);
+      const leaves: Mesh[] = [];
+      biome.traverse((object) => {
+        if (object.name === 'maple-leaves') leaves.push(object as Mesh);
+      });
+      const ground = world.heightAt(x, z);
+      const hit = new Raycaster(new Vector3(x, ground + 0.1, z), new Vector3(0, 1, 0)).intersectObjects(leaves, false)[0];
+      return hit ? hit.point.y - ground : null;
     },
     director: {
       phase: () => world.director.phase,

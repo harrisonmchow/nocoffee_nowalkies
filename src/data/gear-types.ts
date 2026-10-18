@@ -46,6 +46,7 @@ export const itemTypes = {
   water: { category: 'gear', label: 'Water', zone: 'kit', size: 'sm' },
   electronics: { category: 'gear', label: 'Electronics', zone: 'kit', size: 'sm' },
   'first-aid': { category: 'gear', label: 'First aid', zone: 'kit', size: 'sm' },
+  chair: { category: 'gear', label: 'Chair', zone: 'kit', size: 'md' },
   accessories: { category: 'gear', label: 'Accessories', zone: 'kit', size: 'sm' },
 } as const satisfies Record<string, TypeSpec>;
 

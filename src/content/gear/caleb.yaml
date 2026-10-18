@@ -45,10 +45,11 @@ items:
       model: proc:pack
   - id: tent
     name: Tent
+    brand: Durston X-Dome 2
     category: gear
     type: tent
     scene:
-      model: proc:tent/trekking-pole
+      model: proc:tent/durston-x-dome-2
   - id: sleeping-pad
     name: Sleeping pad
     category: gear
@@ -83,6 +84,14 @@ items:
     name: Power bank and cables
     category: gear
     type: electronics
+  - id: chair
+    name: Camp chair
+    brand: NEMO Moonlite
+    category: gear
+    type: chair
+    link: https://www.nemoequipment.com/products/moonlite-reclining-camp-chair
+    scene:
+      model: proc:chair/nemo-moonlite
   - id: first-aid
     name: First aid kit
     category: gear

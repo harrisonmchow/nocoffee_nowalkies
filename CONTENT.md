@@ -72,7 +72,7 @@ items:
 
 **Clothing types:** `hat`, `gloves`, `rain-jacket`, `down-jacket`, `fleece`, `shirt`, `pants`, `socks`, `shoes`.
 
-**Gear types:** `bag`, `tent`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `accessories`.
+**Gear types:** `bag`, `tent`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `chair`, `accessories`.
 
 The type decides where the item sits on the flat-lay. To add a new type, add one line to `src/data/gear-types.ts`.
 
@@ -126,7 +126,7 @@ Only items with `scene` appear in the camp. Each model has its own place, and it
 
 | Where | Models |
 | --- | --- |
-| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack`, `proc:stove-pot`, `proc:bottle` |
+| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack`, `proc:stove-pot`, `proc:bottle`, `proc:chair/nemo-moonlite` |
 | Inside the tent | `proc:sleeping-pad`, `proc:sleeping-bag` or `proc:quilt`, `proc:pillow`, `proc:headtorch` |
 
 Real tents, by model id:
@@ -134,8 +134,11 @@ Real tents, by model id:
 | Model | Tent | Where it's used |
 | --- | --- | --- |
 | `proc:tent/zorali-summitseeker-2p` | Zorali SummitSeeker 2P, rebuilt from its four product photos and its listed size (220 cm long, 130 cm wide at the head, 105 cm at the foot, 110 cm high) | Harry's camp |
+| `proc:tent/durston-x-dome-2` | Durston X-Dome 2, drawn from photos of Caleb's own (ported from the `caleb/mountain-poc` branch): two crossing poles, a brow pole over the doors, a sage fly, about 210 × 130 cm and 117 cm tall | Caleb's camp |
 
 A camp whose tent item names a real tent pitches it in place of the stand-in, and the sleeping kit goes inside it. Any other `proc:tent/...` keeps the stand-in. The tent's card shows the item's `brand` line, so Harry's says "Zorali SummitSeeker 2P". Its weight isn't filled in yet: add `weightG` once it's weighed (the listing gives 1620 g trail weight).
+
+The chair is a real one too: `proc:chair/nemo-moonlite` is the NEMO Moonlite, rebuilt from its product photos and listed size (50 × 51 × 64 cm), set facing the fire. It comes in Smokey Olive; add a colourway to pick another: `proc:chair/nemo-moonlite/black-pearl`, `/quicksilver` or `/brilliant-blue`. NEMO lists 872 g as its minimum weight: add `weightG` once it's weighed.
 
 Clothing shows on the person instead. They wear the colours of any clothing item that has a `colour`: a jacket (rain jacket, down jacket or fleece), the pants, the hat and the shoes.
 
