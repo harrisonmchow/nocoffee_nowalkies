@@ -12,7 +12,7 @@ test.describe.configure({ mode: 'default', timeout: 180_000 });
 test.beforeAll(() => mkdirSync(OUT, { recursive: true }));
 
 const CAMPS = [
-  { person: 'caleb', name: 'Caleb', biome: 'maple-autumn', own: ['maple-leaves', 'maple-far-crowns', 'spruces', 'leaf-carpet', 'falling-leaves', 'dog'] },
+  { person: 'caleb', name: 'Caleb', biome: 'maple-autumn', own: ['maple-leaves', 'maple-bark', 'spruces', 'leaf-carpet', 'falling-leaves', 'dog'] },
   { person: 'mikey', name: 'Mikey', biome: 'coast-sunset', own: ['sea', 'dune-grass', 'car'] },
 ] as const;
 
@@ -74,7 +74,33 @@ test('a screenshot matrix: Caleb’s and Mikey’s landscape, campsite and tent,
   });
 });
 
-test('Caleb’s maples keep their species from seed to seed', async ({ page }, testInfo) => {
+test('Caleb’s one maple stands on the ground, a giant with the whole camp under it', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'biomes-desktop', 'one run is enough');
+  // The camp (LAYOUTS['maple-autumn'] in scene/biome-set.ts): the tent's 2.1 by 1.4 m footprint on a grid, the fire and the person.
+  const tent = { x: -1.8, z: -0.6 };
+  const camp = [
+    ...[-0.9, -0.3, 0.3, 0.9].flatMap((dx) => [-0.5, 0, 0.5].map((dz) => [tent.x + dx, tent.z + dz] as const)),
+    [2.0, 1.6] as const,
+    [0.45, 1.2] as const,
+  ];
+  for (const seed of [1, 2, 3]) {
+    await openCamp(page, 'caleb', 'maple-autumn', `t=4&seed=${seed}`, 'camp');
+    const roots = await page.evaluate(() => window.__world!.roots());
+    expect(roots.length, `seed ${seed}: maples in the valley`).toBe(1);
+    const [maple] = roots;
+    // Against the terrain as drawn: a root above the lowest ground around its trunk hangs in the air.
+    expect(maple.gap, `seed ${seed}: the maple floats`).toBeLessThanOrEqual(0);
+    // Three to five garden maples (about 4.5 m) tall.
+    expect(maple.height, `seed ${seed}: the maple's height`).toBeGreaterThan(13.5);
+    expect(maple.height, `seed ${seed}: the maple's height`).toBeLessThan(22.5);
+    // Everything at camp under its leaves, and they're well above it (the person is 1.8 m).
+    const cover = await page.evaluate((points) => points.map(([x, z]) => window.__world!.cover(x, z)), camp);
+    expect(cover.every((c) => c !== null), `seed ${seed}: the camp under the crown`).toBe(true);
+    expect(Math.min(...(cover as number[])), `seed ${seed}: lowest leaves over the camp`).toBeGreaterThan(3);
+  }
+});
+
+test('Caleb’s maple keeps its species from seed to seed', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'biomes-desktop', 'one run is enough');
   const images: SheetImage[] = [];
   const triangles: number[] = [];
@@ -88,7 +114,7 @@ test('Caleb’s maples keep their species from seed to seed', async ({ page }, t
   }
   // Other trees in other places, the same kind of tree: the camp's size barely moves.
   for (const n of triangles) expect(Math.abs(n - triangles[0]) / triangles[0]).toBeLessThan(0.15);
-  await contactSheet(page.context().browser()!, images, `${OUT}/m3-maples-seeds.png`, { columns: 3, title: 'Three seeds of the same grove' });
+  await contactSheet(page.context().browser()!, images, `${OUT}/m3-maples-seeds.png`, { columns: 3, title: 'Three seeds of the same maple' });
 });
 
 test('Mikey’s sea: its crest, true depth and Fresnel come from the same waves', async ({ page }, testInfo) => {

@@ -97,6 +97,14 @@ export const drawings: Record<ItemType, string> = {
     <rect class="f" x="36" y="56" width="128" height="96" rx="16"/>
     <path d="M36 74 L164 74"/>
     <path class="f" d="M92 86 L108 86 L108 102 L124 102 L124 118 L108 118 L108 134 L92 134 L92 118 L76 118 L76 102 L92 102 Z"/>`,
+  chair: `
+    <path class="f" d="M58 34 L142 34 L150 92 Q100 104 50 92 Z"/>
+    <path class="f" d="M50 92 Q100 104 150 92 L156 150 Q100 166 44 150 Z"/>
+    <path d="M58 34 L44 150 M142 34 L156 150 M66 100 L134 100"/>
+    <path d="M70 108 L38 176 M70 108 L64 30 M130 108 L162 176 M130 108 L136 30 M70 108 L130 108"/>
+    <circle class="f" cx="70" cy="108" r="6"/>
+    <circle class="f" cx="130" cy="108" r="6"/>
+    <path class="f" d="M86 36 L114 36 L110 52 L90 52 Z"/>`,
   accessories: `
     <ellipse cx="100" cy="112" rx="72" ry="44"/>
     <ellipse cx="100" cy="112" rx="64" ry="36"/>

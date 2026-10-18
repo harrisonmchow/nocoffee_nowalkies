@@ -5,7 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
 // and ?tier switches exist. Baselines (screenshots and axe results) live in
 // tests/__snapshots__, one set per platform, because font rendering differs
 // between machines.
-const PORT = 4330;
+// PLAYWRIGHT_PORT moves it when 4330 is taken (an existing server there is reused, whatever it's serving).
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 4330);
 const sheets = /sheets\.spec\.ts/;
 const frames = /frames\.spec\.ts/;
 const biomes = /biomes\.spec\.ts/;
@@ -49,7 +50,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run build && npx astro preview --host 127.0.0.1 --port ${PORT}`,
+    // --ignore-lock: Astro allows one preview per project, and a preview left open shouldn't stop the tests.
+    command: `npm run build && npx astro preview --ignore-lock --host 127.0.0.1 --port ${PORT}`,
     url: `http://127.0.0.1:${PORT}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

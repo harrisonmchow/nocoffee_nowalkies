@@ -166,13 +166,16 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
 
 **M3 done (17 October 2026), except the hub: Caleb's and Mikey's camps.** The hub waits, since `/gear/` is hidden and nothing links to it.
 
-- **Caleb: autumn under Japanese maples** (`scene/maples.ts`, `scene/leaf-fall.ts`).
-  - The maples grow by the vegetation skill's structured Ash system, with an Acer palmatum species table: a short trunk forking low into a few leaders, wide spreading tiers, fine twigs.
-  - Recorded divergences from the Ash contract: radius-driven terms (gnarliness, tropism) measure radius in 8 cm units, since the scene is in metres; leaves are sprays of three palmate leaves on one drawn texture; the perpendicular twin card only near each twig's tip.
-  - Near the camp, about 23 full growths (three seeded variants, instanced, high tier), ringed around the clearing with a clear corridor for the cameras. Out to 700 m, cheap maples: a trunk and crown cards painted with many small leaves.
-  - Leaves are coloured per tree from an autumn palette, darker deep in the crown, fluttering from their roots, and glowing when back-lit by the low sun.
+- **Caleb: autumn under one great Japanese maple** (`scene/maples.ts`, `scene/leaf-fall.ts`).
+  - The valley's only maple is a giant, about 18 m tall (four garden maples) with a crown about 35 m across, after the references: one sinuous trunk forking into at most seven long limbs that rise, arch out and droop, side branches, and fine kinked twigs hanging from them with the leaves. The limbs are far apart, so the crown is a broad, layered umbrella that's open underneath.
+  - It stands 7–10 m behind the camp from the views, leaning a little over it, with the whole camp under its crown; nothing hangs below 3.2 m within 13 m of the camp, so the campsite and the orbit's camera stay clear. One tree, not a grove: more impressive, and cheaper (about 50k triangles and two draws, where 27 garden maples were about 110k).
+  - Growth (any size; size 1 is a garden maple of about 5 m): a larger tree isn't scaled up but grown out, with more branches along its longer limbs and more twigs along its branches, slightly larger leaf sprays, and more sides on its trunk and limbs. Of three seeds, the one grown closest to 18 m is fitted to it.
+  - Recorded divergences from the vegetation skill's structured Ash system: each branch is a walk whose heading follows two slow waves and a few elbow kinks (so limbs wind rather than wobble), levelling out rather than sweeping into the ground; four fixed levels (stems, limbs, branches, twigs) with children alternating sides; parallel-transport rings and pipe-model radii; leaves are sprays of three palmate leaves on one drawn texture, only on twigs and branch ends, with crown-volume normals and the perpendicular twin card only at each twig's tip.
+  - The camp is in a level clearing: the valley's bumps fade out within about 35 m of it, rising back by 150 m. The tree is planted on the terrain as drawn (its triangles), not the height field, which runs above it over rises.
+  - Tests: one maple, its root on the drawn ground (raycast), 13.5–22.5 m tall, and the tent, fire and person all under leaves more than 3 m up.
+  - Leaves are coloured in broad patches of reds warming to orange and gold toward the top (per card, from a slow noise over the crown), darker deep in it, fluttering from their roots, and glowing when back-lit by the low sun.
   - A carpet of fallen leaves around the tent, and about 100 leaves (60 on mid) drifting down through the clearing, each on its own phase.
-  - From afar, the terrain's canopy covers the valley (with a clearing around the camp) and is painted as separate crowns: a cell per tree, shaded as a dome, each tree red or amber. A few evergreens among the maples.
+  - From afar, the terrain's canopy covers the valley (with a clearing around the camp) and is painted as separate crowns: a cell per tree, shaded as a dome, each tree red or amber. A few evergreens further off.
   - Light: a low golden sun from ahead, warm haze lying in the valley, mist puffs on the floor, cool blue shade; mossy rock and soil.
 - **Mikey: the coast at sunset** (`scene/sea.ts`, `scene/dune-grass.ts`).
   - The sea follows the water-optics skill's authored analytic surface: one wave list gives the normal and the crest metric; finer ripples add to the normal only and fade before they're unresolved. Fresnel from the air side, against the sky's own radiance; the body is the sand bed at its true depth (sea level less the heightmap), absorbed per channel along the refracted path, plus the water's scatter; the sun's glitter path; foam from the crest metric and where waves break in the shallows. The last metre of depth fades out, so the waterline is soft.
@@ -212,6 +215,52 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
   - The intake, a spec of 64 components generated from the same part list, strict validation, and the blockout, structural and form passes, each rendered from the generated factory and reviewed against the photos. Tier 1 silhouette overlap with the primary photo is 0.95.
   - It stopped at the material pass, where its target was already reached: 0.80 against 0.70, with every critical feature at or above its bar. That pass's per-part colour check matches all 16 colours against a render's five dominant ones, so it can't pass for a tent whose inner, poles and zips hide under the fly. Measured per material instead: the fly, band and mesh are within delta-E 10 of the photos.
 - **Not yet:** the vents' visors are subtler than the photos'; the inner door's exact cut and the far side are inferred; the other three camps still have the stand-in.
+
+**Caleb's camp chair is his real one (18 October 2026): the NEMO Moonlite.** Rebuilt in code from NEMO's product photos (the four colourways from one studio angle, a side view with a sitter, and close-ups of a hub, a corner pocket and the recline hardware) and its listed size, 50 × 51 × 64 cm, through the img2threejs skill's pipeline. It sits on the far side of the fire from the tent, angled toward the fire and the camera.
+
+- **How it's built** (`scene/moonlite-geometry.ts`):
+  - The frame: two forged hubs 15 cm up, joined by a crossbar. From each hub, four straight 16 mm tubes make an X: two legs to flared rubber feet, an upright to the seat's front corner, and a longer one to the top of the back.
+  - The sling hangs from the four ball tips. Its centre line is a curve from the top of the back down to a low point 28 cm up and back up to the front edge. Each free side sweeps down and in between its corners, and the cloth cups between them. The back stays in front of the rear uprights, which show through the mesh in the photos.
+  - Black pockets wrap the top corners and cup the front ones. A shield patch sits at the top of the back.
+  - The armrest straps run from each top pocket to the front pocket, with the light recline webbing from the buckle forward, and a pull tab with its toggle.
+  - Each part is built for the chair's left side and reflected for its right, with its triangles turned back.
+  - The four colourways are presets, with colours sampled from the photos. The knit, the MOONLITE print and the logos are flat colour: all below a pixel at the campsite's distance.
+- **In the camp** (`createChair` in `scene/gear-models.ts`): about 4.9k triangles in the world's prop materials, with the cloth two-sided. At camp distance the feet read as frame, the print as webbing and the toggle as buckle, so they share those materials, as do hubs the frame's colour: 5 draw calls (6 for Black Pearl and Quicksilver, whose hubs differ). Quicksilver's black feet take its violet frame colour.
+- **Budget:** Caleb's campsite (high tier) is at 76 draw calls against the 60 budget, 71 of them without the chair. It was already over before the chair, from the uncommitted maple and X-Dome work, so the budget test fails either way. A chair spot facing the fire was added to every camp layout; only Caleb's kit has a chair.
+- **Content:** a `chair` gear type with its own flat-lay drawing, and Caleb's item "Camp chair", "NEMO Moonlite", with the product link and no weight yet.
+- **The pipeline's record** (outside the repo, in the session's workspace):
+  - Covered: the intake, a strict-validated spec of 29 components from the same part list, PBR evidence for all nine materials (confidence 0.71–0.86), and two blockout reviews against the photo, using a camera fitted to the photo's silhouette.
+  - **Stopped at blockout:**
+    - The Tier 1 silhouette overlap reaches 0.839 against the 0.85 gate, measured on the photo with its ground shadow removed and the knit's see-through holes closed. The gate is 0.85, so the pass gate doesn't unlock.
+    - Divine Eye passes it (fidelity 0.856). The turntable and multi-angle checks pass.
+    - The last geometry changes moved the overlap by less than 0.002, so it's at a plateau.
+  - **The generated factory isn't used:** it places each part in its own normalised frame, so its renders are a slab and floating struts. Every review was rendered from `moonlite-geometry.ts`.
+- **Not yet:** the far side and the back of the sling are mirrored or inferred; the far strap sits about 1.5 cm further out in the photo; the recline position isn't modelled (it's always upright).
+
+**Caleb's X-Dome 2, rebuilt to Durston's dimensions, with an inner and an openable door (19 October 2026).** One model with an openable door rather than two models (closed and open), following the X-Mid's `setDoor`. Built from Durston's product photos: the dimension diagram (top, end and side views), the fly closed from the side and the end, the door open, and the inner pitched alone.
+
+- **What was wrong:** the earlier model had a 2.1 × 1.3 m box with pointed vestibules, two crossing poles, and no inner. Durston's diagram shows:
+  - a near-square fly, 2.2 × 2.0 m between the pole feet;
+  - a hubbed frame;
+  - an inner set diagonally across the fly.
+- **The frame** (`scene/xdome-geometry.ts`):
+  - At each end, two legs climb from the corners to a hub 1.03 m up, and a ridge joins the hubs (0.76 m apart).
+  - The legs rise evenly across the end (nearly straight in the end view) and swing in along the tent near the top (curved in the side view). The side silhouette is within about 5 cm of the photo's half-width at every height.
+  - A brow pole crosses the ridge on a strut, 1.165 m at the top. Its ends lift the fly's peaks over the doors, a little above the hubs.
+- **The fly:** a membrane pinned at the hem and under the legs, the ridge and the brow pole, so it's a trapezoid seen from the end. Seams run from each peak to both corners, and a vent hood hangs from each hub down to its legs.
+- **The inner:**
+  - A 2.24 × 1.3 m parallelogram floor, its ends along the fly's ends and its centre line 0.3 m toward the front at one end and toward the back at the other. So each vestibule is a triangle beside its door, 0.65 m deep at one end and next to nothing at the other.
+  - A grey bathtub 13 cm up, then dark mesh rising steeply off the rim (about 69°) to follow the fly 6 cm under it, peaking 1.09 m up (Durston: 43 in).
+- **The doors:**
+  - Each fly door is a fan from its peak. It's zipped to the hem 0.45 m right of centre (the top view's dotted line) and sewn along the seam to the left corner.
+  - Under it, the inner has its own door, zipped from 1.0 m up down to the tub, right of centre.
+  - `setDoor(k)` (0 zipped, 1 open) gathers both front doors back along their seams in folds, as the magnets hold them in the main shot.
+  - Each hole in the fly and the inner is cut along its grid, with the cut's corners slid onto the seam and zip so the edges run straight.
+- **In the camp** (`scene/xdome.ts`):
+  - Drawn at its real size; the old upward stretch is gone.
+  - Pitched with the front door open (`PITCHED_DOOR`). At night the headtorch lights the inner's floor and mesh through the doorway.
+  - The sleeping kit lies along the inner's slant, on its back half: camp.ts takes an optional `yaw` in a tent's `inside`.
+- **Not yet:** how the gathered doors fold, the inner door's exact outline, and the inner's walls between rim and poles are inferred. The inner's solid panels at its lower ends are left out.
 
 ---
 

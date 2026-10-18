@@ -575,7 +575,7 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     expect((await shown()).cloud).toBe(false);
   });
 
-  test('Harry’s tent is his Zorali SummitSeeker; a camp without a real tent keeps the stand-in', async ({ page }) => {
+  test('Harry’s tent is his Zorali SummitSeeker, and Kevin’s is his NEMO Dagger', async ({ page }) => {
     const parts = () => page.evaluate(() => ['summitseeker', 'summitseeker-fly', 'summitseeker-inner', 'summitseeker-canopy', 'summitseeker-frame'].map((name) => window.__world!.shows(name)));
     // Pitched as soon as the camp is built, so it's there from the landscape, before the kit arrives.
     await openCamp(page, 'harry', 'alpine-aurora');
@@ -584,6 +584,7 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     expect(await parts()).toEqual([true, true, true, true, true]);
     await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
     expect(await parts()).toEqual([false, false, false, false, false]);
+    expect(await page.evaluate(() => ['dagger', 'dagger-fly', 'dagger-door', 'dagger-poles'].map((name) => window.__world!.shows(name)))).toEqual([true, true, true, true]);
   });
 
   test('clicking the tent goes inside, to the sleeping bag, the mat and the pillow', async ({ page }, testInfo) => {

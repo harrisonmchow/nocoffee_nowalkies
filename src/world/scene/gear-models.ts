@@ -4,6 +4,7 @@
 // lights only that thing, and an anchor (local) for its hotspot.
 import {
   BoxGeometry,
+  DoubleSide,
   CapsuleGeometry,
   CylinderGeometry,
   Mesh,
@@ -17,6 +18,7 @@ import {
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createPropMaterial } from './props-material';
+import { MOONLITE_COLOURWAYS, MOONLITE_HEIGHT, buildMoonlite, type MoonliteColourway } from './moonlite-geometry';
 import type { WorldUniforms } from '../systems/uniforms';
 
 export type GearModel = {
@@ -265,44 +267,104 @@ export function createDog(kit: Kit, coat = '#b07a45'): GearModel & { update(time
 }
 
 /**
- * A generic dual-cab ute, about 5.2 m long, front toward +z: a stand-in for
- * Mikey's car until a model replaces it. Glossy paint, dark glass, an open
- * tray, and four wheels.
+ * A Suzuki Jimny (the boxy JB74), about 3.5 m long, front toward +z: a
+ * stand-in for Mikey's car until a model replaces it. Upright and square,
+ * two-tone with a black roof and pillars, round headlights either side of a
+ * five-slot grille, black wheel-arch flares, and the spare on the back door.
  */
-export function createCar(kit: Kit, paintColour = '#dcd9d2'): GearModel {
+export function createCar(kit: Kit, paintColour = '#e2c31f'): GearModel {
   const { object, material, add, finish } = build(kit);
   object.name = 'car';
   const paint = material(paintColour, { roughness: 0.28, metalness: 0.15 });
+  const roof = material('#18191b', { roughness: 0.35, metalness: 0.2 });
   const glass = material('#141a20', { roughness: 0.06, metalness: 0.7 });
   const trim = material('#1e1f21', { roughness: 0.7 });
   const tyre = material('#151515', { roughness: 0.92 });
-  const hub = material('#b9bab8', { roughness: 0.3, metalness: 0.8 });
+  const hub = material('#5d6062', { roughness: 0.35, metalness: 0.75 });
   const lamp = material('#f4e2c0', { roughness: 0.3, emissive: '#ffd9a0' });
   lamp.emissiveIntensity = 0.6;
   const tail = material('#5a0d0d', { roughness: 0.4, emissive: '#c01818' });
   tail.emissiveIntensity = 0.4;
-  // The body: a lower shell the length of the car, the bonnet, and the cab with its glasshouse and roof.
-  add(new RoundedBoxGeometry(1.84, 0.62, 5.2, 3, 0.12), paint, 0, 0.66, 0);
-  add(new RoundedBoxGeometry(1.8, 0.24, 1.45, 3, 0.1), paint, 0, 1.05, 1.85);
-  add(new RoundedBoxGeometry(1.76, 0.42, 2.45, 3, 0.1), paint, 0, 1.14, 0.25);
-  add(new RoundedBoxGeometry(1.66, 0.5, 2.25, 3, 0.12), glass, 0, 1.56, 0.2);
-  add(new RoundedBoxGeometry(1.7, 0.08, 2.15, 2, 0.04), paint, 0, 1.84, 0.15);
-  // The tray: open, its sides and tailgate standing up from the shell.
-  for (const side of [-1, 1]) add(new RoundedBoxGeometry(0.07, 0.42, 1.75, 2, 0.03), paint, side * 0.885, 1.15, -1.62);
-  add(new RoundedBoxGeometry(1.84, 0.42, 0.07, 2, 0.03), paint, 0, 1.15, -2.5);
-  add(new RoundedBoxGeometry(1.7, 0.04, 1.7, 1, 0.02), trim, 0, 0.98, -1.62);
-  // Bumpers, lights and wheels.
-  add(new RoundedBoxGeometry(1.9, 0.2, 0.22, 2, 0.06), trim, 0, 0.5, 2.6);
-  add(new RoundedBoxGeometry(1.9, 0.2, 0.22, 2, 0.06), trim, 0, 0.5, -2.58);
+  // The body: a tall, square shell riding high, its flat bonnet, and an upright glasshouse under a black roof.
+  add(new RoundedBoxGeometry(1.5, 0.62, 3.25, 3, 0.06), paint, 0, 0.81, 0);
+  add(new RoundedBoxGeometry(1.48, 0.06, 0.9, 2, 0.03), paint, 0, 1.13, 1.17);
+  add(new RoundedBoxGeometry(1.44, 0.44, 2.2, 2, 0.04), glass, 0, 1.34, -0.47);
+  add(new RoundedBoxGeometry(1.5, 0.08, 2.3, 2, 0.03), roof, 0, 1.62, -0.47);
   for (const side of [-1, 1]) {
-    add(new RoundedBoxGeometry(0.34, 0.14, 0.06, 1, 0.03), lamp, side * 0.66, 0.9, 2.6);
-    add(new RoundedBoxGeometry(0.12, 0.26, 0.06, 1, 0.03), tail, side * 0.85, 1.05, -2.56);
+    // Black A-pillars, body-colour pillars behind them, a drip rail and a mirror.
+    add(new BoxGeometry(0.05, 0.44, 0.09), roof, side * 0.725, 1.34, 0.66);
+    for (const z of [-0.2, -1.5]) add(new BoxGeometry(0.05, 0.44, z < -1 ? 0.2 : 0.12), paint, side * 0.725, 1.34, z);
+    add(new BoxGeometry(0.03, 0.03, 2.3), roof, side * 0.74, 1.6, -0.47);
+    add(new RoundedBoxGeometry(0.1, 0.12, 0.06, 1, 0.02), roof, side * 0.82, 1.16, 0.6);
+    // A black sill between the arches.
+    add(new RoundedBoxGeometry(0.06, 0.12, 1.3, 1, 0.03), trim, side * 0.76, 0.55, 0);
+  }
+  // The face: a black grille with five slots, round headlights, and a chunky bumper.
+  add(new RoundedBoxGeometry(0.86, 0.26, 0.04, 1, 0.015), trim, 0, 0.88, 1.63);
+  for (let i = -2; i <= 2; i++) add(new BoxGeometry(0.07, 0.17, 0.02), tyre, i * 0.15, 0.88, 1.65);
+  for (const side of [-1, 1]) {
+    const bezel = add(new TorusGeometry(0.11, 0.02, 6, 20), trim, side * 0.6, 0.88, 1.635);
+    bezel.scale.z = 1.5;
+    const light = add(new CylinderGeometry(0.1, 0.1, 0.04, 20), lamp, side * 0.6, 0.88, 1.63);
+    light.rotation.x = Math.PI / 2;
+  }
+  add(new RoundedBoxGeometry(1.6, 0.22, 0.2, 2, 0.05), trim, 0, 0.52, 1.68);
+  // The back: a bumper with the tail-lights in it, and the spare wheel on the door.
+  add(new RoundedBoxGeometry(1.6, 0.22, 0.2, 2, 0.05), trim, 0, 0.52, -1.67);
+  for (const side of [-1, 1]) add(new RoundedBoxGeometry(0.2, 0.08, 0.04, 1, 0.015), tail, side * 0.6, 0.55, -1.78);
+  const spare = add(new CylinderGeometry(0.33, 0.33, 0.22, 20), tyre, 0, 0.98, -1.74);
+  spare.rotation.x = Math.PI / 2;
+  const spareHub = add(new CylinderGeometry(0.17, 0.17, 0.24, 14), hub, 0, 0.98, -1.74);
+  spareHub.rotation.x = Math.PI / 2;
+  // Wheels under flared arches, set out near the corners.
+  for (const side of [-1, 1]) {
     for (const end of [-1, 1]) {
-      const wheel = add(new CylinderGeometry(0.39, 0.39, 0.28, 20), tyre, side * 0.82, 0.39, end * 1.62);
+      const z = end * 1.125;
+      const wheel = add(new CylinderGeometry(0.35, 0.35, 0.24, 20), tyre, side * 0.7, 0.35, z);
       wheel.rotation.z = Math.PI / 2;
-      const cap = add(new CylinderGeometry(0.22, 0.22, 0.3, 16), hub, side * 0.82, 0.39, end * 1.62);
+      const cap = add(new CylinderGeometry(0.2, 0.2, 0.26, 14), hub, side * 0.7, 0.35, z);
       cap.rotation.z = Math.PI / 2;
+      const flare = add(new TorusGeometry(0.42, 0.06, 6, 16, Math.PI), trim, side * 0.77, 0.4, z);
+      flare.rotation.y = Math.PI / 2;
+      flare.scale.x = 1.4;
     }
   }
   return finish(new Vector3(0, 2.0, 0));
+}
+
+/**
+ * A camp chair: the NEMO Moonlite (moonlite-geometry.ts), about 0.64 m tall,
+ * facing +z, in the colourway its model names
+ * (`proc:chair/nemo-moonlite/<colourway>`, Smokey Olive by default).
+ */
+export function createChair(kit: Kit, variant: string[] = []): GearModel {
+  const { object, material, finish } = build(kit);
+  object.name = 'chair';
+  const way = variant[1] && variant[1] in MOONLITE_COLOURWAYS ? (variant[1] as MoonliteColourway) : 'smokey-olive';
+  const c = MOONLITE_COLOURWAYS[way];
+  // The sling, pockets and webbing are single sheets, seen from both sides.
+  const cloth = (color: string, roughness: number) => {
+    const m = material(color, { roughness });
+    m.side = DoubleSide;
+    return m;
+  };
+  // At camp distance the feet read as frame, the print as webbing and the toggle as
+  // buckle, so they share those materials: five or six draw calls, not nine. The hubs
+  // keep their own only where they're a different colour (Black Pearl's chartreuse).
+  const frame = material(c.frame, { roughness: 0.4, metalness: 0.5 });
+  const webbing = cloth(c.webbing, 0.85);
+  const metal = material(c.toggle, { roughness: 0.35, metalness: 0.75 });
+  const meshes = buildMoonlite({
+    frame,
+    hub: c.hub === c.frame ? frame : material(c.hub, { roughness: 0.45, metalness: 0.5 }),
+    rubber: frame,
+    mesh: cloth(c.mesh, 1),
+    trim: cloth(c.trim, 0.8),
+    webbing,
+    metal,
+    print: webbing,
+    toggle: metal,
+  });
+  meshes.forEach((m) => object.add(m));
+  return finish(new Vector3(0, MOONLITE_HEIGHT + 0.06, -0.2));
 }

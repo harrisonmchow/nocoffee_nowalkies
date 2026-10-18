@@ -139,7 +139,7 @@ function cirque(seed: number): TerrainSpec {
   return { height, camp, water: lake, lake: { x: 0, z: lakeZ, radius: lakeR } };
 }
 
-// Caleb (placeholder until M3): a forested valley with hills either side.
+// Caleb: a forested valley with hills either side, the camp in a level clearing among the maples.
 function valley(seed: number): TerrainSpec {
   const n1 = createSimplex2D(seed);
   const n2 = createSimplex2D(seed + 1);
@@ -149,6 +149,8 @@ function valley(seed: number): TerrainSpec {
     let h = 295 + 430 * smoothstep(120, 1300, across) + 70 * fbm(n1, x / 600, z / 600, 4);
     h += 22 * fbm(n2, x / 120, z / 120, 3);
     const r = Math.hypot(x, z);
+    // Around the camp the valley's bumps settle into a broad, gentle clearing, so the forest stands on level ground around it.
+    h = camp + (h - camp) * (0.06 + 0.94 * smoothstep(35, 150, r));
     h = Math.max(h, (700 + 900 * ridged(n1, x / 2400, z / 2400, 4)) * smoothstep(1600, 3200, r));
     return withPad(h, x, z, camp, 20);
   };
