@@ -72,7 +72,7 @@ items:
 
 **Clothing types:** `hat`, `gloves`, `rain-jacket`, `down-jacket`, `fleece`, `shirt`, `pants`, `socks`, `shoes`.
 
-**Gear types:** `bag`, `tent`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `accessories`.
+**Gear types:** `bag`, `tent`, `chair`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `accessories`.
 
 The type decides where the item sits on the flat-lay. To add a new type, add one line to `src/data/gear-types.ts`.
 
@@ -126,8 +126,8 @@ Only items with `scene` appear in the camp. Each model has its own place, and it
 
 | Where | Models |
 | --- | --- |
-| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack`, `proc:stove-pot`, `proc:bottle` |
-| Inside the tent | `proc:sleeping-pad`, `proc:sleeping-bag` or `proc:quilt`, `proc:pillow`, `proc:headtorch` |
+| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack`, `proc:stove-pot`, `proc:bottle`, a real chair (below) |
+| Inside the tent | `proc:sleeping-pad` or a real pad (below), `proc:sleeping-bag` or `proc:quilt`, `proc:pillow` or a real pillow (below), `proc:headtorch` |
 
 Real tents, by model id:
 
@@ -137,7 +137,20 @@ Real tents, by model id:
 
 A camp whose tent item names a real tent pitches it in place of the stand-in, and the sleeping kit goes inside it. Any other `proc:tent/...` keeps the stand-in. The tent's card shows the item's `brand` line, so Harry's says "Zorali SummitSeeker 2P". Its weight isn't filled in yet: add `weightG` once it's weighed (the listing gives 1620 g trail weight).
 
+Real kit, by model id:
+
+| Model | Kit | Where it's used |
+| --- | --- | --- |
+| `proc:sleeping-pad/nemo-tensor-all-season` | NEMO Tensor All-Season, Regular Wide: 183 × 64 cm and 8.9 cm thick, rebuilt from its five product photos (the listing gives the thickness; the length and width are NEMO's Regular Wide size) | Harry's tent |
+| `proc:pillow/nemo-fillo` | NEMO Fillo in Silt Stripe, 43 × 27 × 10 cm, rebuilt from its five product photos | Harry's tent |
+| `proc:chair/alton-lightweight` | Alton Lightweight Camp Chair, 50 × 52 × 67 cm, rebuilt from its five product photos | Harry's campsite, by the fire |
+| `proc:pack/osprey-aether-65` | Osprey Aether 65 Men's, Large/X-Large, in Deep Water Blue: 80 cm high, rebuilt from two photos of it (front and back) and its listed size (80 × 40 × 28 cm) | Harry's campsite, by the tent |
+
+A pad, pillow or pack item that names a real model gets it in place of the stand-in, and the bag and pillow then lie on the real pad's top. A chair only appears with a real model (there's no stand-in) and a chair spot in the camp's layout (`chair` in `biome-set.ts`); only Harry's camp has one. None of the four has a weight yet: add `weightG` once they're weighed (the listings give 530 g for the pad, 260 g for the pillow, 850 g for the chair and 2.1 kg for the pack).
+
 Clothing shows on the person instead. They wear the colours of any clothing item that has a `colour`: a jacket (rain jacket, down jacket or fleece), the pants, the hat and the shoes.
+
+Kevin's camp also has a snow leopard, which isn't anyone's kit, so it has no item or hotspot. It's the one model at camp that someone else made: "Snow leopard by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/26tTvxyxkPC)". That credit is on `/credits`. Any other third-party model needs its credit added to the `models` list in `src/pages/credits.astro`, worded as its source asks.
 
 ## Gear reviews
 

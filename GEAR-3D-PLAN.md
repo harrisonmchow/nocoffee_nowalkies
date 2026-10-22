@@ -213,6 +213,67 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
   - It stopped at the material pass, where its target was already reached: 0.80 against 0.70, with every critical feature at or above its bar. That pass's per-part colour check matches all 16 colours against a render's five dominant ones, so it can't pass for a tent whose inner, poles and zips hide under the fly. Measured per material instead: the fly, band and mesh are within delta-E 10 of the photos.
 - **Not yet:** the vents' visors are subtler than the photos'; the inner door's exact cut and the far side are inferred; the other three camps still have the stand-in.
 
+**Harry's pad, pillow and chair are his real ones (20 October 2026): the NEMO Tensor All-Season, the NEMO Fillo and the Alton Lightweight Camp Chair.** Each was rebuilt in code from its product page's photos and listed size, through the img2threejs skill's pipeline. The pad and pillow replace the stand-ins in Harry's tent, and the chair is new, by the fire.
+
+- **How they're built:** as with the tent, each model's parts are described as data first and then built, so the review renders, the pipeline's specs and the camp all use the same numbers. `scene/kit-geometry.ts` holds what the three share.
+  - **The pad** (`scene/tensor-geometry.ts`): the quilted top's height is one function, with 20 baffles along and 9 domed cells across each (counted on the top-down photo), valleys 45% of the top's rise deep and dimples between cells 30%. The top rounds over a squared-off edge to a seam that dips under each valley, over a red-orange base. Each baffle's end bulges 1.5 cm, so the edge is scalloped. The valve, loop and marks sit on the same function, so they lie on the cells exactly.
+  - **The pillow** (`scene/fillo-geometry.ts`): two faces rise from a seam over round shoulders to a domed middle, with the corners pinched lower. Its ten stripes (2.6 cm apart and 4 mm wide, measured on the front photo) and the back's navy panel are vertex colours with hard edges, not textures.
+  - **The chair** (`scene/alton-chair-geometry.ts`): its frame (hubs, feet and pole tips) and the three photos' cameras were solved together from 28 points measured on the photos, to 12 px rms on 2,000 px. The sling's corners, front edge, seat, seam, patch, slits and pocket were then triangulated from the photos through those cameras. Each of its cross-sections runs from a centre line out to side edges that bow outward, rising gently across the centre panel and then sharply into the side panels. The sling sits slightly skewed on the frame, as the photos show; about half of the measured skew is kept.
+  - Colours were sampled from crops of the photos. Every material is flat colour: the chair's ripstop grid is averaged into its colour, since it is below a pixel at camp distances.
+- **In the camp** (`scene/kit-models.ts`): each model is merged into one mesh per material in the world's own materials, coloured per vertex. The pad and pillow are one draw call each and the chair two (fabric and frame). They keep the stand-ins' contract: their own highlight, a hotspot and a card.
+  - `camp.ts` picks real kit by `proc:<type>/<variant>` (`REAL_KIT`), and every other camp keeps the stand-ins. The real pad says how high things rest on it, so the bag and pillow lift onto its 8.4 cm top. The real pillow lies across the pad's head.
+  - The chair stands at a new `chair` spot in Harry's layout (`biome-set.ts`), by the fire and facing it, three-quarter on to the view. Only a camp with that spot and a real chair gets one.
+- **Content:** Harry's pad and pillow items have brand lines ("NEMO Tensor All-Season (Regular Wide)", "NEMO Fillo (Silt Stripe)") and links. There is a new chair item (brand line "Alton Lightweight", so it reads "Alton Lightweight Camp chair", with a link), a new `chair` gear type in the flat-lay's "Kitchen and kit" zone, and its drawing. No weights yet, so Harry's totals don't change.
+- **Measured** (desktop, high tier): Harry's campsite went from 44 to 46 calls and from 128k to 156k triangles, with programs unchanged at 18 (no new shaders).
+- **Validated:** the campsite test now expects the chair's hotspot, and its card names it. A new test checks that Harry's camp shows the real pad, pillow and chair and Kevin's the stand-ins. The pillow's card names the Fillo.
+  - The full suite's first run: 116 passed, 10 failed.
+  - Re-recorded as intended changes:
+    - the flat-lay fallback screenshots (desktop, phone and WebKit), which add the chair and the brand lines; that baseline still read "Tent", from before Harry's tent had its brand line;
+    - the axe snapshots of Harry's page and camp page, where an existing label-mismatch entry carries the item count, now 11.
+  - Three camp tests timed out under the suite's software-WebGL load and pass when run on their own: Kevin's camp, the SummitSeeker test and going into the tent.
+  - The contact sheets and the WebKit frame-time test pass.
+  - The biome checks for Caleb's and Mikey's camps time out on this machine at the moment (3 of 5 on desktop, 2 of 3 on phone, different tests on each run). The last commit, without these changes, times out the same way.
+- **The pipeline's record** (outside the repo, in the session's workspace):
+  - For each model: the intake, a spec generated from the same part list, strict validation, and passes rendered from the generated factory, patched to build from the shipped parts, and reviewed against the photos.
+  - The pad and chair went through all eight passes to completion, with part coverage and the action-ready hierarchy checked. Tier 1 silhouette overlap with the primary photo is 0.865 for the pad and 0.853 for the chair.
+    - The chair is compared with its photos' own segmentation: the chair's pixels are kept, and the studio's soft floor shadow is set to the background, since that shadow is the photo's light and not the chair. Against the raw photo, the best light-matched render reaches 0.80.
+  - The pillow stopped at the material pass, where its target was already reached (0.84 against 0.70, with every critical feature at or above its bar). That pass's per-part colour check can't see the pillow's back (underneath in the primary photo) or its trims (a few pixels each). Measured per material from an ID render instead, the cover is within delta-E 5 of the front photo.
+- **Not yet:** the marks' and patch's lettering; the ripstop's grid; the pillow's corners are a little rounder than the photo's soft points; chairs for the other camps.
+
+**Kevin's camp has a snow leopard (22 October 2026), the first third-party model and the first GLB.** "Snow leopard by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/26tTvxyxkPC)", credited on `/credits` as §6.7 asks.
+
+- **The asset** (`src/assets/3d/snow-leopard.glb`): the Poly Pizza download, repacked by hand. It keeps the same mesh (988 triangles, standing, facing +z). Its 2048² PNG became a 1024² WebP (`EXT_texture_webp`), and its sampler was switched to trilinear. The credit is in `asset.copyright`. That took it from 1.8 MB to 127 KB. Vite emits it with a hashed name.
+  - There's still no `scripts/assets/` pipeline: one GLB didn't justify it. The repack script is in the session's workspace, not the repo.
+- **Loading** (`scene/snow-leopard.ts`): `GLTFLoader` is imported dynamically, so its 44 KB chunk loads only for Kevin's camp. The GLB is fetched while Kevin's terrain tile builds (`buildBiomeSet`).
+  - If the fetch fails, the camp is built without the leopard.
+  - Its mesh is redrawn in the world's own prop material, with no snow, so the haze, grade and firelight treat it like the rest of the camp.
+  - Its painted coat (about 0.19 albedo) graded down to a black cat at night, so the material's colour is lifted 1.8×.
+- **Where it stands** (`LEOPARD` in `biome-set.ts`): on the open snow in front of the camp, side-on to the view and walking toward the fire. Scaled to about 1 m long and 0.6 m at the shoulder.
+  - Spots by the stove and past the fire looked better on desktop, but they sat under the stove and water hotspots or fell outside a phone's narrower frame.
+  - This spot is clear of every hotspot and in the default frame on both.
+  - It isn't kit, so it has no hotspot or card.
+- **Measured** (desktop, high tier): Kevin's campsite is at 40 calls, 228k triangles and 16 programs, all within budget.
+- **Validated:**
+  - A new camp test checks that Kevin's camp shows the leopard with no hotspot and that Harry's camp has none. Every Kevin test passes on desktop and phone.
+  - The fallback screenshots and axe snapshots are unchanged. The footer link is now "Credits", since the page credits the model as well as the photos.
+
+**Harry's pack is his real one (22 October 2026): the Osprey Aether 65 Men's, Large/X-Large, in Deep Water Blue.** It was rebuilt in code from Harry's own two photos of it, from the front and from behind, and its listed size (80 × 40 × 28 cm), through the img2threejs skill's pipeline. It replaces the stand-in pack in his camp.
+
+- **How it's built** (`scene/aether-geometry.ts`): as with the other kit, the parts are described as data first and then built.
+  - The bag and lid are one soft loft: superellipse cross-sections from a closed, rounded base up through the lid's overhang to its domed top, fitted to both photos' silhouettes. The front pocket stands 2.2 cm proud.
+  - The harness has an arched back panel. The shoulder straps and hip belt are padded bands swept along paths. Unworn, each side hangs the way its photo shows it: the left strap and wing as in the front photo, the right wing flopped open behind as in the back photo.
+  - The front's straps, buckles, reflective oval, cords and prints were placed through the photo's fitted camera: a render of the body's surface positions was read at each feature's pixels. That puts them within about a centimetre of the photo.
+  - The colours were calibrated region by region, so that the review render matches the photo under the studio's light. The lid's colour is about the body's: it looks lighter in the photo only because it faces the light. The prints are faint tints, and their lettering isn't reproduced.
+- **In the camp** (`createOspreyAether` in `scene/kit-models.ts`): three meshes, for the nylon body and lid, the harness, and the trim, coloured per vertex. It stands at the stand-in's spot, and at 80 cm it's taller than the stand-in was (65 cm). `REAL_KIT` picks it by `proc:pack/osprey-aether-65`; every other camp keeps the stand-in pack.
+- **Content:** Harry's pack item has a brand line ("Osprey Aether 65") and a link to its listing. No weight yet, so Harry's totals don't change (the listing gives 2.1 kg).
+- **Measured** (desktop, high tier): Harry's campsite went from 46 to 47 calls and from 156k to 171k triangles, with programs unchanged at 18.
+- **Validated:** the real-kit test now covers the pack: Harry's camp shows the Aether, and Kevin's keeps the stand-in. The campsite test opens the pack's card and checks its brand. Every camp test passes on desktop, phone and WebKit, as do the other suites. The fallback screenshots and axe snapshots are unchanged.
+- **The pipeline's record** (outside the repo, in the session's workspace):
+  - The intake, a spec of 47 components generated from the same part list, strict validation, and the blockout, structural and form passes, each rendered from the generated factory and reviewed against the photos. Tier 1 silhouette overlap is 0.87 with the front photo and 0.85 with the back one.
+  - Like the tent's and the pillow's, it stopped at the material pass, where its target was already reached (0.80 against 0.70). That pass's per-part colour check can't see the grey harness webbing from the front view, where it covers about 1,000 of 495,000 pixels. Every other material clears it.
+  - Measured per material from an ID render instead: the nylon is within delta-E 5.5 of the front photo, the blue webbing 2.0 and the prints 4.5. Part coverage and the action-ready hierarchy check out, though the stop leaves them unrecorded in the pipeline's checklist.
+- **Not yet:** the wearer's right side, which mirrors the left because no photo shows it; the lettering on the lid and the AETHER 65 print; the ripstop and hex textures; the hip belt's lumbar pad, which is taller in the photo.
+
 ---
 
 ## 0. Decisions at a glance
@@ -706,7 +767,7 @@ If scanning disappoints, the other routes still stand: an AI image-to-3D draft (
 
 ### 6.2 Gear
 
-**Now: generic placeholders**, built with the geometry kit so they're properly sized and lit, and need no licences. The first real model is Harry's tent, the Zorali SummitSeeker 2P (Progress, 18 October 2026): parametric, as planned below, from its photos and spec sheet.
+**Now: generic placeholders**, built with the geometry kit so they're properly sized and lit, and need no licences. The first real models are Harry's: his tent, the Zorali SummitSeeker 2P (Progress, 18 October 2026), his pad, pillow and chair, the NEMO Tensor All-Season, NEMO Fillo and Alton Lightweight Camp Chair (Progress, 20 October 2026), and his pack, the Osprey Aether 65 (Progress, 22 October 2026). All are parametric, as planned below, from their photos and spec sheets.
 
 | Item | Placeholder now | Later | Triangles |
 | --- | --- | --- | --- |

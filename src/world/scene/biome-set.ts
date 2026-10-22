@@ -1,7 +1,7 @@
 // Everything one camp needs in the scene: its terrain tile, the heightmap the
-// clouds fade against, the camp, its own dressing (Kevin's frozen lake and
-// spruces, Mikey's sea) and the camera station. Built lazily, kept warm, and
-// swapped while the screen is in limbo.
+// clouds fade against, the camp, its own dressing (Kevin's frozen lake,
+// spruces and snow leopard, Mikey's sea) and the camera station. Built
+// lazily, kept warm, and swapped while the screen is in limbo.
 import {
   CircleGeometry,
   ConeGeometry,
@@ -38,6 +38,7 @@ import { createFallingLeaves, createLeafCarpet } from './leaf-fall';
 import { createMaples } from './maples';
 import { createSea } from './sea';
 import { createPropMaterial } from './props-material';
+import { createSnowLeopard } from './snow-leopard';
 import { requestTile } from './terrain-client';
 import { terrainFor, type HeightField, type TerrainSpec } from './terrain-fields';
 import { createTerrainMesh } from './terrain';
@@ -54,6 +55,8 @@ const LAYOUTS: Record<BiomeId, CampLayout> = {
     tent: { x: -1.6, z: -0.8, rotation: 0.25, colour: '#4f7a52' }, fire: { x: 2.0, z: 1.4 },
     person: { x: 0.55, z: 1.1, rotation: 0.4, jacket: '#2f5e44' }, pack: { x: -0.35, z: 0.55, rotation: -0.3 },
     stove: { x: 2.9, z: 0.45 }, water: { x: 3.15, z: 0.75 }, dog: { x: 0.95, z: 2.2, rotation: 1.45 }, boulders: 12,
+    // Harry's chair, by the fire and facing it, three-quarter on to the view.
+    chair: { x: 1.2, z: 0.4, rotation: 0.68 },
   },
   'maple-autumn': {
     tent: { x: -1.8, z: -0.6, rotation: 0.3, colour: '#c99a2e' }, fire: { x: 2.0, z: 1.6 },
@@ -208,6 +211,8 @@ export type BiomeSet = Awaited<ReturnType<typeof buildBiomeSet>>;
 export async function buildBiomeSet(id: BiomeId, ctx: BiomeSetContext) {
   const spec = terrainFor(id, ctx.seed);
   const radius = 5000;
+  // Kevin's snow leopard is the one model to download: fetched while the terrain builds.
+  const leopard = id === 'rockies-night' ? createSnowLeopard(ctx.uniforms, ctx.starLayers) : null;
   const tile = await requestTile({ biome: id, seed: ctx.seed, resolution: ctx.resolution, radius, power: 1.6 });
   const group = new Object3D();
   group.name = `biome-${id}`;
@@ -234,6 +239,13 @@ export async function buildBiomeSet(id: BiomeId, ctx: BiomeSetContext) {
     const trees = createSpruces(ctx.uniforms, ctx.starLayers, spec, ctx.trees, ctx.plants + 7);
     group.add(trees.mesh);
     disposers.push(trees.dispose);
+    const cat = await leopard;
+    if (cat) {
+      cat.object.position.set(LEOPARD.x, spec.height(LEOPARD.x, LEOPARD.z), LEOPARD.z);
+      cat.object.rotation.y = LEOPARD.rotation;
+      group.add(cat.object);
+      disposers.push(cat.dispose);
+    }
   }
   if (id === 'maple-autumn') {
     // A grove of Japanese maples around the clearing, thinning into the valley, and a few evergreens among them.
@@ -390,6 +402,16 @@ function createIce(uniforms: WorldUniforms, starLayers: number, spec: TerrainSpe
     },
   };
 }
+
+// ---------------------------------------------------------------- Kevin's snow leopard
+
+/**
+ * Where it stands, relative to the camp pad: on the open snow in front of the
+ * camp, below the pack and the tent on screen and clear of every hotspot,
+ * side-on to the view and padding toward the fire. Further out to either side
+ * and a phone's narrow frame loses it.
+ */
+const LEOPARD = { x: -1.5, z: 3.0, rotation: 1.15 };
 
 // ---------------------------------------------------------------- Kevin's spruces
 

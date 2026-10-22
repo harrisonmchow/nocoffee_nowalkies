@@ -60,6 +60,15 @@ export const drawings: Record<ItemType, string> = {
     <path class="f" d="M52 58 L148 58 L156 142 L44 142 Z"/>
     <path class="f" d="M64 142 L100 180 L136 142 Z"/>
     <path d="M100 58 L100 142 M76 58 L70 142 M124 58 L130 142"/>`,
+  chair: `
+    <path d="M68 104 L44 46 M132 104 L156 46 M68 104 L38 166 M132 104 L162 166"/>
+    <circle class="f" cx="44" cy="46" r="4"/><circle class="f" cx="156" cy="46" r="4"/>
+    <circle class="f" cx="38" cy="166" r="4"/><circle class="f" cx="162" cy="166" r="4"/>
+    <path class="f" d="M44 84 L30 88 L32 128 L46 130 Z"/>
+    <path class="f" d="M56 36 Q100 30 144 36 Q154 38 154 48 L158 136 Q158 148 146 150 Q100 158 54 150 Q42 148 42 136 L46 48 Q46 38 56 36 Z"/>
+    <path d="M72 112 L128 112"/>
+    <path d="M70 114 Q64 126 70 136 Q76 126 70 114 Z M130 114 Q124 126 130 136 Q136 126 130 114 Z"/>
+    <rect x="89" y="46" width="22" height="8" rx="2"/>`,
   'sleeping-pad': `
     <rect class="f" x="68" y="18" width="64" height="164" rx="16"/>
     <path d="M70 44 L130 44 M70 64 L130 64 M70 84 L130 84 M70 104 L130 104 M70 124 L130 124 M70 144 L130 144 M70 164 L130 164"/>

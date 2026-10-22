@@ -42,6 +42,7 @@ export const itemTypes = {
   pillow: { category: 'gear', label: 'Pillow', zone: 'sleep', size: 'sm' },
   bag: { category: 'gear', label: 'Pack', zone: 'pack', size: 'lg' },
   tent: { category: 'gear', label: 'Tent', zone: 'shelter', size: 'lg' },
+  chair: { category: 'gear', label: 'Camp chair', zone: 'kit', size: 'md' },
   cooking: { category: 'gear', label: 'Cooking', zone: 'kit', size: 'sm' },
   water: { category: 'gear', label: 'Water', zone: 'kit', size: 'sm' },
   electronics: { category: 'gear', label: 'Electronics', zone: 'kit', size: 'sm' },

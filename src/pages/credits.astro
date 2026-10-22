@@ -6,33 +6,72 @@ import { regions } from '../data/regions';
 
 const standIns = photos.filter((p) => p.standIn);
 const regionName = (slug: string) => regions.find((r) => r.slug === slug)?.name ?? slug;
+
+// Third-party models in the 3D camps (GEAR-3D-PLAN.md §6.7). Each credit reads
+// exactly as its source asks: "<name> by <author> [<licence>] (<licence url>) via <site> (<source>)".
+const models = [
+  {
+    name: 'Snow leopard',
+    author: 'Poly by Google',
+    licence: 'CC-BY',
+    licenceUrl: 'https://creativecommons.org/licenses/by/3.0/',
+    via: 'Poly Pizza',
+    source: 'https://poly.pizza/m/26tTvxyxkPC',
+    where: 'Kevin’s camp',
+  },
+];
 ---
-<Base title="Photo credits" current="credits" description="Credits for the stand-in photography used on this site.">
+<Base title="Credits" current="credits" description="Credits for the stand-in photography and the 3D models used on this site.">
   <section class="cr wrap">
-    <h1>Photo credits</h1>
-    <p class="cr__lede">
-      Until our own photos are uploaded, this site uses openly licensed photos of the same places from Wikimedia Commons. Thanks to the photographers below.
-    </p>
-    <ul class="cr__list" role="list">
-      {standIns.map((p) => (
-        <li>
-          <Image src={p.image} alt="" widths={[160]} sizes="80px" />
-          <div>
-            <p class="cr__title">{p.caption}</p>
-            <p class="mono muted">{regionName(p.region)} · {p.credit} · {p.license}</p>
-          </div>
-          <a href={p.source} rel="noopener" target="_blank">Source</a>
-        </li>
-      ))}
-    </ul>
+    <h1>Credits</h1>
+
+    <section class="cr__group" aria-labelledby="cr-photos">
+      <h2 id="cr-photos">Photos</h2>
+      <p class="cr__lede">
+        Until our own photos are uploaded, this site uses openly licensed photos of the same places from Wikimedia Commons. Thanks to the photographers below.
+      </p>
+      <ul class="cr__list" role="list">
+        {standIns.map((p) => (
+          <li>
+            <Image src={p.image} alt="" widths={[160]} sizes="80px" />
+            <div>
+              <p class="cr__title">{p.caption}</p>
+              <p class="mono muted">{regionName(p.region)} · {p.credit} · {p.license}</p>
+            </div>
+            <a href={p.source} rel="noopener" target="_blank">Source</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="cr__group" aria-labelledby="cr-models">
+      <h2 id="cr-models">3D models</h2>
+      <p class="cr__lede">
+        The camps on the gear pages are built in code, apart from these openly licensed models. Thanks to their makers.
+      </p>
+      <ul class="cr__list cr__list--text" role="list">
+        {models.map((m) => (
+          <li>
+            <div>
+              <p class="cr__title">{m.name} <span class="muted">· {m.where}</span></p>
+              <p class="mono cr__credit">
+                {m.name} by {m.author} [{m.licence}] (<a href={m.licenceUrl} rel="noopener" target="_blank">{m.licenceUrl}</a>) via {m.via} (<a href={m.source} rel="noopener" target="_blank">{m.source}</a>)
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   </section>
 </Base>
 
 <style>
   .cr { padding-top: clamp(56px, 9vw, 120px); }
   .cr h1 { font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -0.04em; }
+  .cr__group { margin-top: clamp(40px, 6vw, 72px); }
+  .cr h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); }
   .cr__lede { margin-top: 18px; max-width: 60ch; color: var(--ink-2); }
-  .cr__list { list-style: none; margin: 48px 0 0; padding: 0; border-top: 1px solid var(--rule); }
+  .cr__list { list-style: none; margin: 32px 0 0; padding: 0; border-top: 1px solid var(--rule); }
   .cr__list li {
     display: grid;
     grid-template-columns: 80px 1fr auto;
@@ -41,11 +80,15 @@ const regionName = (slug: string) => regions.find((r) => r.slug === slug)?.name 
     padding: 14px 0;
     border-bottom: 1px solid var(--rule);
   }
+  .cr__list--text li { grid-template-columns: 1fr; }
   .cr__list img { width: 80px; height: 56px; object-fit: cover; border-radius: 4px; }
   .cr__title { font-size: 0.9375rem; }
   .cr__list a { font-size: 0.875rem; }
+  .cr__credit { margin-top: 4px; color: var(--ink-2); overflow-wrap: anywhere; }
+  .cr__credit a { font-size: inherit; color: inherit; }
   @media (max-width: 600px) {
     .cr__list li { grid-template-columns: 64px 1fr; }
+    .cr__list--text li { grid-template-columns: 1fr; }
     .cr__list img { width: 64px; height: 48px; }
     .cr__list a { grid-column: 2; }
   }

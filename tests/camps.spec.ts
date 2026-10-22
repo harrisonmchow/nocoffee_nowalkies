@@ -519,10 +519,10 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
     await uiReady(page);
     await still(page);
-    expect(Object.keys(await page.evaluate(() => window.__world!.anchors())).sort()).toEqual(['clothing', 'pack', 'stove', 'tent', 'water']);
+    expect(Object.keys(await page.evaluate(() => window.__world!.anchors())).sort()).toEqual(['chair', 'clothing', 'pack', 'stove', 'tent', 'water']);
     // Each dot sits above its thing, on a stem down to it, so it never covers it (the stove and its water most of all).
     const at = await page.evaluate(() => window.__world!.anchors());
-    for (const [id, label] of [['clothing', 'Clothing'], ['pack', 'Pack'], ['tent', 'Tent'], ['stove', 'Stove and pot'], ['water', 'Water bottles']] as const) {
+    for (const [id, label] of [['clothing', 'Clothing'], ['pack', 'Pack'], ['tent', 'Tent'], ['chair', 'Camp chair'], ['stove', 'Stove and pot'], ['water', 'Water bottles']] as const) {
       const box = (await dot(page, label).boundingBox())!;
       expect(box.y + box.height / 2, `${label}'s dot`).toBeLessThan(at[id].y);
     }
@@ -545,6 +545,17 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     await expect(card(page)).toContainText('Zorali SummitSeeker 2P');
     await expect(card(page)).toContainText('Click to look inside');
     await page.screenshot({ path: `${OUT}/m4-camp-tent-${testInfo.project.name}.png` });
+    // His chair by the fire, by name (its own dot: the chair is too low and open to point at from below its hotspot).
+    await dot(page, 'Camp chair').click();
+    await expect(card(page)).toContainText('Camp chair');
+    await expect(card(page)).toContainText('Alton Lightweight');
+    await page.keyboard.press('Escape');
+    await expect(card(page)).toBeHidden();
+    // His pack by the tent, by name.
+    await dot(page, 'Pack').click();
+    await expect(card(page)).toContainText('Osprey Aether 65');
+    await page.keyboard.press('Escape');
+    await expect(card(page)).toBeHidden();
     // A piece of kit by its hotspot, pinned by a click, with a link to its page; Esc puts it away.
     await dot(page, 'Stove and pot').click();
     await expect(card(page)).toHaveClass(/is-pinned/);
@@ -586,6 +597,24 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     expect(await parts()).toEqual([false, false, false, false, false]);
   });
 
+  test('Harry’s pad, pillow, chair and pack are his own NEMO Tensor, NEMO Fillo, Alton and Osprey Aether; other camps keep the stand-ins', async ({ page }) => {
+    const parts = () => page.evaluate(() => ['tensor-pad', 'fillo-pillow', 'alton-chair', 'osprey-aether', 'pad', 'pillow', 'pack'].map((name) => window.__world!.shows(name)));
+    await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
+    expect(await parts()).toEqual([true, true, true, true, false, false, false]);
+    await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
+    expect(await parts()).toEqual([false, false, false, false, true, true, true]);
+  });
+
+  test('Kevin’s camp has its snow leopard; the other camps don’t', async ({ page }) => {
+    const leopard = () => page.evaluate(() => window.__world!.shows('snow-leopard'));
+    await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
+    expect(await leopard()).toBe(true);
+    // It's dressing, not kit: no hotspot of its own.
+    expect(Object.keys(await page.evaluate(() => window.__world!.anchors()))).not.toContain('snow-leopard');
+    await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
+    expect(await leopard()).toBe(false);
+  });
+
   test('clicking the tent goes inside, to the sleeping bag, the mat and the pillow', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'phone', 'the phone taps its way in, below');
     await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
@@ -608,6 +637,7 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     // The pillow, pinned by its hotspot, with a link to its page.
     await dot(page, 'Pillow').click();
     await expect(card(page)).toContainText('Pillow');
+    await expect(card(page)).toContainText('NEMO Fillo');
     await expect(card(page).getByRole('link', { name: 'Details' })).toHaveAttribute('href', '/gear/harry/gear/pillow/');
     // Esc closes the card first, then leaves the tent; the page stays where it is.
     await page.keyboard.press('Escape');

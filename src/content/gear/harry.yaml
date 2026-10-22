@@ -39,10 +39,12 @@ items:
     type: shoes
   - id: pack
     name: Pack
+    brand: Osprey Aether 65
     category: gear
     type: bag
+    link: https://www.amazon.com.au/dp/B08LNZ47FG
     scene:
-      model: proc:pack
+      model: proc:pack/osprey-aether-65
   - id: tent
     name: Tent
     brand: Zorali SummitSeeker 2P
@@ -53,10 +55,12 @@ items:
       model: proc:tent/zorali-summitseeker-2p
   - id: sleeping-pad
     name: Sleeping pad
+    brand: NEMO Tensor All-Season (Regular Wide)
     category: gear
     type: sleeping-pad
+    link: https://ultralightgear.com.au/products/nemo-tensor-all-season-insulated-sleeping-pad?variant=48685446627612
     scene:
-      model: proc:sleeping-pad
+      model: proc:sleeping-pad/nemo-tensor-all-season
   - id: sleeping-bag
     name: Sleeping bag
     category: gear
@@ -65,10 +69,20 @@ items:
       model: proc:sleeping-bag
   - id: pillow
     name: Pillow
+    brand: NEMO Fillo (Silt Stripe)
     category: gear
     type: pillow
+    link: https://ultralightgear.com.au/products/nemo-fillo-ultralight-pillow?variant=52802016477468
     scene:
-      model: proc:pillow
+      model: proc:pillow/nemo-fillo
+  - id: chair
+    name: Camp chair
+    brand: Alton Lightweight
+    category: gear
+    type: chair
+    link: https://altongoods.com/products/ultralight-chair?variant=55581550805297
+    scene:
+      model: proc:chair/alton-lightweight
   - id: stove
     name: Stove and pot
     category: gear
