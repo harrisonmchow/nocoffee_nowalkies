@@ -105,6 +105,13 @@ export const drawings: Record<ItemType, string> = {
     <circle class="f" cx="70" cy="108" r="6"/>
     <circle class="f" cx="130" cy="108" r="6"/>
     <path class="f" d="M86 36 L114 36 L110 52 L90 52 Z"/>`,
+  table: `
+    <path class="f" d="M30 70 L170 70 L162 104 L38 104 Z"/>
+    <path d="M77 70 L74 104 M123 70 L126 104"/>
+    <path d="M58 106 L142 168 M142 106 L58 168 M68 104 L128 150 M132 104 L72 150"/>
+    <path d="M100 136 L100 125"/>
+    <circle class="f" cx="100" cy="137" r="6"/>
+    <circle class="f" cx="100" cy="125" r="5"/>`,
   accessories: `
     <ellipse cx="100" cy="112" rx="72" ry="44"/>
     <ellipse cx="100" cy="112" rx="64" ry="36"/>

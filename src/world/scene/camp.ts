@@ -44,6 +44,7 @@ import {
   createQuilt,
   createSleepingBag,
   createStove,
+  createTable,
   type GearModel,
 } from './gear-models';
 import { createSummitSeeker } from './summitseeker';
@@ -396,6 +397,9 @@ const REAL_TENTS: Record<string, (uniforms: WorldUniforms, starLayers: number) =
   'durston-x-mid-pro-2': createXMid,
 };
 
+/** Where a camp table stands, in the chair's own space: off its left armrest (+x), level with the seat. */
+const TABLE_BESIDE_CHAIR = { x: 0.5, z: 0.05 };
+
 export type CampLayout = {
   tent: { x: number; z: number; rotation: number; colour: string };
   fire: { x: number; z: number };
@@ -592,13 +596,21 @@ export function createCamp(
         else if (model === 'stove-pot') built = place(createStove(kitArgs), layout.stove.x, layout.stove.z, 0);
         else if (model === 'bottle') built = place(createBottle(kitArgs, item.colour), layout.water.x, layout.water.z, 0);
         else if (model === 'chair') built = place(createChair(kitArgs, item.model?.split('/').slice(1)), layout.chair.x, layout.chair.z, layout.chair.rotation);
+        else if (model === 'table') {
+          // Beside the chair, at its left hand, the long side along it.
+          const { x, z, rotation } = layout.chair;
+          const [side, ahead] = [TABLE_BESIDE_CHAIR.x, TABLE_BESIDE_CHAIR.z];
+          const at = { x: x + side * Math.cos(rotation) + ahead * Math.sin(rotation), z: z - side * Math.sin(rotation) + ahead * Math.cos(rotation) };
+          built = place(createTable(kitArgs), at.x, at.z, rotation + Math.PI / 2);
+        }
         else if (model === 'sleeping-pad') {
           const at = inTent(spots.pad);
-          built = place(createPad(kitArgs, item.colour), at.x, at.z, spots.yaw ?? 0, tent.group, at.y);
+          built = place(createPad(kitArgs, item.colour, item.model?.split('/').slice(1)), at.x, at.z, spots.yaw ?? 0, tent.group, at.y);
         } else if (model === 'sleeping-bag' || model === 'quilt') {
           const at = inTent(spots.bed);
-          const make = model === 'quilt' ? createQuilt : createSleepingBag;
-          built = place(make(kitArgs, item.colour), at.x, at.z, spots.yaw ?? 0, tent.group, at.y);
+          const variant = item.model?.split('/').slice(1);
+          const made = model === 'quilt' ? createQuilt(kitArgs, item.colour, variant) : createSleepingBag(kitArgs, item.colour);
+          built = place(made, at.x, at.z, spots.yaw ?? 0, tent.group, at.y);
         } else if (model === 'pillow') {
           const at = inTent(spots.pillow);
           built = place(createPillow(kitArgs, item.colour), at.x, at.z, spots.yaw ?? 0, tent.group, at.y);
