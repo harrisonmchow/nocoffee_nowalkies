@@ -237,6 +237,14 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
   - **The generated factory isn't used:** it places each part in its own normalised frame, so its renders are a slab and floating struts. Every review was rendered from `moonlite-geometry.ts`.
 - **Not yet:** the far side and the back of the sling are mirrored or inferred; the far strap sits about 1.5 cm further out in the photo; the recline position isn't modelled (it's always upright).
 
+**Caleb's camp table (19 October 2026): the Helinox Table Zero LT**, beside the chair at its left hand. Rebuilt in code from the retailer's product photos (a three-quarter view, the long side from above and level, the top rolled back off the frame, and close-ups of the hubs and a corner) and its listed size, 30 × 49.5 × 31 cm, through the img2threejs skill's pipeline.
+
+- **How it's built** (`scene/table-zero-geometry.ts`): two black wedge hubs 15.5 cm up, joined by a crossbar across the width. From each hub, four straight 10 mm cyan tubes make an X along the length: two legs to feet ±17.5 cm out, and two uprights to saddles under that side's rail. The rails run under the long edges, close under the sheet and in from its edge, so the binding hides them from above, as in the photos. The see-through mesh top has a black binding, two black seams across it and the logo patch.
+- **In the camp** (`createTable` in `scene/gear-models.ts`): 894 triangles in three materials (frame, black hardware, a translucent two-sided top). It stands 0.5 m off the chair's left armrest with its long side along the chair (`TABLE_BESIDE_CHAIR` in camp.ts), so any kit with a `proc:table/…` item gets it beside its chair. Caleb's campsite (high tier) went from 81 to 85 draw calls.
+- **Content:** a `table` gear type with its own flat-lay drawing, and Caleb's item "Camp table", "Helinox Table Zero LT", 240 g, with the product link.
+- **The pipeline's record** (outside the repo): a strict-validated spec of 24 components, PBR evidence for its three materials (confidence 0.73–0.84), cameras fitted to three photos, and a four-view turntable. It **stopped at blockout**: Tier 1 silhouette overlap is 0.81 against the 0.85 gate, a limit set by the 5 mm-wide tubes against a camera fitted to a photo. The multi-angle and turntable checks pass.
+- **Not yet:** the hubs' spacing across the width is inferred (no end-on photo), and the far X sits a little lower than in the photo; the corner grommets are plain clips; the GhostGrid weave and logo are flat colour.
+
 **Caleb's X-Dome 2, rebuilt to Durston's dimensions, with an inner and an openable door (19 October 2026).** One model with an openable door rather than two models (closed and open), following the X-Mid's `setDoor`. Built from Durston's product photos: the dimension diagram (top, end and side views), the fly closed from the side and the end, the door open, and the inner pitched alone.
 
 - **What was wrong:** the earlier model had a 2.1 × 1.3 m box with pointed vestibules, two crossing poles, and no inner. Durston's diagram shows:
@@ -252,15 +260,56 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
   - A 2.24 × 1.3 m parallelogram floor, its ends along the fly's ends and its centre line 0.3 m toward the front at one end and toward the back at the other. So each vestibule is a triangle beside its door, 0.65 m deep at one end and next to nothing at the other.
   - A grey bathtub 13 cm up, then dark mesh rising steeply off the rim (about 69°) to follow the fly 6 cm under it, peaking 1.09 m up (Durston: 43 in).
 - **The doors:**
-  - Each fly door is a fan from its peak. It's zipped to the hem 0.45 m right of centre (the top view's dotted line) and sewn along the seam to the left corner.
+  - Each fly door is two leaves zipped together from the peak down to the hem 0.45 m right of centre (the top view's dotted line). The large leaf is sewn along the seam to the left corner, the small one along the seam to the right corner, and the fly is cut behind the whole side between them. Both leaves are one mesh.
   - Under it, the inner has its own door, zipped from 1.0 m up down to the tub, right of centre.
-  - `setDoor(k)` (0 zipped, 1 open) gathers both front doors back along their seams in folds, as the magnets hold them in the main shot.
+  - `setDoor(k)` (0 zipped, 1 open) opens the whole side, as in Durston's open-side photo. Each leaf gathers back along its own seam in folds, rolled up the same way, the large to the left and the small to the right. (Durston's photo has the small leaf guyed out as a wing; the model rolls it instead.) The inner's door gathers back with the large leaf. The front zip shows only while the door is shut.
   - Each hole in the fly and the inner is cut along its grid, with the cut's corners slid onto the seam and zip so the edges run straight.
 - **In the camp** (`scene/xdome.ts`):
   - Drawn at its real size; the old upward stretch is gone.
   - Pitched with the front door open (`PITCHED_DOOR`). At night the headtorch lights the inner's floor and mesh through the doorway.
   - The sleeping kit lies along the inner's slant, on its back half: camp.ts takes an optional `yaw` in a tent's `inside`.
 - **Not yet:** how the gathered doors fold, the inner door's exact outline, and the inner's walls between rim and poles are inferred. The inner's solid panels at its lower ends are left out.
+
+**Caleb's sleeping mat (19 October 2026): the EXPED Ultra 5R**, size M, in the X-Dome's inner under his bag and pillow. Rebuilt in code from the retailer's product photos (top views, a three-quarter view from the head, close-ups of the valves and the tubes) and its listed size, 183 × 52 × 7 cm, through the img2threejs skill's pipeline.
+
+- **How it's built** (`scene/ultra-mat-geometry.ts`):
+  - One closed, welded shell: a grid over the plan, with the top mirrored to make the underside.
+  - Seven head-to-toe tubes, each a broad crown pinched to a V at the welds between them. The outer tubes round down to a near-upright side wall.
+  - Each tube closes in a dome, so the head and foot edges are scalloped, one lobe per tube.
+  - Two flat valves sit on the foot end's top, lids shut, with the IN lid's cord lying beside it. The EXPED wordmark is in thin strokes along the other side's outer tube near the head, reading the right way round from above.
+- **In the camp** (`createPad` in `scene/gear-models.ts`, by the model's variant: `proc:sleeping-pad/exped-ultra-5r`):
+  - About 6.1k triangles in four materials (Lichen shell, valve, cord, print), so four draw calls where the stand-in mat had one.
+  - Caleb's campsite (high tier) measured 85 calls with this mat and the table, against the 60 budget.
+  - The X-Dome's bag and pillow spots are raised 1.5 cm for the 7 cm mat.
+  - The other kits keep the stand-in.
+- **Content:** Caleb's item "Sleeping pad", "EXPED Ultra 5R", with the product link. There's no weight yet: it's 585, 655 or 700 g depending on the size, which isn't known.
+- **The pipeline's record** (outside the repo):
+  - A strict-validated spec of 11 components, with PBR evidence for all four materials (confidence 0.75–0.86).
+  - A camera fitted to the three-quarter photo (with its pump bag painted out). Tier 1 silhouette overlap is 0.933. The turntable, multi-angle and self-intersection checks pass.
+  - Measured per material against photo crops, the colours are within delta-E 20: shell 0.8, valve 4.5, print 8.4, cord 17.9.
+  - **Stopped at the material pass:** its Tier 1 per-part colour check compares each part with the render's five dominant colours, so the 3 mm cord can never pass it.
+- **Not yet:** the underside mirrors the top, and which side the valves sit on is inferred. The ends' puckered welds are smooth domes. The ripstop grid and the SYNMAT print are left out, as below a pixel at camp distance. The valves are opaque, not translucent.
+
+**Caleb's quilt (19 October 2026): the Neve Gear Waratah**, laid over the EXPED in the X-Dome's inner, in place of the stand-in sleeping bag. Rebuilt in code from Neve's product photos (closed and opened flat from above, the lining, the footbox from the side on a mat and from its end, the collar's drawcord) through the img2threejs skill's pipeline. Neve publishes no dimensions, so its size is inferred from the 6' fit and the mat in their side photo.
+
+- **How it's built** (`scene/waratah-geometry.ts`):
+  - One lofted surface swept head to foot, empty, its opening down. Over the torso its section is an arch over the mat, the flanks falling past the mat's sides to the floor.
+  - Past the hips the hems rise to rest on the mat, then the flanks curl under it. The footbox is a closed tube lying on the mat, taller than the torso, and closes in a blunt dome gathered by a drawcord.
+  - Box baffles pinch the loft: lengthwise over the torso (8.5 cm), four crosswise in the footbox, and a chest baffle under the collar.
+  - A pale lining sits a loft's depth inside, seen through the head opening, joined to the shell by rims at the collar and along the hems.
+  - Colour follows Neve's three-panel cut: navy, with a black panel down the sleeper's right flank (toward the door), a black collar and a black footbox end. A white footbox cord and the neck cord each have a cord lock.
+- **In the camp** (`createQuilt` in `scene/gear-models.ts`, by the model's variant: `proc:quilt/neve-gear-waratah`):
+  - About 12k triangles in five materials (navy, black, lining, cord, cord locks), so five draw calls. Caleb's campsite (high tier) measured 88 calls, up from 85.
+  - The lining is two-sided. The quilt's origin is the mat's top (the X-Dome's bed spot), and its flanks reach the floor by the EXPED's thickness.
+  - The other kits keep the stand-in quilt and bag.
+- **Content:** Caleb's item "Quilt", "Neve Gear Waratah", with the product link, replacing the sample "Sleeping bag". There's no weight yet: it depends on the rating and size, which aren't known.
+- **The pipeline's record** (outside the repo):
+  - A strict-validated spec of 9 components, with PBR evidence for all five materials (confidence 0.72–0.86).
+  - A camera fitted to the side photo (with its mat painted out).
+  - **Stopped at blockout:** Tier 1 silhouette overlap is 0.776 against the 0.85 gate. The photo's mat is a different, thicker one, so its footbox sits higher, and no photo shows the quilt empty on a mat.
+  - The multi-angle check passes. The turntable passes with the cords hidden: the footbox cord's loop encloses background, which the hole check counts.
+  - The self-intersection check was run on the down slab as one closed solid (shell, lining and rims). It found one real defect, now fixed: the hem rims ran on through the closed footbox as a double wall. Of the 25 points still flagged (of 3,676 sampled), every worst point is clean under random rays, apart from a sub-2 mm seam at the collar where the half-resolution lining meets its rim.
+- **Not yet:** the size and the empty drape are inferred. The underside, its zip and the pad straps are hidden and not modelled. The NEVE GEAR and WARATAH prints and the taffeta's crinkle are left out, as below a pixel at camp distance. Neve's photos show a glossier taffeta than the camp's prop material gives.
 
 ---
 

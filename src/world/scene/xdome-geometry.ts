@@ -84,26 +84,32 @@ const legZ = (x: number) => (Math.abs(x) > HUB_X ? D * (1 - ((L - Math.abs(x)) /
 const legX = (z: number) => L - (L - HUB_X) * (1 - Math.abs(z) / D) ** LEG_BOW;
 
 // Doors -------------------------------------------------------------------
-// A door, in face coordinates: xl across the face, to the right as you face it from outside
-// (x = side * xl), and y up. It's a fan from its peak: the zip runs down to its base right of
-// centre, its seam down to the left, and its base closes it.
+// A door leaf, in face coordinates: xl across the face, to the right as you face it from outside
+// (x = side * xl), and y up. It's a fan from its peak, between the seam it's sewn on and the zip
+// that closes it, and its base closes it.
 
 type Fan = { peakY: number; hingeX: number; zipX: number; baseY: number };
-// The fly's: from the peak under the brow pole's end, zipped to the hem 0.45 m right of centre
-// (Durston's top view), sewn to the left corner.
+// The fly's door is two leaves, zipped to each other from the peak under the brow pole's end down
+// to the hem 0.45 m right of centre (Durston's top view): the large one sewn to the left corner,
+// the small one to the right. Open, the whole side between the two seams is open.
 const FLY_DOOR: Fan = { peakY: EAR_Y - 0.02, hingeX: -(L - 0.05), zipX: 0.45, baseY: HEM };
+const FLY_PANEL: Fan = { ...FLY_DOOR, hingeX: L - 0.05 };
+const FLY_OPENING: Fan = { ...FLY_DOOR, zipX: L - 0.05 };
 // The inner's: from under the fly's peak down to its tub, zipped to the right as in Durston's
 // photo of the inner alone, and pulled aside to the left with the fly's in the open-door shot.
 const INNER_DOOR: Fan = { peakY: 1.0, hingeX: -0.8, zipX: 0.3, baseY: TUB };
 
 /** A point on a door, (xl, y): t 0 at its seam .. 1 at its zip, r 0 at the peak .. 1 at its base. */
 const doorFan = (f: Fan, t: number, r: number): [number, number] => [(f.hingeX + (f.zipX - f.hingeX) * t) * r, f.peakY + (f.baseY - f.peakY) * r];
-/** A door's seam and zip, each from a to b with the door on its left, and its inward normal. */
-const doorEdges = (f: Fan) =>
-  [[0, f.peakY, f.hingeX, f.baseY], [f.zipX, f.baseY, 0, f.peakY]].map(([ax, ay, bx, by]) => {
+/** A door's seam and zip, each from a to b, and its normal into the door. */
+const doorEdges = (f: Fan) => {
+  const [cx, cy] = doorFan(f, 0.5, 0.6);
+  return [[0, f.peakY, f.hingeX, f.baseY], [f.zipX, f.baseY, 0, f.peakY]].map(([ax, ay, bx, by]) => {
     const len = Math.hypot(bx - ax, by - ay);
-    return { ax, ay, nx: -(by - ay) / len, ny: (bx - ax) / len };
+    const flip = (cx - ax) * -(by - ay) + (cy - ay) * (bx - ax) < 0 ? -1 : 1;
+    return { ax, ay, nx: (-flip * (by - ay)) / len, ny: (flip * (bx - ax)) / len };
   });
+};
 /** How far (xl, y) is inside a door past its seam and its zip, less these margins. */
 const doorDepths = (f: Fan, xl: number, y: number, seam: number, zip: number) =>
   doorEdges(f).map(({ ax, ay, nx, ny }, k) => (xl - ax) * nx + (y - ay) * ny - (k ? zip : seam));
@@ -352,7 +358,7 @@ function makeMembrane(): { geometry: THREE.BufferGeometry; m: Surface } {
     }
   }
   // The fly is cut behind both doors. Only the long faces count: near the peak, the roof is close by.
-  const index = cutDoors(pos, tris, m, FLY_DOOR, 0.02, 0.015, (x, y, z) =>
+  const index = cutDoors(pos, tris, m, FLY_OPENING, 0.02, 0.02, (x, y, z) =>
     Math.abs(z) > 0.2 && Math.abs(z) > Math.abs(onFace(x, y, z > 0 ? 1 : -1).z) - 0.03 ? (z > 0 ? 1 : -1) : 0);
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
@@ -528,35 +534,43 @@ function surfaceCurve(m: Surface, plan: [number, number][], lift: number) {
 }
 
 /**
- * A door on a long side (+1 = +z, -1 = -z), a few mm proud of its surface: the fan from its peak,
- * between its seam and its zip. setOpen gathers it back toward the seam, as the fly's is held
- * open by its magnets in Durston's main shot: its folds stand proud, more toward the base.
+ * How a door leaf opens: gathered toward its seam, losing this share of its width, in folds
+ * standing this far proud; and its free corner swung out (and up) this far, as a guyed-out wing.
  */
-function makeDoor(s: Surface, fan: Fan, side: 1 | -1, cloth: THREE.Material, name: string, folds: number, toggleMat?: THREE.Material) {
+type Leaf = { fan: Fan; gather: number; folds: number; swing: number };
+
+/**
+ * A door on a long side (+1 = +z, -1 = -z), a few mm proud of its surface: its leaves, each the fan
+ * from its peak between its seam and its zip, in one mesh. setOpen opens them as in Durston's
+ * photos: the large leaf gathered back on its seam, held by its magnets, its folds standing proud
+ * toward the base; the small one swung out the other way, its corner guyed out off the ground.
+ */
+function makeDoor(s: Surface, leaves: Leaf[], side: 1 | -1, cloth: THREE.Material, name: string, toggleMat?: THREE.Material) {
   const on = (xl: number, y: number, lift: number) => s.onFace(side * xl, y, side, lift);
-  const NU = 24, NV = 16;
-  const pos = new Float32Array((NU + 1) * (NV + 1) * 3);
+  const NU = 24, NV = 16, per = (NU + 1) * (NV + 1);
+  const pos = new Float32Array(per * leaves.length * 3);
   const uv: number[] = [], index: number[] = [];
-  for (let iu = 0; iu <= NU; iu++) {
-    for (let iv = 0; iv <= NV; iv++) {
-      const [xl, y] = doorFan(fan, iu / NU, iv / NV);
-      uv.push(xl / 0.6, -y / 0.6); // same cloth scale as the fly
+  leaves.forEach(({ fan }, n) => {
+    for (let iu = 0; iu <= NU; iu++) {
+      for (let iv = 0; iv <= NV; iv++) {
+        const [xl, y] = doorFan(fan, iu / NU, iv / NV);
+        uv.push(xl / 0.6, -y / 0.6); // same cloth scale as the fly
+      }
     }
-  }
-  for (let iu = 0; iu < NU; iu++) {
-    for (let iv = 0; iv < NV; iv++) {
-      const a = iu * (NV + 1) + iv, b = a + NV + 1;
-      index.push(a, b, a + 1, a + 1, b, b + 1);
+    for (let iu = 0; iu < NU; iu++) {
+      for (let iv = 0; iv < NV; iv++) {
+        const a = n * per + iu * (NV + 1) + iv, b = a + NV + 1;
+        index.push(a, b, a + 1, a + 1, b, b + 1);
+      }
     }
-  }
+  });
   const geo = new THREE.BufferGeometry();
   const position = new THREE.BufferAttribute(pos, 3);
   geo.setAttribute('position', position);
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  geo.setIndex(index);
   const panel = new THREE.Mesh(geo, cloth);
   panel.name = `${name}-panel`;
-  // The magnetic toggle that holds it open, on its edge halfway down.
+  // The magnetic toggle that holds the large leaf open, on its edge halfway down.
   const toggle = toggleMat && new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.03, 0.006), toggleMat);
   if (toggle) {
     toggle.name = `${name}-toggle`;
@@ -566,40 +580,49 @@ function makeDoor(s: Surface, fan: Fan, side: 1 | -1, cloth: THREE.Material, nam
   door.name = name;
   door.add(panel);
 
+  /** Where a leaf's point (t, r) sits, opened e of the way (eased). */
+  const leafPoint = ({ fan, gather, folds, swing }: Leaf, t: number, r: number, e: number, extra = 0) => {
+    const [xl, y] = doorFan(fan, t * (1 - gather * e), r);
+    // Folds that run out from the peak, and the swing, growing toward the free corner.
+    const fold = 0.5 - 0.5 * Math.cos(t * Math.PI * 9);
+    const out = e * swing * r ** 1.5 * t ** 1.2;
+    const p = on(xl, y, 0.003 + extra + e * r * Math.min(1, t * 6) * folds * (0.22 + 0.78 * fold) + out);
+    p.y += 0.6 * out * r;
+    return p;
+  };
   /** 0 zipped .. 1 open. */
   const setOpen = (k: number) => {
     const e = k * k * (3 - 2 * k);
-    for (let iu = 0; iu <= NU; iu++) {
-      const t = iu / NU;
-      // Gathered into a sixth of its width, in folds that run out from the peak.
-      const fold = 0.5 - 0.5 * Math.cos(t * Math.PI * 9);
-      for (let iv = 0; iv <= NV; iv++) {
-        const r = iv / NV;
-        const [xl, y] = doorFan(fan, t * (1 - 0.84 * e), r);
-        const lift = 0.003 + e * r * Math.min(1, t * 6) * folds * (0.22 + 0.78 * fold);
-        const p = on(xl, y, lift);
-        position.setXYZ(iu * (NV + 1) + iv, p.x, p.y, p.z);
+    leaves.forEach((leaf, n) => {
+      for (let iu = 0; iu <= NU; iu++) {
+        for (let iv = 0; iv <= NV; iv++) {
+          const p = leafPoint(leaf, iu / NU, iv / NV, e);
+          position.setXYZ(n * per + iu * (NV + 1) + iv, p.x, p.y, p.z);
+        }
       }
-    }
+    });
     position.needsUpdate = true;
     geo.computeVertexNormals();
     geo.computeBoundingSphere();
     if (toggle) {
-      const [xl, y] = doorFan(fan, 1 - 0.84 * e, 0.5);
-      const at = toggle.position.copy(on(xl, y, 0.008 + folds * e));
+      const at = toggle.position.copy(leafPoint(leaves[0], 1, 0.5, e, 0.005));
       toggle.lookAt(at.clone().add(s.normalAt(at.x, at.z)));
     }
   };
   setOpen(0);
-  // Wind the triangles so the panel faces out of the tent on either side.
+  // Wind each leaf's triangles so it faces out of the tent, whichever way its fan runs.
   const v = (k: number) => new THREE.Vector3().fromBufferAttribute(position, k);
-  const n0 = v(index[1]).sub(v(index[0])).cross(v(index[2]).sub(v(index[0])));
-  const probe = v(index[0]);
-  if (n0.dot(s.normalAt(probe.x, probe.z)) < 0) {
-    for (let k = 0; k < index.length; k += 3) [index[k + 1], index[k + 2]] = [index[k + 2], index[k + 1]];
-    geo.setIndex(index);
-    geo.computeVertexNormals();
-  }
+  const perLeaf = NU * NV * 6;
+  leaves.forEach((_, n) => {
+    const o = n * perLeaf;
+    const n0 = v(index[o + 1]).sub(v(index[o])).cross(v(index[o + 2]).sub(v(index[o])));
+    const probe = v(index[o]);
+    if (n0.dot(s.normalAt(probe.x, probe.z)) < 0) {
+      for (let k = o; k < o + perLeaf; k += 3) [index[k + 1], index[k + 2]] = [index[k + 2], index[k + 1]];
+    }
+  });
+  geo.setIndex(index);
+  geo.computeVertexNormals();
   return { door, setOpen };
 }
 
@@ -739,13 +762,12 @@ export function buildXDome(mats: XDomeMaterials) {
   };
   const peak: [number, number] = [0, FLY_DOOR.peakY];
   const seamCurves = [surfaceCurve(m, [[0, -BROW_Z], [0, BROW_Z]], 0.003)];
-  const zips: THREE.Mesh[] = [];
-  for (const side of [1, -1] as const) {
-    seamCurves.push(face(side, peak, [FLY_DOOR.hingeX, HEM + 0.01], 0.004), face(side, peak, [L - 0.05, HEM + 0.01], 0.004));
-    zips.push(tube(face(side, peak, [FLY_DOOR.zipX * 0.99, HEM + 0.01], 0.005), 0.0018, 40, zipMat, ''));
-  }
+  const zips = ([1, -1] as const).map((side) => {
+    seamCurves.push(face(side, peak, [FLY_DOOR.hingeX, HEM + 0.01], 0.004), face(side, peak, [FLY_PANEL.hingeX, HEM + 0.01], 0.004));
+    return tube(face(side, peak, [FLY_DOOR.zipX * 0.99, HEM + 0.01], 0.006), 0.0018, 40, zipMat, side > 0 ? 'xdome-door-zip' : 'fly-zip');
+  });
   const seams = merged(seamCurves.map((curve) => tube(curve, 0.0025, 48, cloth, '')), cloth, 'fly-seams');
-  membrane.add(detail(seams), detail(merged(zips, zipMat, 'fly-zips')));
+  membrane.add(detail(seams), detail(zips[1]));
 
   // Webbing loops on the fly beside each leg, about halfway up (Durston's end view).
   const loops = new THREE.InstancedMesh(new THREE.BoxGeometry(0.018, 0.05, 0.006), webMat, 4);
@@ -767,15 +789,22 @@ export function buildXDome(mats: XDomeMaterials) {
   root.add(fly);
 
   // Doors on both long sides, under the peaks the brow pole lifts.
-  const front = makeDoor(m, FLY_DOOR, 1, mats.doorCloth, 'xdome-door', 0.036, webMat);
-  const back = makeDoor(m, FLY_DOOR, -1, cloth, 'xdome-door-back', 0.036, webMat);
+  const flyLeaves: Leaf[] = [
+    { fan: FLY_DOOR, gather: 0.84, folds: 0.036, swing: 0 },
+    { fan: FLY_PANEL, gather: 0.84, folds: 0.036, swing: 0 },
+  ];
+  const front = makeDoor(m, flyLeaves, 1, mats.doorCloth, 'xdome-door', webMat);
+  const back = makeDoor(m, flyLeaves, -1, cloth, 'xdome-door-back', webMat);
+  // The front zip goes with the leaves: seen while they're zipped, gone once they're apart.
+  front.door.add(detail(zips[0]));
   root.add(front.door, back.door);
 
   // The inner, with its own doors under the fly's.
   const s = makeInnerSurface(m);
   const inner = makeInner(s, mats.inner, mats.mesh);
-  const innerFront = makeDoor(s, INNER_DOOR, 1, mats.mesh, 'inner-door', 0.016);
-  const innerBack = makeDoor(s, INNER_DOOR, -1, mats.mesh, 'inner-door-back', 0.016);
+  const innerLeaves: Leaf[] = [{ fan: INNER_DOOR, gather: 0.84, folds: 0.016, swing: 0 }];
+  const innerFront = makeDoor(s, innerLeaves, 1, mats.mesh, 'inner-door');
+  const innerBack = makeDoor(s, innerLeaves, -1, mats.mesh, 'inner-door-back');
   for (const d of [innerFront, innerBack]) d.door.children[0].renderOrder = 1;
   inner.add(innerFront.door, innerBack.door);
   root.add(inner);
@@ -835,10 +864,11 @@ export function buildXDome(mats: XDomeMaterials) {
   poles.add(main, awning);
   root.add(poles);
 
-  /** 0 zipped .. 1 open: the front doors, the fly's and the inner's, gathered back together. */
+  /** 0 zipped .. 1 open: the front doors, both the fly's leaves and the inner's, opened together. */
   const setDoor = (k: number) => {
     front.setOpen(k);
     innerFront.setOpen(k);
+    zips[0].visible = k < 0.02;
   };
   return { root, fly, doors: [front.door, back.door], inner, poles, setDoor, textures: [normalMap, roughnessMap] };
 }

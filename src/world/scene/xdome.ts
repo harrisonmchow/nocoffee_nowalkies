@@ -16,8 +16,9 @@ const along = (d: number, across: number, y: number) =>
   new Vector3(d * Math.cos(INNER_YAW) - across * Math.sin(INNER_YAW), y, -d * Math.sin(INNER_YAW) - across * Math.cos(INNER_YAW));
 const XDOME_INSIDE = {
   pad: along(0, 0.3, 0),
-  bed: along(0.02, 0.3, 0.055),
-  pillow: along(-0.72, 0.3, 0.1),
+  // On the 7 cm EXPED Ultra 5R.
+  bed: along(0.02, 0.3, 0.072),
+  pillow: along(-0.72, 0.3, 0.115),
   // Hung under the brow pole's strut.
   headtorch: new Vector3(0, 1.0, 0),
   yaw: INNER_YAW,

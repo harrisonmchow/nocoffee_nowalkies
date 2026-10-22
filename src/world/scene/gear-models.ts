@@ -19,6 +19,9 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createPropMaterial } from './props-material';
 import { MOONLITE_COLOURWAYS, MOONLITE_HEIGHT, buildMoonlite, type MoonliteColourway } from './moonlite-geometry';
+import { ULTRA_COLOURS, ULTRA_THICKNESS, buildUltraMat } from './ultra-mat-geometry';
+import { TABLE_ZERO_COLOURS, TABLE_ZERO_HEIGHT, buildTableZero } from './table-zero-geometry';
+import { WARATAH_COLOURS, WARATAH_LOFT, buildWaratah } from './waratah-geometry';
 import type { WorldUniforms } from '../systems/uniforms';
 
 export type GearModel = {
@@ -146,10 +149,16 @@ export function createBottle(kit: Kit, color = '#6f9cb8'): GearModel {
   return finish(new Vector3(0, 0.28, 0));
 }
 
-/** An inflatable sleeping mat, 183 × 51 cm, lying along x, with lengthwise baffles. */
-export function createPad(kit: Kit, color = '#d38a2e'): GearModel {
+/**
+ * An inflatable sleeping mat, 183 × 51 cm, lying along x, with lengthwise
+ * baffles; or a real one, by the variant its model names
+ * (`proc:sleeping-pad/exped-ultra-5r`).
+ */
+export function createPad(kit: Kit, color?: string, variant: string[] = []): GearModel {
+  if (variant[0] === 'exped-ultra-5r') return createUltraMat(kit, color);
   const { object, material, add, finish } = build(kit);
   object.name = 'pad';
+  color ??= '#d38a2e';
   const shell = material(color, { roughness: 0.55 });
   add(new RoundedBoxGeometry(1.83, 0.055, 0.51, 3, 0.025), shell, 0, 0.0275, 0);
   for (let i = -2; i <= 2; i++) {
@@ -159,6 +168,25 @@ export function createPad(kit: Kit, color = '#d38a2e'): GearModel {
   }
   // The bag lies on it, so its dot hangs below its front edge rather than above.
   return { ...finish(new Vector3(0.62, 0.08, 0.18)), pin: 'below' };
+}
+
+/**
+ * The EXPED Ultra 5R (ultra-mat-geometry.ts), 183 × 52 × 7 cm, lying along x,
+ * head toward -x, valves at the foot: four draw calls, its shell in Lichen
+ * unless the kit gives it a colour.
+ */
+function createUltraMat(kit: Kit, color: string = ULTRA_COLOURS.shell): GearModel {
+  const { object, material, finish } = build(kit);
+  object.name = 'pad';
+  const meshes = buildUltraMat({
+    shell: material(color, { roughness: 0.55 }),
+    valve: material(ULTRA_COLOURS.valve, { roughness: 0.3 }),
+    cord: material(ULTRA_COLOURS.cord, { roughness: 0.85 }),
+    print: material(ULTRA_COLOURS.print, { roughness: 0.7 }),
+  });
+  meshes.forEach((m) => object.add(m));
+  // The bag lies on it, so its dot hangs below its front edge rather than above.
+  return { ...finish(new Vector3(0.62, ULTRA_THICKNESS + 0.01, 0.2)), pin: 'below' };
 }
 
 /** A mummy sleeping bag lying along x, hood toward -x. */
@@ -177,14 +205,40 @@ export function createSleepingBag(kit: Kit, color = '#3b4c6e'): GearModel {
   return finish(new Vector3(0.35, 0.24, 0.05));
 }
 
-/** A quilt laid over the mat: a soft slab with baffle lines, foot box toward +x. */
-export function createQuilt(kit: Kit, color = '#5d4a6e'): GearModel {
+/**
+ * A quilt laid over the mat: a soft slab with baffle lines, foot box toward +x; or a real one, by
+ * the variant its model names (`proc:quilt/neve-gear-waratah`).
+ */
+export function createQuilt(kit: Kit, color = '#5d4a6e', variant: string[] = []): GearModel {
+  if (variant[0] === 'neve-gear-waratah') return createWaratah(kit);
   const { object, material, add, finish } = build(kit);
   object.name = 'quilt';
   const shell = material(color, { roughness: 0.62 });
   add(new RoundedBoxGeometry(1.75, 0.09, 0.62, 3, 0.04), shell, 0.04, 0.1, 0);
   for (let i = -3; i <= 3; i++) add(new BoxGeometry(0.012, 0.012, 0.6), shell, 0.04 + i * 0.22, 0.146, 0);
   return finish(new Vector3(0.25, 0.2, 0.05));
+}
+
+/**
+ * The Neve Gear Waratah (waratah-geometry.ts), laid over the mat with its opening down, head
+ * toward -x, footbox toward +x: five draw calls. Its origin is the mat's top, and its flanks reach
+ * the floor, the EXPED's thickness below.
+ */
+function createWaratah(kit: Kit): GearModel {
+  const { object, material, finish } = build(kit);
+  object.name = 'quilt';
+  const lining = material(WARATAH_COLOURS.lining, { roughness: 0.5 });
+  // Only seen from inside, through the head opening.
+  lining.side = DoubleSide;
+  const meshes = buildWaratah({
+    shell: material(WARATAH_COLOURS.shell, { roughness: 0.4 }),
+    panel: material(WARATAH_COLOURS.panel, { roughness: 0.38 }),
+    lining,
+    cord: material(WARATAH_COLOURS.cord, { roughness: 0.85 }),
+    hardware: material(WARATAH_COLOURS.hardware, { roughness: 0.4 }),
+  }, ULTRA_THICKNESS);
+  meshes.forEach((m) => object.add(m));
+  return finish(new Vector3(0.1, WARATAH_LOFT + 0.02, 0.05));
 }
 
 /** An inflatable camp pillow. */
@@ -367,4 +421,25 @@ export function createChair(kit: Kit, variant: string[] = []): GearModel {
   });
   meshes.forEach((m) => object.add(m));
   return finish(new Vector3(0, MOONLITE_HEIGHT + 0.06, -0.2));
+}
+
+/**
+ * A camp table: the Helinox Table Zero LT (table-zero-geometry.ts), 0.3 m
+ * tall and 0.495 m long, its long side facing +z.
+ */
+export function createTable(kit: Kit): GearModel {
+  const { object, material, finish } = build(kit);
+  object.name = 'table';
+  // The GhostGrid top is see-through: the ground and the frame show through it.
+  const mesh = material(TABLE_ZERO_COLOURS.mesh, { roughness: 0.85 });
+  mesh.side = DoubleSide;
+  mesh.transparent = true;
+  mesh.opacity = 0.82;
+  const meshes = buildTableZero({
+    frame: material(TABLE_ZERO_COLOURS.frame, { roughness: 0.35, metalness: 0.5 }),
+    hardware: material(TABLE_ZERO_COLOURS.hardware, { roughness: 0.6 }),
+    mesh,
+  });
+  meshes.forEach((m) => object.add(m));
+  return finish(new Vector3(0, TABLE_ZERO_HEIGHT + 0.06, 0));
 }
