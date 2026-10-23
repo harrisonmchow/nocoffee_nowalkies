@@ -60,15 +60,6 @@ export const drawings: Record<ItemType, string> = {
     <path class="f" d="M52 58 L148 58 L156 142 L44 142 Z"/>
     <path class="f" d="M64 142 L100 180 L136 142 Z"/>
     <path d="M100 58 L100 142 M76 58 L70 142 M124 58 L130 142"/>`,
-  chair: `
-    <path d="M68 104 L44 46 M132 104 L156 46 M68 104 L38 166 M132 104 L162 166"/>
-    <circle class="f" cx="44" cy="46" r="4"/><circle class="f" cx="156" cy="46" r="4"/>
-    <circle class="f" cx="38" cy="166" r="4"/><circle class="f" cx="162" cy="166" r="4"/>
-    <path class="f" d="M44 84 L30 88 L32 128 L46 130 Z"/>
-    <path class="f" d="M56 36 Q100 30 144 36 Q154 38 154 48 L158 136 Q158 148 146 150 Q100 158 54 150 Q42 148 42 136 L46 48 Q46 38 56 36 Z"/>
-    <path d="M72 112 L128 112"/>
-    <path d="M70 114 Q64 126 70 136 Q76 126 70 114 Z M130 114 Q124 126 130 136 Q136 126 130 114 Z"/>
-    <rect x="89" y="46" width="22" height="8" rx="2"/>`,
   'sleeping-pad': `
     <rect class="f" x="68" y="18" width="64" height="164" rx="16"/>
     <path d="M70 44 L130 44 M70 64 L130 64 M70 84 L130 84 M70 104 L130 104 M70 124 L130 124 M70 144 L130 144 M70 164 L130 164"/>
@@ -106,6 +97,21 @@ export const drawings: Record<ItemType, string> = {
     <rect class="f" x="36" y="56" width="128" height="96" rx="16"/>
     <path d="M36 74 L164 74"/>
     <path class="f" d="M92 86 L108 86 L108 102 L124 102 L124 118 L108 118 L108 134 L92 134 L92 118 L76 118 L76 102 L92 102 Z"/>`,
+  chair: `
+    <path class="f" d="M58 34 L142 34 L150 92 Q100 104 50 92 Z"/>
+    <path class="f" d="M50 92 Q100 104 150 92 L156 150 Q100 166 44 150 Z"/>
+    <path d="M58 34 L44 150 M142 34 L156 150 M66 100 L134 100"/>
+    <path d="M70 108 L38 176 M70 108 L64 30 M130 108 L162 176 M130 108 L136 30 M70 108 L130 108"/>
+    <circle class="f" cx="70" cy="108" r="6"/>
+    <circle class="f" cx="130" cy="108" r="6"/>
+    <path class="f" d="M86 36 L114 36 L110 52 L90 52 Z"/>`,
+  table: `
+    <path class="f" d="M30 70 L170 70 L162 104 L38 104 Z"/>
+    <path d="M77 70 L74 104 M123 70 L126 104"/>
+    <path d="M58 106 L142 168 M142 106 L58 168 M68 104 L128 150 M132 104 L72 150"/>
+    <path d="M100 136 L100 125"/>
+    <circle class="f" cx="100" cy="137" r="6"/>
+    <circle class="f" cx="100" cy="125" r="5"/>`,
   accessories: `
     <ellipse cx="100" cy="112" rx="72" ry="44"/>
     <ellipse cx="100" cy="112" rx="64" ry="36"/>

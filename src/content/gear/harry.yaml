@@ -61,12 +61,14 @@ items:
     link: https://ultralightgear.com.au/products/nemo-tensor-all-season-insulated-sleeping-pad?variant=48685446627612
     scene:
       model: proc:sleeping-pad/nemo-tensor-all-season
-  - id: sleeping-bag
-    name: Sleeping bag
+  - id: quilt
+    name: Quilt
+    brand: Neve Gear Waratah
     category: gear
-    type: sleeping-bag
+    type: quilt
+    link: https://nevegear.com.au/products/waratah
     scene:
-      model: proc:sleeping-bag
+      model: proc:quilt/neve-gear-waratah
   - id: pillow
     name: Pillow
     brand: NEMO Fillo (Silt Stripe)

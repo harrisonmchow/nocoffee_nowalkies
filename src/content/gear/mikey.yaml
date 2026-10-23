@@ -45,10 +45,12 @@ items:
       model: proc:pack
   - id: tent
     name: Tent
+    brand: Durston X-Mid Pro 2
     category: gear
     type: tent
+    link: https://durstongear.com/products/x-mid-pro-2-tent-ultralight-thruhiking
     scene:
-      model: proc:tent/trekking-pole
+      model: proc:tent/durston-x-mid-pro-2
   - id: sleeping-pad
     name: Sleeping pad
     category: gear

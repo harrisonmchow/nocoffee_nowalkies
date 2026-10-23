@@ -18,8 +18,8 @@ import { TENSOR, TENSOR_COLOURS, buildTensor } from './tensor-geometry';
 
 type Kit = { uniforms: WorldUniforms; starLayers: number };
 
-/** A real kit model: a stand-in's GearModel, and for a pad, the height in its own frame that what lies on it rests at. */
-export type KitModel = GearModel & { top?: number };
+/** A real kit model: a stand-in's GearModel, and for a pad, the height in its own frame that what lies on it rests at, and how wide it is (a quilt drapes clear of it). */
+export type KitModel = GearModel & { top?: number; width?: number };
 
 /** Its vertex colours as multiples of the material's own colour, so the two don't multiply into a darker one, and pointing at it lifts that colour. */
 function relativeTo(geometry: BufferGeometry, colour: string) {
@@ -52,7 +52,7 @@ export function createTensorPad(kit: Kit): KitModel {
   const g = buildTensor();
   const pad = mesh(kit, [g.top, g.base, g.valve, g.marks], TENSOR_COLOURS.top, { roughness: 0.55 });
   // The bag lies on it, so its dot hangs below its front edge rather than above; what lies on it presses into the cells a little.
-  return model('tensor-pad', [pad], new Vector3(0.62, TENSOR.height, 0.2), { pin: 'below', top: TENSOR.height - 0.005 });
+  return model('tensor-pad', [pad], new Vector3(0.62, TENSOR.height, 0.2), { pin: 'below', top: TENSOR.height - 0.005, width: TENSOR.width });
 }
 
 /** The NEMO Fillo in Silt Stripe: lying flat, its long side along x, its valve, loop and label on the +x edge. One mesh. */

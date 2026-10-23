@@ -45,22 +45,27 @@ items:
       model: proc:pack
   - id: tent
     name: Tent
+    brand: Durston X-Dome 2
     category: gear
     type: tent
     scene:
-      model: proc:tent/trekking-pole
+      model: proc:tent/durston-x-dome-2
   - id: sleeping-pad
     name: Sleeping pad
+    brand: EXPED Ultra 5R
     category: gear
     type: sleeping-pad
+    link: https://www.wildernesssports.com.au/products/exped-ultra-5r-sleeping-mat
     scene:
-      model: proc:sleeping-pad
-  - id: sleeping-bag
-    name: Sleeping bag
+      model: proc:sleeping-pad/exped-ultra-5r
+  - id: quilt
+    name: Quilt
+    brand: Neve Gear Waratah
     category: gear
-    type: sleeping-bag
+    type: quilt
+    link: https://nevegear.com.au/products/waratah
     scene:
-      model: proc:sleeping-bag
+      model: proc:quilt/neve-gear-waratah
   - id: pillow
     name: Pillow
     category: gear
@@ -83,6 +88,23 @@ items:
     name: Power bank and cables
     category: gear
     type: electronics
+  - id: chair
+    name: Camp chair
+    brand: NEMO Moonlite
+    category: gear
+    type: chair
+    link: https://www.nemoequipment.com/products/moonlite-reclining-camp-chair
+    scene:
+      model: proc:chair/nemo-moonlite
+  - id: table
+    name: Camp table
+    brand: Helinox Table Zero LT
+    category: gear
+    type: table
+    weightG: 240
+    link: https://ultralightgear.com.au/products/helinox-table-zero-lt
+    scene:
+      model: proc:table/helinox-table-zero-lt
   - id: first-aid
     name: First aid kit
     category: gear

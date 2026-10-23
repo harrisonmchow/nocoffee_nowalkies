@@ -35,11 +35,12 @@ import { PRESETS } from './biomes';
 import { createCamp, type CampLayout } from './camp';
 import { createDuneGrass } from './dune-grass';
 import { createFallingLeaves, createLeafCarpet } from './leaf-fall';
-import { createMaples } from './maples';
+import { createMaple } from './maples';
 import { createSea } from './sea';
 import { createPropMaterial } from './props-material';
 import { createSnowLeopard } from './snow-leopard';
 import { requestTile } from './terrain-client';
+import { surfaceOf } from './terrain-tile';
 import { terrainFor, type HeightField, type TerrainSpec } from './terrain-fields';
 import { createTerrainMesh } from './terrain';
 
@@ -47,8 +48,8 @@ type V3 = [number, number, number];
 
 /**
  * Where everything goes, relative to the camp pad: the tent (in each person's
- * tone), the fire, the person between them, their pack, stove and water, and
- * a dog, for a camp that has one.
+ * tone), the fire, the person between them, their pack, stove and water, a
+ * camp chair facing the fire, and a dog, for a camp that has one.
  */
 const LAYOUTS: Record<BiomeId, CampLayout> = {
   'alpine-aurora': {
@@ -62,6 +63,7 @@ const LAYOUTS: Record<BiomeId, CampLayout> = {
     tent: { x: -1.8, z: -0.6, rotation: 0.3, colour: '#c99a2e' }, fire: { x: 2.0, z: 1.6 },
     person: { x: 0.45, z: 1.2, rotation: 0.35, jacket: '#8a5a1e' }, pack: { x: -0.5, z: 0.75, rotation: -0.2 },
     stove: { x: 2.9, z: 0.7 }, water: { x: 3.2, z: 1.0 }, dog: { x: 0.7, z: 2.45, rotation: 1.45 }, boulders: 5,
+    chair: { x: 3.25, z: 1.95, rotation: -1.35 },
   },
   // Mikey's: the car side-on to the view, the tent pitched beside it, and Mikey between them.
   'coast-sunset': {
@@ -69,11 +71,13 @@ const LAYOUTS: Record<BiomeId, CampLayout> = {
     person: { x: -2.7, z: -0.4, rotation: 0.5, jacket: '#7c2f2a' }, pack: { x: -1.5, z: 0.3, rotation: -0.25 },
     car: { x: -6.2, z: -2.6, rotation: 1.3 },
     stove: { x: 2.5, z: 0.9 }, water: { x: 2.8, z: 1.2 }, dog: { x: 0.85, z: 2.2, rotation: 1.2 }, boulders: 3,
+    chair: { x: 0.6, z: 0.8, rotation: 0.79 },
   },
   'rockies-night': {
     tent: { x: -2.0, z: -1.0, rotation: -0.2, colour: '#3d6f9e' }, fire: { x: 1.8, z: 1.5 },
     person: { x: 0.3, z: 1.0, rotation: 0.25, jacket: '#24476b' }, pack: { x: -0.8, z: 0.45, rotation: 0.2 },
     stove: { x: 2.7, z: 0.6 }, water: { x: 3.0, z: 0.9 }, dog: { x: 1.0, z: 1.85, rotation: 1.2 }, boulders: 6,
+    chair: { x: 0.9, z: 0.4, rotation: 0.69 },
   },
 };
 
@@ -213,7 +217,10 @@ export async function buildBiomeSet(id: BiomeId, ctx: BiomeSetContext) {
   const radius = 5000;
   // Kevin's snow leopard is the one model to download: fetched while the terrain builds.
   const leopard = id === 'rockies-night' ? createSnowLeopard(ctx.uniforms, ctx.starLayers) : null;
-  const tile = await requestTile({ biome: id, seed: ctx.seed, resolution: ctx.resolution, radius, power: 1.6 });
+  const power = 1.6;
+  const tile = await requestTile({ biome: id, seed: ctx.seed, resolution: ctx.resolution, radius, power });
+  // The ground as drawn, for planting trees on (the height field runs above it over rises, between the grid's vertices).
+  const ground = surfaceOf(tile, power);
   const group = new Object3D();
   group.name = `biome-${id}`;
   group.visible = false;
@@ -236,7 +243,7 @@ export async function buildBiomeSet(id: BiomeId, ctx: BiomeSetContext) {
     const lake = createIce(ctx.uniforms, ctx.starLayers, spec);
     group.add(lake.mesh);
     disposers.push(lake.dispose);
-    const trees = createSpruces(ctx.uniforms, ctx.starLayers, spec, ctx.trees, ctx.plants + 7);
+    const trees = createSpruces(ctx.uniforms, ctx.starLayers, spec, ground, ctx.trees, ctx.plants + 7);
     group.add(trees.mesh);
     disposers.push(trees.dispose);
     const cat = await leopard;
@@ -248,11 +255,11 @@ export async function buildBiomeSet(id: BiomeId, ctx: BiomeSetContext) {
     }
   }
   if (id === 'maple-autumn') {
-    // A grove of Japanese maples around the clearing, thinning into the valley, and a few evergreens among them.
-    const grove = createMaples(ctx.uniforms, ctx.starLayers, spec, { near: Math.round(ctx.trees / 60), far: Math.round(ctx.trees / 5), seed: ctx.plants + 11 });
-    group.add(grove.group);
-    disposers.push(grove.dispose);
-    const evergreens = createSpruces(ctx.uniforms, ctx.starLayers, spec, Math.round(ctx.trees / 28), ctx.plants + 7);
+    // One giant Japanese maple over the camp, the valley's only one, and a few evergreens further off.
+    const maple = createMaple(ctx.uniforms, ctx.starLayers, spec, ground, { seed: ctx.plants + 11, camp: { x: 0, z: 0 } });
+    group.add(maple.group);
+    disposers.push(maple.dispose);
+    const evergreens = createSpruces(ctx.uniforms, ctx.starLayers, spec, ground, Math.round(ctx.trees / 28), ctx.plants + 7);
     group.add(evergreens.mesh);
     disposers.push(evergreens.dispose);
     // The tent on a carpet of leaves, and more coming down.
@@ -455,7 +462,8 @@ function spruceGeometry(seed: number) {
   return merged;
 }
 
-function createSpruces(uniforms: WorldUniforms, starLayers: number, spec: TerrainSpec, count: number, seed: number) {
+/** Spruces, placed by the height field and planted on `ground` (the terrain as drawn). */
+function createSpruces(uniforms: WorldUniforms, starLayers: number, spec: TerrainSpec, ground: HeightField, count: number, seed: number) {
   const geometry = spruceGeometry(seed);
   const material = createPropMaterial(uniforms, starLayers, { color: '#ffffff', roughness: 0.95, snow: true });
   material.vertexColors = true;
@@ -483,7 +491,7 @@ function createSpruces(uniforms: WorldUniforms, starLayers: number, spec: Terrai
     if (density(x / 140, z / 140) + random() * 0.6 < 0.2) continue; // clumps and clearings
     const s = 0.65 + random() * 0.8;
     q.setFromAxisAngle(new Vector3(0, 1, 0), random() * Math.PI * 2);
-    m.compose(new Vector3(x, h - 0.4, z), q, new Vector3(s, s * (0.9 + random() * 0.3), s));
+    m.compose(new Vector3(x, ground(x, z) - 0.4, z), q, new Vector3(s, s * (0.9 + random() * 0.3), s));
     mesh.setMatrixAt(placed++, m);
   }
   mesh.count = placed;

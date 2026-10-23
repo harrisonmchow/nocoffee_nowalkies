@@ -166,13 +166,16 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
 
 **M3 done (17 October 2026), except the hub: Caleb's and Mikey's camps.** The hub waits, since `/gear/` is hidden and nothing links to it.
 
-- **Caleb: autumn under Japanese maples** (`scene/maples.ts`, `scene/leaf-fall.ts`).
-  - The maples grow by the vegetation skill's structured Ash system, with an Acer palmatum species table: a short trunk forking low into a few leaders, wide spreading tiers, fine twigs.
-  - Recorded divergences from the Ash contract: radius-driven terms (gnarliness, tropism) measure radius in 8 cm units, since the scene is in metres; leaves are sprays of three palmate leaves on one drawn texture; the perpendicular twin card only near each twig's tip.
-  - Near the camp, about 23 full growths (three seeded variants, instanced, high tier), ringed around the clearing with a clear corridor for the cameras. Out to 700 m, cheap maples: a trunk and crown cards painted with many small leaves.
-  - Leaves are coloured per tree from an autumn palette, darker deep in the crown, fluttering from their roots, and glowing when back-lit by the low sun.
+- **Caleb: autumn under one great Japanese maple** (`scene/maples.ts`, `scene/leaf-fall.ts`).
+  - The valley's only maple is a giant, about 18 m tall (four garden maples) with a crown about 35 m across, after the references: one sinuous trunk forking into at most seven long limbs that rise, arch out and droop, side branches, and fine kinked twigs hanging from them with the leaves. The limbs are far apart, so the crown is a broad, layered umbrella that's open underneath.
+  - It stands 7–10 m behind the camp from the views, leaning a little over it, with the whole camp under its crown; nothing hangs below 3.2 m within 13 m of the camp, so the campsite and the orbit's camera stay clear. One tree, not a grove: more impressive, and cheaper (about 50k triangles and two draws, where 27 garden maples were about 110k).
+  - Growth (any size; size 1 is a garden maple of about 5 m): a larger tree isn't scaled up but grown out, with more branches along its longer limbs and more twigs along its branches, slightly larger leaf sprays, and more sides on its trunk and limbs. Of three seeds, the one grown closest to 18 m is fitted to it.
+  - Recorded divergences from the vegetation skill's structured Ash system: each branch is a walk whose heading follows two slow waves and a few elbow kinks (so limbs wind rather than wobble), levelling out rather than sweeping into the ground; four fixed levels (stems, limbs, branches, twigs) with children alternating sides; parallel-transport rings and pipe-model radii; leaves are sprays of three palmate leaves on one drawn texture, only on twigs and branch ends, with crown-volume normals and the perpendicular twin card only at each twig's tip.
+  - The camp is in a level clearing: the valley's bumps fade out within about 35 m of it, rising back by 150 m. The tree is planted on the terrain as drawn (its triangles), not the height field, which runs above it over rises.
+  - Tests: one maple, its root on the drawn ground (raycast), 13.5–22.5 m tall, and the tent, fire and person all under leaves more than 3 m up.
+  - Leaves are coloured in broad patches of reds warming to orange and gold toward the top (per card, from a slow noise over the crown), darker deep in it, fluttering from their roots, and glowing when back-lit by the low sun.
   - A carpet of fallen leaves around the tent, and about 100 leaves (60 on mid) drifting down through the clearing, each on its own phase.
-  - From afar, the terrain's canopy covers the valley (with a clearing around the camp) and is painted as separate crowns: a cell per tree, shaded as a dome, each tree red or amber. A few evergreens among the maples.
+  - From afar, the terrain's canopy covers the valley (with a clearing around the camp) and is painted as separate crowns: a cell per tree, shaded as a dome, each tree red or amber. A few evergreens further off.
   - Light: a low golden sun from ahead, warm haze lying in the valley, mist puffs on the floor, cool blue shade; mossy rock and soil.
 - **Mikey: the coast at sunset** (`scene/sea.ts`, `scene/dune-grass.ts`).
   - The sea follows the water-optics skill's authored analytic surface: one wave list gives the normal and the crest metric; finer ripples add to the normal only and fade before they're unresolved. Fresnel from the air side, against the sky's own radiance; the body is the sand bed at its true depth (sea level less the heightmap), absorbed per channel along the refracted path, plus the water's scatter; the sun's glitter path; foam from the crest metric and where waves break in the shallows. The last metre of depth fades out, so the waterline is soft.
@@ -212,6 +215,101 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
   - The intake, a spec of 64 components generated from the same part list, strict validation, and the blockout, structural and form passes, each rendered from the generated factory and reviewed against the photos. Tier 1 silhouette overlap with the primary photo is 0.95.
   - It stopped at the material pass, where its target was already reached: 0.80 against 0.70, with every critical feature at or above its bar. That pass's per-part colour check matches all 16 colours against a render's five dominant ones, so it can't pass for a tent whose inner, poles and zips hide under the fly. Measured per material instead: the fly, band and mesh are within delta-E 10 of the photos.
 - **Not yet:** the vents' visors are subtler than the photos'; the inner door's exact cut and the far side are inferred; the other three camps still have the stand-in.
+
+**Caleb's camp chair is his real one (18 October 2026): the NEMO Moonlite.** Rebuilt in code from NEMO's product photos (the four colourways from one studio angle, a side view with a sitter, and close-ups of a hub, a corner pocket and the recline hardware) and its listed size, 50 × 51 × 64 cm, through the img2threejs skill's pipeline. It sits on the far side of the fire from the tent, angled toward the fire and the camera.
+
+- **How it's built** (`scene/moonlite-geometry.ts`):
+  - The frame: two forged hubs 15 cm up, joined by a crossbar. From each hub, four straight 16 mm tubes make an X: two legs to flared rubber feet, an upright to the seat's front corner, and a longer one to the top of the back.
+  - The sling hangs from the four ball tips. Its centre line is a curve from the top of the back down to a low point 28 cm up and back up to the front edge. Each free side sweeps down and in between its corners, and the cloth cups between them. The back stays in front of the rear uprights, which show through the mesh in the photos.
+  - Black pockets wrap the top corners and cup the front ones. A shield patch sits at the top of the back.
+  - The armrest straps run from each top pocket to the front pocket, with the light recline webbing from the buckle forward, and a pull tab with its toggle.
+  - Each part is built for the chair's left side and reflected for its right, with its triangles turned back.
+  - The four colourways are presets, with colours sampled from the photos. The knit, the MOONLITE print and the logos are flat colour: all below a pixel at the campsite's distance.
+- **In the camp** (`createChair` in `scene/gear-models.ts`): about 4.9k triangles in the world's prop materials, with the cloth two-sided. At camp distance the feet read as frame, the print as webbing and the toggle as buckle, so they share those materials, as do hubs the frame's colour: 5 draw calls (6 for Black Pearl and Quicksilver, whose hubs differ). Quicksilver's black feet take its violet frame colour.
+- **Budget:** Caleb's campsite (high tier) is at 76 draw calls against the 60 budget, 71 of them without the chair. It was already over before the chair, from the uncommitted maple and X-Dome work, so the budget test fails either way. A chair spot facing the fire was added to every camp layout; only Caleb's kit has a chair.
+- **Content:** a `chair` gear type with its own flat-lay drawing, and Caleb's item "Camp chair", "NEMO Moonlite", with the product link and no weight yet.
+- **The pipeline's record** (outside the repo, in the session's workspace):
+  - Covered: the intake, a strict-validated spec of 29 components from the same part list, PBR evidence for all nine materials (confidence 0.71–0.86), and two blockout reviews against the photo, using a camera fitted to the photo's silhouette.
+  - **Stopped at blockout:**
+    - The Tier 1 silhouette overlap reaches 0.839 against the 0.85 gate, measured on the photo with its ground shadow removed and the knit's see-through holes closed. The gate is 0.85, so the pass gate doesn't unlock.
+    - Divine Eye passes it (fidelity 0.856). The turntable and multi-angle checks pass.
+    - The last geometry changes moved the overlap by less than 0.002, so it's at a plateau.
+  - **The generated factory isn't used:** it places each part in its own normalised frame, so its renders are a slab and floating struts. Every review was rendered from `moonlite-geometry.ts`.
+- **Not yet:** the far side and the back of the sling are mirrored or inferred; the far strap sits about 1.5 cm further out in the photo; the recline position isn't modelled (it's always upright).
+
+**Caleb's camp table (19 October 2026): the Helinox Table Zero LT**, beside the chair at its left hand. Rebuilt in code from the retailer's product photos (a three-quarter view, the long side from above and level, the top rolled back off the frame, and close-ups of the hubs and a corner) and its listed size, 30 × 49.5 × 31 cm, through the img2threejs skill's pipeline.
+
+- **How it's built** (`scene/table-zero-geometry.ts`): two black wedge hubs 15.5 cm up, joined by a crossbar across the width. From each hub, four straight 10 mm cyan tubes make an X along the length: two legs to feet ±17.5 cm out, and two uprights to saddles under that side's rail. The rails run under the long edges, close under the sheet and in from its edge, so the binding hides them from above, as in the photos. The see-through mesh top has a black binding, two black seams across it and the logo patch.
+- **In the camp** (`createTable` in `scene/gear-models.ts`): 894 triangles in three materials (frame, black hardware, a translucent two-sided top). It stands 0.5 m off the chair's left armrest with its long side along the chair (`TABLE_BESIDE_CHAIR` in camp.ts), so any kit with a `proc:table/…` item gets it beside its chair. Caleb's campsite (high tier) went from 81 to 85 draw calls.
+- **Content:** a `table` gear type with its own flat-lay drawing, and Caleb's item "Camp table", "Helinox Table Zero LT", 240 g, with the product link.
+- **The pipeline's record** (outside the repo): a strict-validated spec of 24 components, PBR evidence for its three materials (confidence 0.73–0.84), cameras fitted to three photos, and a four-view turntable. It **stopped at blockout**: Tier 1 silhouette overlap is 0.81 against the 0.85 gate, a limit set by the 5 mm-wide tubes against a camera fitted to a photo. The multi-angle and turntable checks pass.
+- **Not yet:** the hubs' spacing across the width is inferred (no end-on photo), and the far X sits a little lower than in the photo; the corner grommets are plain clips; the GhostGrid weave and logo are flat colour.
+
+**Caleb's X-Dome 2, rebuilt to Durston's dimensions, with an inner and an openable door (19 October 2026).** One model with an openable door rather than two models (closed and open), following the X-Mid's `setDoor`. Built from Durston's product photos: the dimension diagram (top, end and side views), the fly closed from the side and the end, the door open, and the inner pitched alone.
+
+- **What was wrong:** the earlier model had a 2.1 × 1.3 m box with pointed vestibules, two crossing poles, and no inner. Durston's diagram shows:
+  - a near-square fly, 2.2 × 2.0 m between the pole feet;
+  - a hubbed frame;
+  - an inner set diagonally across the fly.
+- **The frame** (`scene/xdome-geometry.ts`):
+  - At each end, two legs climb from the corners to a hub 1.03 m up, and a ridge joins the hubs (0.76 m apart).
+  - The legs rise evenly across the end (nearly straight in the end view) and swing in along the tent near the top (curved in the side view). The side silhouette is within about 5 cm of the photo's half-width at every height.
+  - A brow pole crosses the ridge on a strut, 1.165 m at the top. Its ends lift the fly's peaks over the doors, a little above the hubs.
+- **The fly:** a membrane pinned at the hem and under the legs, the ridge and the brow pole, so it's a trapezoid seen from the end. Seams run from each peak to both corners, and a vent hood hangs from each hub down to its legs.
+- **The inner:**
+  - A 2.24 × 1.3 m parallelogram floor, its ends along the fly's ends and its centre line 0.3 m toward the front at one end and toward the back at the other. So each vestibule is a triangle beside its door, 0.65 m deep at one end and next to nothing at the other.
+  - A grey bathtub 13 cm up, then dark mesh rising steeply off the rim (about 69°) to follow the fly 6 cm under it, peaking 1.09 m up (Durston: 43 in).
+- **The doors:**
+  - Each fly door is two leaves zipped together from the peak down to the hem 0.45 m right of centre (the top view's dotted line). The large leaf is sewn along the seam to the left corner, the small one along the seam to the right corner, and the fly is cut behind the whole side between them. Both leaves are one mesh.
+  - Under it, the inner has its own door, zipped from 1.0 m up down to the tub, right of centre.
+  - `setDoor(k)` (0 zipped, 1 open) opens the whole side, as in Durston's open-side photo. Each leaf gathers back along its own seam in folds, rolled up the same way, the large to the left and the small to the right. (Durston's photo has the small leaf guyed out as a wing; the model rolls it instead.) The inner's door gathers back with the large leaf. The front zip shows only while the door is shut.
+  - Each hole in the fly and the inner is cut along its grid, with the cut's corners slid onto the seam and zip so the edges run straight.
+- **In the camp** (`scene/xdome.ts`):
+  - Drawn at its real size; the old upward stretch is gone.
+  - Pitched with the front door open (`PITCHED_DOOR`). At night the headtorch lights the inner's floor and mesh through the doorway.
+  - The sleeping kit lies along the inner's slant, on its back half: camp.ts takes an optional `yaw` in a tent's `inside`.
+- **Not yet:** how the gathered doors fold, the inner door's exact outline, and the inner's walls between rim and poles are inferred. The inner's solid panels at its lower ends are left out.
+
+**Caleb's sleeping mat (19 October 2026): the EXPED Ultra 5R**, size M, in the X-Dome's inner under his bag and pillow. Rebuilt in code from the retailer's product photos (top views, a three-quarter view from the head, close-ups of the valves and the tubes) and its listed size, 183 × 52 × 7 cm, through the img2threejs skill's pipeline.
+
+- **How it's built** (`scene/ultra-mat-geometry.ts`):
+  - One closed, welded shell: a grid over the plan, with the top mirrored to make the underside.
+  - Seven head-to-toe tubes, each a broad crown pinched to a V at the welds between them. The outer tubes round down to a near-upright side wall.
+  - Each tube closes in a dome, so the head and foot edges are scalloped, one lobe per tube.
+  - Two flat valves sit on the foot end's top, lids shut, with the IN lid's cord lying beside it. The EXPED wordmark is in thin strokes along the other side's outer tube near the head, reading the right way round from above.
+- **In the camp** (`createPad` in `scene/gear-models.ts`, by the model's variant: `proc:sleeping-pad/exped-ultra-5r`):
+  - About 6.1k triangles in four materials (Lichen shell, valve, cord, print), so four draw calls where the stand-in mat had one.
+  - Caleb's campsite (high tier) measured 85 calls with this mat and the table, against the 60 budget.
+  - The X-Dome's bag and pillow spots are raised 1.5 cm for the 7 cm mat.
+  - The other kits keep the stand-in.
+- **Content:** Caleb's item "Sleeping pad", "EXPED Ultra 5R", with the product link. There's no weight yet: it's 585, 655 or 700 g depending on the size, which isn't known.
+- **The pipeline's record** (outside the repo):
+  - A strict-validated spec of 11 components, with PBR evidence for all four materials (confidence 0.75–0.86).
+  - A camera fitted to the three-quarter photo (with its pump bag painted out). Tier 1 silhouette overlap is 0.933. The turntable, multi-angle and self-intersection checks pass.
+  - Measured per material against photo crops, the colours are within delta-E 20: shell 0.8, valve 4.5, print 8.4, cord 17.9.
+  - **Stopped at the material pass:** its Tier 1 per-part colour check compares each part with the render's five dominant colours, so the 3 mm cord can never pass it.
+- **Not yet:** the underside mirrors the top, and which side the valves sit on is inferred. The ends' puckered welds are smooth domes. The ripstop grid and the SYNMAT print are left out, as below a pixel at camp distance. The valves are opaque, not translucent.
+
+**Caleb's quilt (19 October 2026): the Neve Gear Waratah**, laid over the EXPED in the X-Dome's inner, in place of the stand-in sleeping bag. Rebuilt in code from Neve's product photos (closed and opened flat from above, the lining, the footbox from the side on a mat and from its end, the collar's drawcord) through the img2threejs skill's pipeline. Neve publishes no dimensions, so its size is inferred from the 6' fit and the mat in their side photo.
+
+- **How it's built** (`scene/waratah-geometry.ts`):
+  - One lofted surface swept head to foot, empty, its opening down. Over the torso its section is an arch over the mat, the flanks falling past the mat's sides to the floor.
+  - Past the hips the hems rise to rest on the mat, then the flanks curl under it. The footbox is a closed tube lying on the mat, taller than the torso, and closes in a blunt dome gathered by a drawcord.
+  - Box baffles pinch the loft: lengthwise over the torso (8.5 cm), four crosswise in the footbox, and a chest baffle under the collar.
+  - A pale lining sits a loft's depth inside, seen through the head opening, joined to the shell by rims at the collar and along the hems.
+  - Colour follows Neve's three-panel cut: navy, with a black panel down the sleeper's right flank (toward the door), a black collar and a black footbox end. A white footbox cord and the neck cord each have a cord lock.
+- **In the camp** (`createQuilt` in `scene/gear-models.ts`, by the model's variant: `proc:quilt/neve-gear-waratah`):
+  - About 12k triangles in five materials (navy, black, lining, cord, cord locks), so five draw calls. Caleb's campsite (high tier) measured 88 calls, up from 85.
+  - The lining is two-sided. The quilt's origin is the mat's top (the X-Dome's bed spot), and its flanks reach the floor by the EXPED's thickness.
+  - The other kits keep the stand-in quilt and bag.
+- **Content:** Caleb's item "Quilt", "Neve Gear Waratah", with the product link, replacing the sample "Sleeping bag". There's no weight yet: it depends on the rating and size, which aren't known.
+- **The pipeline's record** (outside the repo):
+  - A strict-validated spec of 9 components, with PBR evidence for all five materials (confidence 0.72–0.86).
+  - A camera fitted to the side photo (with its mat painted out).
+  - **Stopped at blockout:** Tier 1 silhouette overlap is 0.776 against the 0.85 gate. The photo's mat is a different, thicker one, so its footbox sits higher, and no photo shows the quilt empty on a mat.
+  - The multi-angle check passes. The turntable passes with the cords hidden: the footbox cord's loop encloses background, which the hole check counts.
+  - The self-intersection check was run on the down slab as one closed solid (shell, lining and rims). It found one real defect, now fixed: the hem rims ran on through the closed footbox as a double wall. Of the 25 points still flagged (of 3,676 sampled), every worst point is clean under random rays, apart from a sub-2 mm seam at the collar where the half-resolution lining meets its rim.
+- **Not yet:** the size and the empty drape are inferred. The underside, its zip and the pad straps are hidden and not modelled. The NEVE GEAR and WARATAH prints and the taffeta's crinkle are left out, as below a pixel at camp distance. Neve's photos show a glossier taffeta than the camp's prop material gives.
 
 **Harry's pad, pillow and chair are his real ones (20 October 2026): the NEMO Tensor All-Season, the NEMO Fillo and the Alton Lightweight Camp Chair.** Each was rebuilt in code from its product page's photos and listed size, through the img2threejs skill's pipeline. The pad and pillow replace the stand-ins in Harry's tent, and the chair is new, by the fire.
 
@@ -273,6 +371,28 @@ Scope: four crew tabs on `/gear/` (Harry, Caleb, Mikey, Kevin). Each tab is a bi
   - Like the tent's and the pillow's, it stopped at the material pass, where its target was already reached (0.80 against 0.70). That pass's per-part colour check can't see the grey harness webbing from the front view, where it covers about 1,000 of 495,000 pixels. Every other material clears it.
   - Measured per material from an ID render instead: the nylon is within delta-E 5.5 of the front photo, the blue webbing 2.0 and the prints 4.5. Part coverage and the action-ready hierarchy check out, though the stop leaves them unrecorded in the pipeline's checklist.
 - **Not yet:** the wearer's right side, which mirrors the left because no photo shows it; the lettering on the lid and the AETHER 65 print; the ripstop and hex textures; the hip belt's lumbar pad, which is taller in the photo.
+
+**Harry's quilt is a Neve Gear Waratah, like Caleb's (23 October 2026), and Harry's and Caleb's kit branches are merged.** Caleb's work (the X-Dome rebuild, the EXPED Ultra 5R, the Waratah, the NEMO Moonlite and the Helinox Table Zero LT, and the Dagger and X-Mid tents for Kevin's and Mikey's camps) now sits alongside Harry's (the SummitSeeker, the Tensor, the Fillo, the Alton chair and the Aether pack).
+
+- **Harry's quilt:** his "Sleeping bag" item is now "Quilt", "Neve Gear Waratah", with Neve's product link (`proc:quilt/neve-gear-waratah`), as in Caleb's kit. It lies over his Tensor in the SummitSeeker. Its page moved from `/gear/harry/gear/sleeping-bag/` to `/gear/harry/gear/quilt/`. No weight yet: it depends on a rating and size that aren't known.
+- **Fitting the Waratah to a different pad:** it was drawn over Caleb's EXPED (52 cm wide and 7 cm thick), and Harry's Tensor is 64 cm wide and 8.4 cm to its top. Over the torso, the Tensor's sides poked out under the quilt's flanks.
+  - `buildWaratah` now takes the torso arch's half-width as well as the pad's thickness. `torsoFor(width)` keeps it 4 cm clear of the pad's sides, and never narrower than over the EXPED.
+  - The real pad tells the quilt how thick and wide it is (`top` and `width` on the Tensor's `KitModel`). Without a real pad the quilt keeps the EXPED's numbers, so Caleb's camp is unchanged.
+- **How the two branches' approaches fit together** (`camp.ts`):
+  - Harry's real kit comes from `REAL_KIT` by `proc:<type>/<variant>`. Caleb's comes from the stand-in builders themselves (`createPad`, `createQuilt` and `createChair` in `gear-models.ts`), by variant.
+  - A chair item takes `REAL_KIT` first, so Harry's Alton stays an Alton; any other chair gets the Moonlite.
+  - The kit lies along a tent's `yaw` (Caleb's X-Dome), and a real pad lifts what lies on it (Harry's Tensor).
+  - Both branches had added a `chair` gear type and drawing. Caleb's are kept, since the later of each pair was the one in effect.
+  - Every camp's layout has a chair spot now (Caleb's). Harry's stays where his Alton was placed.
+- **Measured** (desktop, high tier): Harry's campsite is at 50 calls, 182k triangles and 19 programs (47, 171k and 18 before the merge). The quilt is five draw calls where the stand-in bag was two.
+- **Validated:**
+  - The real-kit test now also checks Harry's Waratah and Kevin's stand-in bag. The Waratah is found by its cord locks' mesh, since its object shares the stand-in quilt's name.
+  - The tent test expects the quilt's hotspot, and its card names the Waratah.
+  - The flat-lay fallback screenshots are re-recorded. They add the quilt and the pack's brand line, take Caleb's chair drawing and type order, and read "Credits" in the footer.
+  - Every other test passes on desktop, phone and WebKit, and in the biome suites, except two budget checks that already fail on Caleb's branch before the merge:
+    - Kevin's campsite: 252.6k triangles against 250k. It's 251.6k on Caleb's branch (the Dagger is about 18k), plus about 1k for the snow leopard.
+    - Caleb's campsite: 88 draw calls against 60, as his entries above record.
+- **Not yet:** bringing Kevin's and Caleb's campsites back within budget. The least visible trims for Kevin's would be about 2% fewer spruces, or fewer sides on the Dagger's seam and pole tubes.
 
 ---
 
@@ -767,7 +887,7 @@ If scanning disappoints, the other routes still stand: an AI image-to-3D draft (
 
 ### 6.2 Gear
 
-**Now: generic placeholders**, built with the geometry kit so they're properly sized and lit, and need no licences. The first real models are Harry's: his tent, the Zorali SummitSeeker 2P (Progress, 18 October 2026), his pad, pillow and chair, the NEMO Tensor All-Season, NEMO Fillo and Alton Lightweight Camp Chair (Progress, 20 October 2026), and his pack, the Osprey Aether 65 (Progress, 22 October 2026). All are parametric, as planned below, from their photos and spec sheets.
+**Now: generic placeholders**, built with the geometry kit so they're properly sized and lit, and need no licences. The first real models were Harry's tent, the Zorali SummitSeeker 2P, and Caleb's chair, the NEMO Moonlite (Progress, 18 October 2026). Then came Caleb's table, X-Dome, mat and quilt (19 October) and Harry's pad, pillow and chair (20 October). Harry's pack followed (22 October), and his quilt, a Neve Gear Waratah like Caleb's (23 October). All are parametric, as planned below, from their photos and spec sheets.
 
 | Item | Placeholder now | Later | Triangles |
 | --- | --- | --- | --- |

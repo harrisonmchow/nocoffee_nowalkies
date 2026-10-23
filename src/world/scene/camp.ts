@@ -1,7 +1,9 @@
 // The camp: a tent and a campfire, the person and their kit. The tent is a
 // generic dome stand-in until a camp's gear names a real one (Harry's
-// SummitSeeker: summitseeker.ts), and so is each piece of kit (Harry's pad,
-// pillow and chair: kit-models.ts); the fire stays.
+// SummitSeeker: summitseeker.ts; Caleb's X-Dome: xdome.ts; Kevin's Dagger:
+// dagger.ts; Mikey's X-Mid Pro 2: xmid.ts), and so is each piece of kit
+// (Harry's pad, pillow, chair and pack: kit-models.ts; Caleb's mat, quilt,
+// chair and table, by variant: gear-models.ts); the fire stays.
 import {
   type MeshStandardMaterial,
   AdditiveBlending,
@@ -33,6 +35,7 @@ import type { CampItem } from '../route';
 import { createPropMaterial } from './props-material';
 import {
   createBottle,
+  createChair,
   createCar,
   createDog,
   createFigure,
@@ -43,10 +46,14 @@ import {
   createQuilt,
   createSleepingBag,
   createStove,
+  createTable,
   type GearModel,
 } from './gear-models';
 import { createAltonChair, createFilloPillow, createOspreyAether, createTensorPad, type KitModel } from './kit-models';
 import { createSummitSeeker } from './summitseeker';
+import { createXDome } from './xdome';
+import { createDagger } from './dagger';
+import { createXMid } from './xmid';
 
 // ---------------------------------------------------------------- tent
 
@@ -376,8 +383,8 @@ type Tent = {
   /** What you point at to pick the tent. */
   shell: Object3D;
   materials: MeshStandardMaterial[];
-  /** Where the sleeping kit and the headtorch go, in the tent's own frame. */
-  inside: typeof INSIDE;
+  /** Where the sleeping kit and the headtorch go, in the tent's own frame, and how the kit is turned (an inner on the slant). */
+  inside: typeof INSIDE & { yaw?: number };
   /** Its hotspot, in its own frame. */
   anchor: Vector3;
   update(tentGlow: number): void;
@@ -388,9 +395,12 @@ type Tent = {
 /** Real tents, by the variant in a kit's `proc:tent/<variant>` model. */
 const REAL_TENTS: Record<string, (uniforms: WorldUniforms, starLayers: number) => Tent> = {
   'zorali-summitseeker-2p': createSummitSeeker,
+  'durston-x-dome-2': createXDome,
+  'nemo-dagger-osmo-3p': createDagger,
+  'durston-x-mid-pro-2': createXMid,
 };
 
-/** Real kit, by the `<type>/<variant>` in an item's `proc:` model; the type alone gets its stand-in. */
+/** Real kit, by the `<type>/<variant>` in an item's `proc:` model; the type alone gets its stand-in (or, for some types, a real one by variant: gear-models.ts). */
 const REAL_KIT: Record<string, (kit: { uniforms: WorldUniforms; starLayers: number }) => KitModel> = {
   'sleeping-pad/nemo-tensor-all-season': createTensorPad,
   'pillow/nemo-fillo': createFilloPillow,
@@ -399,6 +409,8 @@ const REAL_KIT: Record<string, (kit: { uniforms: WorldUniforms; starLayers: numb
 };
 /** The stand-in pad's height: the tent's bed and pillow spots sit on it, and rise with a thicker pad. */
 const STAND_IN_PAD_TOP = 0.055;
+/** Where a camp table stands, in the chair's own space: off its left armrest (+x), level with the seat. */
+const TABLE_BESIDE_CHAIR = { x: 0.5, z: 0.05 };
 
 export type CampLayout = {
   tent: { x: number; z: number; rotation: number; colour: string };
@@ -408,12 +420,12 @@ export type CampLayout = {
   pack: { x: number; z: number; rotation: number };
   stove: { x: number; z: number };
   water: { x: number; z: number };
+  /** Where a camp chair sits, if the kit has one: by the fire, facing it. */
+  chair: { x: number; z: number; rotation: number };
   /** Where a dog stands, if the person's camp has one: between them and the fire, side-on to the view. */
   dog: { x: number; z: number; rotation: number };
   /** A car parked at the camp, if the setting has one (Mikey's, on the sand). */
   car?: { x: number; z: number; rotation: number; colour?: string };
-  /** Where a camp chair stands, if the person's kit has one: by the fire, facing it. */
-  chair?: { x: number; z: number; rotation: number };
   boulders: number;
 };
 
@@ -589,6 +601,8 @@ export function createCamp(
       const kindOf = (item: CampItem) => item.model?.replace(/^proc:/, '').split('/') ?? [];
       const pads = items.filter((i) => kindOf(i)[0] === 'sleeping-pad');
       let lift = 0;
+      // A real pad's top and width, for a real quilt to drape over.
+      let under: { top?: number; width?: number } = {};
       for (const item of [...pads, ...items.filter((i) => !pads.includes(i))]) {
         const [model, variant] = kindOf(item);
         const real = variant ? REAL_KIT[`${model}/${variant}`] : undefined;
@@ -600,22 +614,30 @@ export function createCamp(
         if (model === 'pack') built = place(real ? real(kitArgs) : createPack(kitArgs, item.colour), layout.pack.x, layout.pack.z, layout.pack.rotation);
         else if (model === 'stove-pot') built = place(createStove(kitArgs), layout.stove.x, layout.stove.z, 0);
         else if (model === 'bottle') built = place(createBottle(kitArgs, item.colour), layout.water.x, layout.water.z, 0);
+        else if (model === 'chair') built = place(real ? real(kitArgs) : createChair(kitArgs, item.model?.split('/').slice(1)), layout.chair.x, layout.chair.z, layout.chair.rotation);
+        else if (model === 'table') {
+          // Beside the chair, at its left hand, the long side along it.
+          const { x, z, rotation } = layout.chair;
+          const [side, ahead] = [TABLE_BESIDE_CHAIR.x, TABLE_BESIDE_CHAIR.z];
+          const at = { x: x + side * Math.cos(rotation) + ahead * Math.sin(rotation), z: z - side * Math.sin(rotation) + ahead * Math.cos(rotation) };
+          built = place(createTable(kitArgs), at.x, at.z, rotation + Math.PI / 2);
+        }
         else if (model === 'sleeping-pad') {
           const at = inTent(spots.pad);
-          const pad: KitModel = real ? real(kitArgs) : createPad(kitArgs, item.colour);
-          built = place(pad, at.x, at.z, 0, tent.group, at.y);
+          const pad: KitModel = real ? real(kitArgs) : createPad(kitArgs, item.colour, item.model?.split('/').slice(1));
+          built = place(pad, at.x, at.z, spots.yaw ?? 0, tent.group, at.y);
           lift = (pad.top ?? STAND_IN_PAD_TOP) - STAND_IN_PAD_TOP;
+          under = { top: pad.top, width: pad.width };
         } else if (model === 'sleeping-bag' || model === 'quilt') {
           const at = inTent(spots.bed);
-          const make = model === 'quilt' ? createQuilt : createSleepingBag;
-          built = place(make(kitArgs, item.colour), at.x, at.z, 0, tent.group, at.y + lift);
+          // A real quilt drapes over the pad to the floor, so it's told how thick and wide a real pad is.
+          const made = model === 'quilt' ? createQuilt(kitArgs, item.colour, item.model?.split('/').slice(1), under) : createSleepingBag(kitArgs, item.colour);
+          built = place(made, at.x, at.z, spots.yaw ?? 0, tent.group, at.y + lift);
         } else if (model === 'pillow') {
           const at = inTent(spots.pillow);
           // A real pillow lies across the pad's head, pressed into it a little; the stand-in sits where it always has.
-          if (real) built = place(real(kitArgs), at.x, at.z, Math.PI / 2, tent.group, spots.pad.y + STAND_IN_PAD_TOP + lift - 0.006);
-          else built = place(createPillow(kitArgs, item.colour), at.x, at.z, 0, tent.group, at.y + lift);
-        } else if (model === 'chair' && real && layout.chair) {
-          built = place(real(kitArgs), layout.chair.x, layout.chair.z, layout.chair.rotation);
+          if (real) built = place(real(kitArgs), at.x, at.z, (spots.yaw ?? 0) + Math.PI / 2, tent.group, spots.pad.y + STAND_IN_PAD_TOP + lift - 0.006);
+          else built = place(createPillow(kitArgs, item.colour), at.x, at.z, spots.yaw ?? 0, tent.group, at.y + lift);
         } else if (model === 'headtorch') {
           const at = inTent(spots.headtorch);
           built = place(createHeadtorch(kitArgs), at.x, at.z, 0, tent.group, at.y);

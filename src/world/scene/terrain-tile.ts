@@ -1,7 +1,7 @@
 // Builds one biome's terrain tile from its height field. Pure JS with no DOM,
 // so it runs in the terrain worker (and on the main thread as a fallback).
 import type { BiomeId } from '../../data/biomes';
-import { terrainFor } from './terrain-fields';
+import { terrainFor, type HeightField } from './terrain-fields';
 
 export type TileRequest = {
   biome: BiomeId;
@@ -123,4 +123,34 @@ export function buildTile({ biome, seed, resolution, radius, power }: TileReques
   }
 
   return { positions, normals, fields, indices, heightmap, heightmapSize: COARSE, radius, minHeight, maxHeight };
+}
+
+/**
+ * The height of the tile as drawn: its triangles, not the field they sample.
+ * Away from the camp the warped grid's cells are 10–20 m across, and over a
+ * rise the drawn ground sits well below the field, so whatever's planted on
+ * the field would float. The grid is separable (a column's x and a row's z
+ * are fixed), so each cell is an axis-aligned rectangle split like the indices.
+ */
+export function surfaceOf(tile: TileData, power: number): HeightField {
+  const { positions, radius } = tile;
+  const side = Math.round(Math.sqrt(positions.length / 3));
+  const resolution = side - 1;
+  const cell = (v: number) => {
+    const t = Math.sign(v) * Math.min(1, Math.abs(v) / radius) ** (1 / power);
+    return Math.min(resolution - 1, Math.max(0, Math.floor(((t + 1) / 2) * resolution)));
+  };
+  return (x, z) => {
+    const i = cell(x);
+    const j = cell(z);
+    const a = j * side + i;
+    const b = a + 1;
+    const c = a + side;
+    const d = c + 1;
+    const u = (x - positions[a * 3]) / (positions[b * 3] - positions[a * 3]);
+    const v = (z - positions[a * 3 + 2]) / (positions[c * 3 + 2] - positions[a * 3 + 2]);
+    const [ha, hb, hc, hd] = [a, b, c, d].map((k) => positions[k * 3 + 1]);
+    // Triangles (a, c, b) and (b, c, d): the diagonal runs from b to c.
+    return u + v <= 1 ? ha + u * (hb - ha) + v * (hc - ha) : hd + (1 - u) * (hc - hd) + (1 - v) * (hb - hd);
+  };
 }

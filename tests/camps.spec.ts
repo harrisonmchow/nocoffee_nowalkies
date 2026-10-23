@@ -586,7 +586,7 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     expect((await shown()).cloud).toBe(false);
   });
 
-  test('Harry’s tent is his Zorali SummitSeeker; a camp without a real tent keeps the stand-in', async ({ page }) => {
+  test('Harry’s tent is his Zorali SummitSeeker, and Kevin’s is his NEMO Dagger', async ({ page }) => {
     const parts = () => page.evaluate(() => ['summitseeker', 'summitseeker-fly', 'summitseeker-inner', 'summitseeker-canopy', 'summitseeker-frame'].map((name) => window.__world!.shows(name)));
     // Pitched as soon as the camp is built, so it's there from the landscape, before the kit arrives.
     await openCamp(page, 'harry', 'alpine-aurora');
@@ -595,14 +595,16 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     expect(await parts()).toEqual([true, true, true, true, true]);
     await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
     expect(await parts()).toEqual([false, false, false, false, false]);
+    expect(await page.evaluate(() => ['dagger', 'dagger-fly', 'dagger-door', 'dagger-poles'].map((name) => window.__world!.shows(name)))).toEqual([true, true, true, true]);
   });
 
-  test('Harry’s pad, pillow, chair and pack are his own NEMO Tensor, NEMO Fillo, Alton and Osprey Aether; other camps keep the stand-ins', async ({ page }) => {
-    const parts = () => page.evaluate(() => ['tensor-pad', 'fillo-pillow', 'alton-chair', 'osprey-aether', 'pad', 'pillow', 'pack'].map((name) => window.__world!.shows(name)));
+  test('Harry’s pad, pillow, chair, pack and quilt are his own NEMO Tensor, NEMO Fillo, Alton, Osprey Aether and Neve Gear Waratah; other camps keep the stand-ins', async ({ page }) => {
+    // The Waratah by its cord locks' mesh: its object shares the stand-in quilt's name.
+    const parts = () => page.evaluate(() => ['tensor-pad', 'fillo-pillow', 'alton-chair', 'osprey-aether', 'cord-locks', 'pad', 'pillow', 'pack', 'sleeping-bag'].map((name) => window.__world!.shows(name)));
     await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
-    expect(await parts()).toEqual([true, true, true, true, false, false, false]);
+    expect(await parts()).toEqual([true, true, true, true, true, false, false, false, false]);
     await openCamp(page, 'kevin', 'rockies-night', 't=4', 'camp');
-    expect(await parts()).toEqual([false, false, false, false, true, true, true]);
+    expect(await parts()).toEqual([false, false, false, false, false, true, true, true, true]);
   });
 
   test('Kevin’s camp has its snow leopard; the other camps don’t', async ({ page }) => {
@@ -615,7 +617,7 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     expect(await leopard()).toBe(false);
   });
 
-  test('clicking the tent goes inside, to the sleeping bag, the mat and the pillow', async ({ page }, testInfo) => {
+  test('clicking the tent goes inside, to the quilt, the mat and the pillow', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'phone', 'the phone taps its way in, below');
     await openCamp(page, 'harry', 'alpine-aurora', 't=4', 'camp');
     await uiReady(page);
@@ -625,14 +627,21 @@ test.describe('the landscape, the campsite and the tent (M4)', () => {
     await page.mouse.click(at.x, at.y);
     await expect.poll(() => level(page)).toBe('tent');
     await uiReady(page);
-    expect(Object.keys(await page.evaluate(() => window.__world!.anchors())).sort()).toEqual(['headtorch', 'pillow', 'sleeping-bag', 'sleeping-pad']);
+    expect(Object.keys(await page.evaluate(() => window.__world!.anchors())).sort()).toEqual(['headtorch', 'pillow', 'quilt', 'sleeping-pad']);
     // Once the camera is in and the fly has faded, each has its hotspot, clear of the panel.
     await still(page);
-    for (const name of ['Sleeping pad', 'Sleeping bag', 'Pillow', 'Headtorch']) {
+    for (const name of ['Sleeping pad', 'Quilt', 'Pillow', 'Headtorch']) {
       await expect(page.locator('.wui-hotspot:not(.is-off)', { hasText: name }), name).toHaveCount(1);
     }
     await expect(page.getByRole('button', { name: 'Leave the tent' })).toBeVisible();
     await page.screenshot({ path: `${OUT}/m4-tent-${testInfo.project.name}.png` });
+
+    // The quilt by its hotspot: his Neve Gear Waratah.
+    await dot(page, 'Quilt').click();
+    await expect(card(page)).toContainText('Neve Gear Waratah');
+    await page.keyboard.press('Escape');
+    await expect(card(page)).toBeHidden();
+    expect(await level(page)).toBe('tent');
 
     // The pillow, pinned by its hotspot, with a link to its page.
     await dot(page, 'Pillow').click();

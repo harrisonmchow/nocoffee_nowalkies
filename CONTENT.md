@@ -72,7 +72,7 @@ items:
 
 **Clothing types:** `hat`, `gloves`, `rain-jacket`, `down-jacket`, `fleece`, `shirt`, `pants`, `socks`, `shoes`.
 
-**Gear types:** `bag`, `tent`, `chair`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `accessories`.
+**Gear types:** `bag`, `tent`, `sleeping-pad`, `sleeping-bag`, `quilt`, `pillow`, `cooking`, `water`, `electronics`, `first-aid`, `chair`, `table`, `accessories`.
 
 The type decides where the item sits on the flat-lay. To add a new type, add one line to `src/data/gear-types.ts`.
 
@@ -126,14 +126,17 @@ Only items with `scene` appear in the camp. Each model has its own place, and it
 
 | Where | Models |
 | --- | --- |
-| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack`, `proc:stove-pot`, `proc:bottle`, a real chair (below) |
-| Inside the tent | `proc:sleeping-pad` or a real pad (below), `proc:sleeping-bag` or `proc:quilt`, `proc:pillow` or a real pillow (below), `proc:headtorch` |
+| At the campsite | `proc:tent/trekking-pole` (the stand-in) or a real tent (below), `proc:pack` or a real pack (below), `proc:stove-pot`, `proc:bottle`, a chair (below), and a table beside the chair (below) |
+| Inside the tent | `proc:sleeping-pad` or a real pad (below), `proc:sleeping-bag`, `proc:quilt` or a real quilt (below), `proc:pillow` or a real pillow (below), `proc:headtorch` |
 
 Real tents, by model id:
 
 | Model | Tent | Where it's used |
 | --- | --- | --- |
 | `proc:tent/zorali-summitseeker-2p` | Zorali SummitSeeker 2P, rebuilt from its four product photos and its listed size (220 cm long, 130 cm wide at the head, 105 cm at the foot, 110 cm high) | Harry's camp |
+| `proc:tent/durston-x-dome-2` | Durston X-Dome 2, drawn from photos of Caleb's own (ported from the `caleb/mountain-poc` branch): two crossing poles, a brow pole over the doors, a sage fly, about 210 × 130 cm and 117 cm tall | Caleb's camp |
+| `proc:tent/nemo-dagger-osmo-3p` | NEMO Dagger OSMO 3P | Kevin's camp |
+| `proc:tent/durston-x-mid-pro-2` | Durston X-Mid Pro 2, pitched with its front door open as in Durston's photos | Mikey's camp |
 
 A camp whose tent item names a real tent pitches it in place of the stand-in, and the sleeping kit goes inside it. Any other `proc:tent/...` keeps the stand-in. The tent's card shows the item's `brand` line, so Harry's says "Zorali SummitSeeker 2P". Its weight isn't filled in yet: add `weightG` once it's weighed (the listing gives 1620 g trail weight).
 
@@ -142,11 +145,19 @@ Real kit, by model id:
 | Model | Kit | Where it's used |
 | --- | --- | --- |
 | `proc:sleeping-pad/nemo-tensor-all-season` | NEMO Tensor All-Season, Regular Wide: 183 × 64 cm and 8.9 cm thick, rebuilt from its five product photos (the listing gives the thickness; the length and width are NEMO's Regular Wide size) | Harry's tent |
+| `proc:sleeping-pad/exped-ultra-5r` | EXPED Ultra 5R, size M: 183 × 52 × 7 cm, drawn from its product photos | Caleb's tent |
+| `proc:quilt/neve-gear-waratah` | Neve Gear Waratah down quilt (−6 °C, Regular), drawn from Neve's product photos, laid over the mat with its opening down | Caleb's and Harry's tents |
 | `proc:pillow/nemo-fillo` | NEMO Fillo in Silt Stripe, 43 × 27 × 10 cm, rebuilt from its five product photos | Harry's tent |
 | `proc:chair/alton-lightweight` | Alton Lightweight Camp Chair, 50 × 52 × 67 cm, rebuilt from its five product photos | Harry's campsite, by the fire |
+| `proc:chair/nemo-moonlite` | NEMO Moonlite, 50 × 51 × 64 cm, rebuilt from its product photos and listed size | Caleb's campsite, facing the fire |
+| `proc:table/helinox-table-zero-lt` | Helinox Table Zero LT, 30 × 49.5 × 31 cm, drawn from its product photos | Caleb's campsite, beside the chair |
 | `proc:pack/osprey-aether-65` | Osprey Aether 65 Men's, Large/X-Large, in Deep Water Blue: 80 cm high, rebuilt from two photos of it (front and back) and its listed size (80 × 40 × 28 cm) | Harry's campsite, by the tent |
 
-A pad, pillow or pack item that names a real model gets it in place of the stand-in, and the bag and pillow then lie on the real pad's top. A chair only appears with a real model (there's no stand-in) and a chair spot in the camp's layout (`chair` in `biome-set.ts`); only Harry's camp has one. None of the four has a weight yet: add `weightG` once they're weighed (the listings give 530 g for the pad, 260 g for the pillow, 850 g for the chair and 2.1 kg for the pack).
+A pad, pillow, quilt or pack item that names a real model gets it in place of the stand-in. The bag or quilt and the pillow then lie on the pad's top, and a real quilt drapes over the pad to the floor, clear of its sides.
+
+Every camp's layout has a chair spot by the fire, facing it (`chair` in `biome-set.ts`). A `proc:chair` item that doesn't name a real chair gets the NEMO Moonlite in Smokey Olive; add a colourway to pick another: `proc:chair/nemo-moonlite/black-pearl`, `/quicksilver` or `/brilliant-blue`. A table item stands beside the chair, at its left hand.
+
+Weights: Harry's real kit has none yet, so add `weightG` once each is weighed. The listings give 530 g for the pad, 260 g for the pillow, 850 g for the chair and 2.1 kg for the pack. NEMO lists 872 g as the Moonlite's minimum weight. The EXPED's and the Waratah's depend on a size and rating that aren't known.
 
 Clothing shows on the person instead. They wear the colours of any clothing item that has a `colour`: a jacket (rain jacket, down jacket or fleece), the pants, the hat and the shoes.
 
